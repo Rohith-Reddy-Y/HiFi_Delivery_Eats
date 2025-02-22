@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DECIMAL, TIMESTAMP, ForeignKey, DATETIME
+from sqlalchemy import create_engine, Integer, String, Text, Boolean, DECIMAL, TIMESTAMP, ForeignKey, DATETIME
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from datetime import datetime
 
@@ -6,6 +6,7 @@ from datetime import datetime
 
 # Database Connection
 engine = create_engine("sqlite:///menu.db", echo=True)
+# for the output shown use Echo=True in the connection with db.
 
 # Base Class
 class Base(DeclarativeBase):
@@ -13,14 +14,16 @@ class Base(DeclarativeBase):
 
 # Menu Table
 class Menu(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "menu"
     menu_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     menu_items: Mapped[list["MenuItem"]] = relationship("MenuItem", back_populates="menu")
 
 # MenuItem Table
 class MenuItem(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "menu_item"
     menu_item_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     menu_id: Mapped[str] = mapped_column(ForeignKey("menu.menu_id"), nullable=False)
@@ -40,12 +43,14 @@ class MenuItem(Base):
 
 # Category Table
 class Category(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "category"
     category_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
 # ItemCategoryMapping Table
 class ItemCategoryMapping(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "item_category_mapping"
     mapping_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     menu_item_id: Mapped[str] = mapped_column(ForeignKey("menu_item.menu_item_id"), nullable=False)
@@ -53,6 +58,7 @@ class ItemCategoryMapping(Base):
 
 # Discount Table
 class Discount(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "discount"
     discount_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     menu_item_id: Mapped[str] = mapped_column(ForeignKey("menu_item.menu_item_id"), nullable=False)
@@ -63,6 +69,7 @@ class Discount(Base):
 
 # Rating Table
 class Rating(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "rating"
     rating_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     menu_item_id: Mapped[str] = mapped_column(ForeignKey("menu_item.menu_item_id"), nullable=False)
@@ -73,6 +80,7 @@ class Rating(Base):
 
 # CustomerOrders Table
 class CustomerOrders(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "customer_orders"
     customer_order_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     customer_id: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -82,6 +90,7 @@ class CustomerOrders(Base):
 
 # PersonalizedRecommendations Table
 class PersonalizedRecommendations(Base):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "personalized_recommendations"
     personalized_recommendations_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     customer_id: Mapped[str] = mapped_column(String(10), nullable=False)
