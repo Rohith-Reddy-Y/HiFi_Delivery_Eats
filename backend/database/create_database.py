@@ -12,21 +12,21 @@ engine = create_engine("sqlite:///menu.db", echo=True)
 class Base(DeclarativeBase):
     pass
 
-# Menu Table
-class Menu(Base):
-    __table_args__ = {'extend_existing': True}
-    __tablename__ = "menu"
-    menu_id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    menu_items: Mapped[list["MenuItem"]] = relationship("MenuItem", back_populates="menu")
+# Menu Table : Deleting the menu table. Not required for one restaurant.
+# class Menu(Base):
+#     __table_args__ = {'extend_existing': True}
+#     __tablename__ = "menu"
+#     menu_id: Mapped[str] = mapped_column(String(10), primary_key=True)
+#     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+#     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+#     menu_items: Mapped[list["MenuItem"]] = relationship("MenuItem", back_populates="menu")
 
 # MenuItem Table
 class MenuItem(Base):
     __table_args__ = {'extend_existing': True}
     __tablename__ = "menu_item"
     menu_item_id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    menu_id: Mapped[str] = mapped_column(ForeignKey("menu.menu_id"), nullable=False)
+    # menu_id: Mapped[str] = mapped_column(ForeignKey("menu.menu_id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     price: Mapped[float] = mapped_column(DECIMAL(10,2), nullable=False)
@@ -37,7 +37,7 @@ class MenuItem(Base):
     is_best_seller: Mapped[bool] = mapped_column(Boolean, default=False)
     is_out_of_stock: Mapped[bool] = mapped_column(Boolean, default=False)
     scheduled_update_time: Mapped[datetime] = mapped_column(DATETIME, nullable=True)
-    menu: Mapped["Menu"] = relationship("Menu", back_populates="menu_items")
+    # menu: Mapped["Menu"] = relationship("Menu", back_populates="menu_items")
     discounts: Mapped[list["Discount"]] = relationship("Discount", back_populates="menu_item")
     ratings: Mapped[list["Rating"]] = relationship("Rating", back_populates="menu_item")
 

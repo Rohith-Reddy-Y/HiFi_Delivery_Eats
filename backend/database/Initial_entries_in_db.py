@@ -117,9 +117,9 @@ from datetime import datetime
 # Creating a new session
 session = Session(bind=engine)
 
-# Inserting data into Menu table
-menu = Menu(menu_id="M001")
-session.add(menu)
+# # Inserting data into Menu table
+# menu = Menu(menu_id="M001")
+# session.add(menu)
 
 # Inserting data into Category table
 categories = [
@@ -135,19 +135,19 @@ session.add_all(categories)
 
 # Inserting data into MenuItem table
 menu_items = [
-    MenuItem(menu_item_id="MI001", menu_id="M001", name="Spring Rolls", description="Crispy vegetarian rolls", price=150,
+    MenuItem(menu_item_id="MI001", name="Spring Rolls", description="Crispy vegetarian rolls", price=150,
              image_url="https://github.com/AadityaRajGupta/HiFi_Delivery_Eats/blob/main/frontend/static/images/spring_rolls.jpg", category="Appetizers", nutrient_value="Low Fat", calorie_count=200,
              is_best_seller=True, is_out_of_stock=False, scheduled_update_time=None),
-    MenuItem(menu_item_id="MI002", menu_id="M001", name="Grilled Chicken", description="Juicy grilled chicken with herbs", price=350,
+    MenuItem(menu_item_id="MI002", name="Grilled Chicken", description="Juicy grilled chicken with herbs", price=350,
              image_url="https://github.com/AadityaRajGupta/HiFi_Delivery_Eats/blob/main/frontend/static/images/grilled_chicken.jpg", category="Main Course", nutrient_value="High Protein", calorie_count=450,
              is_best_seller=False, is_out_of_stock=False, scheduled_update_time=None),
-    MenuItem(menu_item_id="MI003", menu_id="M001", name="Chocolate Cake", description="Rich and creamy chocolate cake", price=120,
+    MenuItem(menu_item_id="MI003", name="Chocolate Cake", description="Rich and creamy chocolate cake", price=120,
              image_url="https://github.com/AadityaRajGupta/HiFi_Delivery_Eats/blob/main/frontend/static/images/chocolate_cake.jpg", category="Desserts", nutrient_value="High Sugar", calorie_count=350,
              is_best_seller=True, is_out_of_stock=False, scheduled_update_time=None),
-    MenuItem(menu_item_id="MI004", menu_id="M001", name="Caesar Salad", description="Fresh lettuce with Caesar dressing", price=175,
+    MenuItem(menu_item_id="MI004", name="Caesar Salad", description="Fresh lettuce with Caesar dressing", price=175,
              image_url="https://github.com/AadityaRajGupta/HiFi_Delivery_Eats/blob/main/frontend/static/images/caesar_salad.jpg", category="Salads", nutrient_value="High Fiber", calorie_count=150,
              is_best_seller=False, is_out_of_stock=False, scheduled_update_time=None),
-    MenuItem(menu_item_id="MI005", menu_id="M001", name="Mango Smoothie", description="Refreshing mango smoothie", price=100,
+    MenuItem(menu_item_id="MI005", name="Mango Smoothie", description="Refreshing mango smoothie", price=100,
              image_url="https://github.com/AadityaRajGupta/HiFi_Delivery_Eats/blob/main/frontend/static/images/mango_smoothie.jpg", category="Beverages", nutrient_value="Vitamins Rich", calorie_count=180,
              is_best_seller=True, is_out_of_stock=False, scheduled_update_time=None)
 ]
