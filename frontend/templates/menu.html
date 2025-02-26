@@ -7,8 +7,8 @@
       href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../static/css/style.css" />
-    <link rel="stylesheet" href="../static/css/menu.css" />
+    <link rel="stylesheet" href="templates/menu.css" />
+    <link rel="stylesheet" href="templates/style.css" />
     <title>Menu Management</title>
   </head>
   <body>
@@ -25,27 +25,30 @@
 
       <label>Category:</label>
       <select required>
-        <option value="">Select category</option>
-        <option value="veg">Veg</option>
-        <option value="non-veg">Non-Veg</option></select
+        <option value="">CATEGORY</option>
+        <option value="veg">VEG</option>
+        <option value="non-veg">NON-VEG</option></select
       ><br /><br />
 
       <label>Subcategory:</label>
       <select required>
-        <option value="">Select subcategory</option>
-        <option value="starter">Starter</option>
-        <option value="biryani">Biryani</option>
-        <option value="milkshakes">Milkshakes</option>
-        <option value="curries">Curries</option>
-        <option value="breakfast">Breakfast</option>
-        <option value="icecreams">Icecreams</option></select
+        <option value="">SUB-CATEGORY</option>
+        <option value="Starter">Starter</option>
+        <option value="Soups">Soups</option>
+        <option value="Salads">Salads</option>
+        <option value="Breads">Breads</option>
+        <option value="Main Course">Main Course</option>
+        <option value="Beverages">Beverages</option>
+        <option value="Breakfast">Breakfast</option>
+        <option value="Bryani">Biryani</option>
+        <option value="Icecreams">Icecreams</option></select
       ><br /><br />
 
       <label>Discount (%):</label>
-      <input type="number" min="0" max="100" /><br /><br />
+      <input type="number" min="0" max="100" required /><br /><br />
 
       <label>Upload Image:</label>
-      <input type="file" accept="image/*" /><br /><br />
+      <input type="file" accept="image/*" required /><br /><br />
 
       <label>Best Seller:</label>
       <input type="radio" name="best_seller" value="yes" required /> Yes
@@ -78,31 +81,9 @@
       </thead>
       <tbody>
         <!-- Rows will be added dynamically here -->
-        <tr>
-          <td>Veg Biryani</td>
-          <td>Delicious vegetable biryani</td>
-          <td>₹ 150</td>
-          <td>Veg</td>
-          <td>Biryani</td>
-          <td>10%</td>
-          <td>[Image]</td>
-          <td>Yes</td>
-          <td>20</td>
-          <td>Edit | Delete</td>
-        </tr>
-        <tr>
-          <td>Chicken Curry</td>
-          <td>Spicy chicken curry</td>
-          <td>₹ 80</td>
-          <td>Non-Veg</td>
-          <td>Curries</td>
-          <td>5%</td>
-          <td>[Image]</td>
-          <td>No</td>
-          <td>15</td>
-          <td>Edit | Delete</td>
-        </tr>
+        <tr></tr>
       </tbody>
     </table>
+    <script src="js/menu.js"></script>
   </body>
 </html>
