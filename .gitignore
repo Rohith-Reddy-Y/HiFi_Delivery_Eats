@@ -164,3 +164,15 @@ cython_debug/
 my_help.txt
 research/
 create_structure.py
+backend/app.py
+backend/requirements.txt
+backend/database/db_connection.py
+backend/database/generate_key.py
+backend/database/image.png
+backend/database/models.py
+frontend/templates/index.html
+.gitignore
+backend/app.py
+backend/requirements.txt
+frontend/templates/index.html
+

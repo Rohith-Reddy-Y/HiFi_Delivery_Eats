@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--========== BOX ICONS ==========-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <!--========== CSS ==========-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <title>Hifi Delviery Website</title>
+  </head>
+  <body>
+    <!--========== SCROLL TOP ==========-->
+    <a href="#" class="scrolltop" id="scroll-top">
+      <i class="bx bx-chevron-up scrolltop__icon"></i>
+    </a>
+
+    <!--========== HEADER ==========-->
+    <header class="l-header" id="header">
+      <nav class="nav bd-container">
+        <a href="#" class="nav__logo">Hifi Delivery Eats</a>
+
+        <div class="nav__menu" id="nav-menu">
+          <ul class="nav__list">
+
+            <li class="nav__item">
+              <form class="search-form">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search..."
+                  aria-label="Search"
+                />
+                <button type="submit" class="search-button">
+                  <i class="bx bx-search"></i>
+                </button>
+              </form>
+            </li>
+                        <li class="nav__item">
+              <a href="#home" class="nav__link active-link">Home</a>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('menu') }}" class="nav__link">Menu</a>
+            </li>
+            <li class="nav__item">
+              <a href="#cart" class="nav__link">Cart</a>
+            </li>
+            <li class="nav__item">
+              <a href="#about" class="nav__link">About</a>
+            </li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Contact us</a>
+            </li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Sign </a>
+            </li>
+
+            <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
+          </ul>
+        </div>
+
+        <div class="nav__toggle" id="nav-toggle">
+          <i class="bx bx-menu"></i>
+        </div>
+      </nav>
+    </header>
+
+    <main class="l-main">
+      <!--========== HOME ==========-->
+      <section class="home" id="home">
+        <div class="home__container bd-container bd-grid">
+          <div class="home__data">
+            <h1 class="home__title">Hifi Delivery Eats</h1>
+            <h2 class="home__subtitle">
+              Experience the best food delivery service with Hifi Delivery Eats!
+              <br />
+            </h2>
+            <a href="{{ url_for('menu') }}" class="button">View Menu</a>
+            <div class="delivered-meals">
+              <p class="delivered-text" id="dynamic-text">
+                <span>1,000+</span> meals delivered last week!
+              </p>
+            </div>
+          </div>
+
+          <img src="{{ url_for('static', filename='images/home.png') }}" alt="" class="home__img" />
+        </div>
+      </section>
+
+      <!--========== MENU ==========-->
+      <section class="menu section bd-container" id="menu">
+        <span class="section-subtitle">Special</span>
+        <h2 class="section-title">Menu Items</h2>
+
+        <div class="menu__container bd-grid">
+          <div
+            class="menu__content"
+            data-name="Barbecue salad"
+            data-price="100.00"
+          >
+            <img src="{{ url_for('static', filename='images/caesar_salad.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Barbecue salad</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 100.00</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+
+          <div
+            class="menu__content"
+            data-name="Salad with fish"
+            data-price="12.00"
+          >
+            <img src="{{ url_for('static', filename='images/chocolate_cake.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Salad with fish</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 100.00</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+
+          <div
+            class="menu__content"
+            data-name="Spinach salad"
+            data-price="9.50"
+          >
+            <img src="{{ url_for('static', filename='images/grilled_chicken.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Spinach salad</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 500.00</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+
+          <div
+            class="menu__content"
+            data-name="Spinach salad"
+            data-price="9.50"
+          >
+            <img src="{{ url_for('static', filename='images/Fish-1.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Spinach salad</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 80.00</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+
+          <div
+            class="menu__content"
+            data-name="Spinach salad"
+            data-price="9.50"
+          >
+            <img src="{{ url_for('static', filename='images/Grill-1.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Spinach salad</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 120.00</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+          <div
+            class="menu__content"
+            data-name="Hyderabadi Biryani"
+            data-price="120.99"
+          >
+            <img src="{{ url_for('static', filename='images/Dessert-1.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Hyderabadi Biryani</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 120.99</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+                    <div
+            class="menu__content"
+            data-name="Hyderabadi Biryani"
+            data-price="120.99"
+          >
+            <img src="{{ url_for('static', filename='images/Burger-1.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Hyderabadi Biryani</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 120.99</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+                    <div
+            class="menu__content"
+            data-name="Hyderabadi Biryani"
+            data-price="120.99"
+          >
+            <img src="{{ url_for('static', filename='images/Bun-1.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Hyderabadi Biryani</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 120.99</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+                    <div
+            class="menu__content"
+            data-name="Hyderabadi Biryani"
+            data-price="120.99"
+          >
+            <img src="{{ url_for('static', filename='images/Breakfast-3.jpg') }}" alt="" class="menu__img" />
+            <h3 class="menu__name">Hyderabadi Biryani</h3>
+            <span class="menu__detail">Delicious dish</span>
+            <span class="menu__preci">₹ 120.99</span>
+            <a href="#" class="button menu__button"
+              ><i class="bx bx-cart-alt"></i
+            ></a>
+          </div>
+        </div>
+      </section>
+
+
+    <!--========== SCROLL REVEAL ==========-->
+    <script src="https://unpkg.com/scrollreveal"></script>
+
+    <!--========== MAIN JS ==========-->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
