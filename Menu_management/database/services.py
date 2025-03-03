@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, update, delete
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -9,6 +10,7 @@ PRIMARY KEY ID MAPPING:
 -----------------------
     U001 for user
     IC001 for category
+    ISC001 for subcategory
     MI001 for menu_item
     O001 for orders
     OI001 for order_item
@@ -36,31 +38,55 @@ class MenuService:
 # is_out_of_stock,  discount_percentage,  scheduled_update_time,
 
     def add_menu_item(self, name: str, description: str, price: float, image_url: str,
-                      category_name: str, nutrient_value: str, calorie_count: int,
-                      is_best_seller: bool = False, is_out_of_stock: bool = False,discount_percentage:int = 0,scheduled_update_time: datetime = None):
-        """Adds a new menu item and associates it with a category."""
+                  category_name: str, subcategory_name: str, nutrient_value: str, calorie_count: int,
+                  is_best_seller: bool = False, is_out_of_stock: bool = False, 
+                  discount_percentage: int = 0, scheduled_update_time: datetime = None):
+        """Adds a new menu item and associates it with a category and subcategory."""
+    
         try:
-            latest_menu_id = self.get_latest_id(MenuItem.menu_item_id)
-            menu_item_id = generate_next_id(latest_menu_id, "MI")
-            
-            category = self.session.execute(select(Category).where(Category.name == category_name)).scalar_one_or_none()
-            if not category:
-                latest_category_id = self.get_latest_id(Category.category_id)
-                category_id = generate_next_id(latest_category_id, "IC")
-                category = Category(category_id=category_id, name=category_name)
-                self.session.add(category)
-            
-            new_item = MenuItem(
-                menu_item_id=menu_item_id, name=name, description=description, price=price,
-                image_url=image_url, category_id=category.category_id, nutrient_value=nutrient_value,
-                calorie_count=calorie_count, is_best_seller=is_best_seller, is_out_of_stock=is_out_of_stock,
-                discount_percentage = discount_percentage,scheduled_update_time = scheduled_update_time
-            )
-            self.session.add(new_item)
-            self.session.commit()
-            return new_item
-        except Exception as e:
-            self.session.rollback()
+            with self.session.begin():  # Ensures atomic transactions
+                latest_menu_id = self.get_latest_id(MenuItem.menu_item_id)
+                menu_item_id = generate_next_id(latest_menu_id, "MI")
+
+                # Fetch or create category
+                category = self.session.execute(
+                    select(Category).where(Category.name == category_name)
+                ).scalar_one_or_none()
+
+                if not category:
+                    latest_category_id = self.get_latest_id(Category.category_id)
+                    category_id = generate_next_id(latest_category_id, "IC")
+                    category = Category(category_id=category_id, name=category_name)
+                    self.session.add(category)
+                    self.session.flush()  # Ensures category_id is available before use
+
+                # Fetch or create subcategory
+                subcategory = self.session.execute(
+                    select(Subcategory).where(Subcategory.name == subcategory_name)
+                ).scalar_one_or_none()
+
+                if not subcategory:
+                    latest_subcategory_id = self.get_latest_id(Subcategory.subcategory_id)
+                    subcategory_id = generate_next_id(latest_subcategory_id, "ISC")
+                    subcategory = Subcategory(subcategory_id=subcategory_id, name=subcategory_name, category_id=category.category_id)
+                    self.session.add(subcategory)
+                    self.session.flush()  # Ensures subcategory_id is available before use
+
+                # Create new menu item
+                new_item = MenuItem(
+                    menu_item_id=menu_item_id, name=name, description=description, price=price,
+                    image_url=image_url, category_id=category.category_id, subcategory_id=subcategory.subcategory_id,
+                    nutrient_value=nutrient_value, calorie_count=calorie_count,
+                    is_best_seller=is_best_seller, is_out_of_stock=is_out_of_stock,
+                    discount_percentage=discount_percentage, scheduled_update_time=scheduled_update_time
+                )
+
+                self.session.add(new_item)
+
+            return new_item  # Successfully added item (transaction auto-committed)
+    
+        except SQLAlchemyError as e:
+            self.session.rollback()  # Rollback only in case of errors
             raise e
 
     def update_menu_item(self, menu_item_id: str, **kwargs):
