@@ -61,6 +61,19 @@ document.addEventListener("DOMContentLoaded", function () {
   
 
   fetchItemsFromDB(); 
+  
+//   for showing the notification to the admin that something has changed
+function showNotification(message, type) {
+    const notification = document.createElement("div");
+    notification.className = `notification ${type} show`;
+    notification.innerText = message;
+  
+    document.body.appendChild(notification);
+  
+    setTimeout(() => {
+      notification.remove();
+    }, 5000);
+  }
 
   // Add event listener for form submission
   form.addEventListener("submit", function (event) {
@@ -69,35 +82,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Get form values
     const itemName = document.querySelector('input[type="text"]').value.trim();
     const description = document.querySelector("textarea").value.trim();
-    const price = document
-      .querySelector('input[type="number"][step="0.01"]')
-      .value.trim();
+    const price = document.querySelector('input[type="number"][step="0.01"]').value.trim();
     const category = document.querySelector("select").value;
     const subcategory = document.querySelectorAll("select")[1].value;
-    const discount =
-      document
-        .querySelector('input[type="number"][min="0"][max="100"]')
-        .value.trim() || 0; // Default to 0 if empty
+    const discount =document.querySelector('input[type="number"][min="0"][max="100"]').value.trim() || 0; // Default to 0 if empty
     const imageFile = document.querySelector('input[type="file"]').files[0];
-    const bestSeller = document.querySelector(
-      'input[name="best_seller"]:checked'
-    )?.value;
-    const stockAvailable = document.querySelector('input[type="number"][min="0"]')
-    .value.trim();
+    const bestSeller = document.querySelector('input[name="best_seller"]:checked')?.value;
+    const stockAvailable = document.querySelector('input[type="number"][min="0"]').value.trim();
 
     // Validate required fields
-    if (
-      !itemName ||
-      !description ||
-      !price ||
-      !category ||
-      !subcategory ||
-      !bestSeller ||
-      !stockAvailable ||
-      !imageFile // Ensure an image is uploaded
-    ) {
-      alert("Please fill out all required fields and upload an image.");
-      return;
+    if (!itemName || !description || !price || !category || !subcategory || !bestSeller || !stockAvailable || !imageFile){ 
+        showNotification("⚠️ Please fill out all required fields and upload an image.", "error");
+        return;
     }
 
     // Prepare form data for the backend
@@ -119,13 +115,13 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
+        // alert(data);
         if (data.success) {
         //   alert("Item added successfully!");
-          alert(data.message);
+        showNotification("✅ Item added successfully!", "success");
 
           // Create a new row in the table
           const newRow = document.createElement("tr");
-        //   const baseUrl = "https://HiFiDeliveryEats.com/";
           const staticImagePath = "/static/images/";
 
           // Add cells to the row
@@ -136,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <td>${category}</td>
             <td>${subcategory}</td>
             <td>${discount}%</td>
-            <td><img src="${staticImagePath}${data.image_url.split('/').pop()}" alt="${item.name}" width="50"></td>
+            <td><img src="${staticImagePath}${data.image_url ? data.image_url.split('/').pop() : ''}" alt="${itemName}" width="50"></td>
             <td>${bestSeller}</td>
             <td>${stockAvailable}</td>
             <td>
@@ -168,12 +164,16 @@ document.addEventListener("DOMContentLoaded", function () {
             showDeleteConfirmation(newRow, editButton);
           });
         } else {
-          alert("Error adding item: " + data.message);
+        //   alert("Error adding item: " + data.message);
+            showNotification(`❌ Error: ${data.message}`, "error");
         }
       })
       .catch((error) => {
+        console.log(data);
         console.error("Error:", error);
-        alert("An error occurred while adding the item.");
+        // showNotification("Error: " + error, "error");
+        // alert("An error occurred while adding the item.");
+        showNotification("⚠️ An unexpected error occurred.", "error");
       });
   });
 
@@ -280,7 +280,8 @@ function showEditPopup(row, deleteButton, editButton) {
                 body: JSON.stringify(updatedItem),
             }).then(response => response.json())
             .then((data) => {
-                alert('Updated item successfully')
+                // alert('Updated item successfully')
+                showNotification("Item Updated successfully!", "success");
                 document.body.removeChild(popup);
                 deleteButton.disabled = false;
                 editButton.disabled = false;
@@ -338,6 +339,7 @@ function showEditPopup(row, deleteButton, editButton) {
         .then(data => {
             if (data.message) {
                 // alert(data.message); // Alert after successful deletion
+                showNotification("Item Deleted successfully!", "success");
                 row.remove(); // Remove row from UI
             } else {
                 alert("Error: " + data.error);
