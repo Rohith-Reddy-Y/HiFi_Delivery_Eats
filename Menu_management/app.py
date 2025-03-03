@@ -79,21 +79,22 @@ def add_item():
     
 @app.route('/get_items', methods=['GET'])
 def get_items():
-    items = session.query(MenuItem).all()
+    items = (session.query(MenuItem, Category, Subcategory).join(Category, MenuItem.category_id == Category.category_id)
+        .join(Subcategory, MenuItem.subcategory_id == Subcategory.subcategory_id).all())
     items_list = [
         {
-            "menu_item_id": item.menu_item_id,
-            "name": item.name,
-            "description": item.description,
-            "price": item.price,  # Convert DECIMAL to float
-            "category_id": item.category_id,
-            "subcategory_id": item.subcategory_id,
-            "nutrient_value": item.nutrient_value,
-            "calorie_count": item.calorie_count,
-            "discount_percentage": item.discount_percentage if item.discount_percentage else 0.0,
-            "image_url": item.image_url,
-            "is_best_seller": item.is_best_seller,
-            "is_out_of_stock": item.is_out_of_stock
+            "menu_item_id": item.MenuItem.menu_item_id,
+            "name": item.MenuItem.name,
+            "description": item.MenuItem.description,
+            "price": item.MenuItem.price,  # Convert DECIMAL to float
+            "category_name": item.Category.name,
+            "subcategory_name": item.Subcategory.name,
+            "nutrient_value": item.MenuItem.nutrient_value,
+            "calorie_count": item.MenuItem.calorie_count,
+            "discount_percentage": item.MenuItem.discount_percentage if item.MenuItem.discount_percentage else 0.0,
+            "image_url": item.MenuItem.image_url,
+            "is_best_seller": item.MenuItem.is_best_seller,
+            "is_out_of_stock": item.MenuItem.is_out_of_stock
         }
         for item in items
     ]

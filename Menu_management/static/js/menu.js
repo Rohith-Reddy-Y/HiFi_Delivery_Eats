@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <td>${item.name}</td>
             <td>${item.description}</td>
             <td>${item.price}</td>
-            <td>${item.category_id}</td>
-            <td>${item.subcategory_id}</td>
+            <td>${item.category_name}</td>
+            <td>${item.subcategory_name}</td>
             <td>${item.discount_percentage}%</td>
             <td><img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" width="50"></td>
             <td>${item.is_best_seller ? "Yes" : "No"}</td>
