@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-from database.create_database import MenuItem, Category
+from database.create_database import MenuItem, Category, Subcategory
 from database.services import MenuService
 import os
 import logging
@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Create connection to database
-engine = create_engine("sqlite:///hifi_database.db", echo=True)
+engine = create_engine("sqlite:///hifi_database.db", echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 menu_service = MenuService(session)
@@ -40,18 +40,21 @@ def add_item():
         description = data["description"]
         price = float(data["price"])
         category_name = data["category"]
+        subcategory_name = data["subcategory"]
         discount = float(data.get("discount", 0))
         best_seller = data.get("best_seller", "false").lower() in ["yes", "true", "1"]
         is_out_of_stock = data.get("stock_available", "1") == "0"
         
         # Handle image upload
         image_url = ""
+        BASE_URL = "https://HiFiDeliveryEats.com/"
         if "image" in request.files:
             image = request.files["image"]
             if image.filename:
                 image_path = os.path.join(app.config["UPLOAD_FOLDER"], image.filename)
-                image.save(image_path)
-                image_url = image_path
+                image.save(image_path) # Save image
+                # Generate a dummy image URL
+                image_url = f"{BASE_URL}{image.filename}"
         
         new_item = menu_service.add_menu_item(
             name=item_name,
@@ -59,20 +62,21 @@ def add_item():
             price=price,
             image_url=image_url,
             category_name=category_name,
+            subcategory_name=subcategory_name,
             nutrient_value="N/A",
             calorie_count=0,
             is_best_seller=best_seller,
             is_out_of_stock=is_out_of_stock,
             discount_percentage=discount
         )
-        return jsonify({"success": True, "message": "Item added successfully", "item_id": new_item.menu_item_id})
+        
+        return jsonify({"success": True, "message": "Item added successfully", "item_id": new_item.menu_item_id,"image_url":new_item.image_url})
     except Exception as e:
         session.rollback()
         session.close()
         logger.error(f"Error adding menu item: {e}", exc_info=True)
         return jsonify({"success": False, "message": str(e)})
     
-
 @app.route('/get_items', methods=['GET'])
 def get_items():
     items = session.query(MenuItem).all()
@@ -83,6 +87,7 @@ def get_items():
             "description": item.description,
             "price": item.price,  # Convert DECIMAL to float
             "category_id": item.category_id,
+            "subcategory_id": item.subcategory_id,
             "nutrient_value": item.nutrient_value,
             "calorie_count": item.calorie_count,
             "discount_percentage": item.discount_percentage if item.discount_percentage else 0.0,
@@ -92,67 +97,109 @@ def get_items():
         }
         for item in items
     ]
+    session.close()
     return jsonify(items_list)
 
 @app.route('/get_item_by_name/<string:item_name>', methods=['GET'])
 def get_item_by_name(item_name):
-    item = session.query(MenuItem, Category.name.label("category_name")) \
-        .join(Category, MenuItem.category_id == Category.category_id) \
-        .filter(MenuItem.name == item_name).first()
+    try:
+        item = (
+            session.query(
+                MenuItem.menu_item_id, MenuItem.name, MenuItem.description, MenuItem.price,
+                MenuItem.nutrient_value, MenuItem.calorie_count, MenuItem.discount_percentage,
+                MenuItem.image_url, MenuItem.is_best_seller, MenuItem.is_out_of_stock,
+                MenuItem.scheduled_update_time,  
+                Category.name.label("category_name"),
+                Subcategory.name.label("subcategory_name")
+            )    #category_id subcategory_id
+            .join(Category, MenuItem.category_id == Category.category_id, isouter=True)  # Left join in case category is missing
+            .join(Subcategory, MenuItem.subcategory_id == Subcategory.subcategory_id, isouter=True)  # Left join in case subcategory is missing
+            .filter(MenuItem.name == item_name)
+            .first()
+        )
 
-    if not item:
-        return jsonify({"error": "Item not found"}), 404  # Return 404 if not found
-    
-    session.close()
-    return jsonify({
-        "menu_item_id": item.MenuItem.menu_item_id,
-        "name": item.MenuItem.name,
-        "description": item.MenuItem.description,
-        "price": float(item.MenuItem.price),
-        "category_name": item.category_name,  # Fetch category name instead of ID
-        "discount_percentage": item.MenuItem.discount_percentage,
-        "is_best_seller": item.MenuItem.is_best_seller,
-        "is_out_of_stock": item.MenuItem.is_out_of_stock
-    })
+        if not item:
+            return jsonify({"error": "Item not found"}), 404  # Return 404 if not found
+
+        print("\n\n\n")
+        print("Fetched Item:", item)  # Debugging
+        print("\n\n\n")
+        
+        response_data = {
+            "menu_item_id": item.menu_item_id,
+            "name": item.name,
+            "description": item.description,
+            "price": float(item.price),  # Convert DECIMAL to float
+            "category_name": item.category_name if item.category_name else "Uncategorized",
+            "subcategory_name": item.subcategory_name if item.subcategory_name else "Uncategorized",
+            "nutrient_value": item.nutrient_value,
+            "calorie_count": item.calorie_count,
+            "discount_percentage": float(item.discount_percentage or 0.0),
+            "image_url": item.image_url,
+            "is_best_seller": item.is_best_seller,
+            "is_out_of_stock": item.is_out_of_stock,
+            "scheduled_update_time": item.scheduled_update_time.isoformat() if item.scheduled_update_time else None
+        }
+        session.close()
+        return jsonify(response_data)
+
+    except Exception as e:
+        print("Error in get_item_by_name:", str(e))  # Debugging error
+        return jsonify({"error": str(e)}), 500  # Return 500 for internal server errors
 
 @app.route('/update_item', methods=["POST"])
 def update_item():
     try:
         data = request.json  # Get JSON data from request
-        logger.info("Received Data for Update:", data) 
+        logger.info("\n\n\nReceived Data for Update: %s", data,"\n\n\n")  # Log full request data
         
         menu_item_id = data.get("menu_item_id")
+        
         if not menu_item_id:
             return jsonify({"error": "Menu item ID not provided"}), 400
-
+        
         # Fetch the menu item from the database
         menu_item = session.query(MenuItem).filter_by(menu_item_id=menu_item_id).first()
         if not menu_item:
             return jsonify({"error": "Menu item not found"}), 404
 
+        
         # Update only provided fields, keep others unchanged
         menu_item.name = data.get("name", menu_item.name)
         menu_item.description = data.get("description", menu_item.description)
         menu_item.price = data.get("price", menu_item.price)
-        
-        # Fetch category_id based on category_name (if provided)
-        category_id = None
-        if "category_name" in data:
-            category = session.query(Category).filter_by(name=data["category_name"]).first()
-            if category:
-                category_id = category.category_id
-            else:
-                return jsonify({"error": "Invalid category name"}), 400
-            
-        menu_item.category_id = category_id if category_id else menu_item.category_id
-        
         menu_item.discount_percentage = data.get("discount_percentage", menu_item.discount_percentage)
         menu_item.is_best_seller = data.get("is_best_seller", menu_item.is_best_seller)
         menu_item.is_out_of_stock = data.get("is_out_of_stock", menu_item.is_out_of_stock)
 
+        # 🔹 Fetch category_id case-insensitively if category_name is provided
+        if "category_name" in data:
+            category_name = data["category_name"].strip()
+            category = session.query(Category).filter(func.lower(Category.name) == category_name.lower()).first()
+            
+            if category:
+                menu_item.category_id = category.category_id
+                logger.info(f"\n\n\nUpdated category_id to: {menu_item.category_id}")
+            else:
+                logger.error(f"Invalid category name: {category_name}")
+                return jsonify({"error": "Invalid category name"}), 400
+        
+        # 🔹 Fetch subcategory_id case-insensitively if subcategory_name is provided
+        if "subcategory_name" in data:
+            subcategory_name = data["subcategory_name"].strip()
+            subcategory = session.query(Subcategory).filter(func.lower(Subcategory.name) == subcategory_name.lower()).first()
+            
+            if subcategory:
+                menu_item.subcategory_id = subcategory.subcategory_id
+                logger.info(f"\n\n\nUpdated subcategory_id to: {menu_item.subcategory_id}")
+            else:
+                logger.error(f"Invalid subcategory name: {subcategory_name}")
+                return jsonify({"error": "Invalid subcategory name"}), 400
+        
         # Commit changes
         session.commit()
         session.close()
+        logger.info(f"\n\nUpdated Successfully\n\n\n")
         return jsonify({"message": "Menu item updated successfully"}), 200
 
     except Exception as e:
