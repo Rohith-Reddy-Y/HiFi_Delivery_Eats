@@ -41,6 +41,15 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     menu_items = relationship("MenuItem", back_populates="category")
 
+#Subcategory Table
+class Subcategory(Base):
+    __table_args__ = {'extend_existing': True}
+    __tablename__ = "subcategories"
+    subcategory_id: Mapped[str] = mapped_column(String(10), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    category_id: Mapped[str] = mapped_column(ForeignKey("categories.category_id", ondelete="CASCADE"), nullable=False)
+    menu_items = relationship("MenuItem", back_populates="subcategory")  # Relationship with MenuItem
+
 # MenuItem Table
 class MenuItem(Base):
     __table_args__ = {'extend_existing': True}
@@ -51,6 +60,7 @@ class MenuItem(Base):
     price: Mapped[float] = mapped_column(DECIMAL(10,2), nullable=False)
     image_url: Mapped[str] = mapped_column(String(500), nullable=False)
     category_id: Mapped[str] = mapped_column(ForeignKey("categories.category_id", ondelete="CASCADE"), nullable=False)
+    subcategory_id: Mapped[str] = mapped_column(ForeignKey("subcategories.subcategory_id", ondelete="CASCADE"), nullable=False)  # Updated
     nutrient_value: Mapped[str] = mapped_column(String(255), nullable=False)
     calorie_count: Mapped[int] = mapped_column(Integer, nullable=False)
     is_best_seller: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -58,8 +68,10 @@ class MenuItem(Base):
     discount_percentage: Mapped[float] = mapped_column(DECIMAL(5,2), nullable=True)
     scheduled_update_time: Mapped[datetime] = mapped_column(DATETIME, nullable=True)
     category = relationship("Category", back_populates="menu_items")
+    subcategory = relationship("Subcategory", back_populates="menu_items")  # New relationship
     orders = relationship("OrderItem", back_populates="menu_item")
     cart_items = relationship("Cart", back_populates="menu_item")
+
 
 # Order Table
 class Order(Base):
