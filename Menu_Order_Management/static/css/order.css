@@ -1,0 +1,299 @@
+/*========== CART ==========*/
+.cart__container {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+  
+  .cart__inner-section {
+    background-color: #f2f2f2; /* Light grey background for the cart items section */
+    padding: 0; /* Remove padding to reduce extra space */
+    border-radius: 0.5rem;
+  }
+  
+  .cart__clear-controls {
+    display: flex;
+    justify-content: space-between; /* Select All on left, buttons on right */
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .cart__clear-button {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .cart__clear-button:hover {
+    background-color: #e60000;
+  }
+  
+  .cart__select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .cart__selection-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .cart__selection-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  
+  .cart__selection-buttons .clear-selected {
+    background-color: #ff4d4d;
+    color: #fff;
+  }
+  
+  .cart__selection-buttons .clear-selected:hover {
+    background-color: #e60000;
+  }
+  
+  .cart__selection-buttons .cancel {
+    background-color: #ddd;
+    color: #333;
+  }
+  
+  .cart__selection-buttons .cancel:hover {
+    background-color: #bbb;
+  }
+  
+  .cart__content {
+    display: block; /* Remove flex layout since selection is now inline */
+  }
+  
+  .cart__items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%; /* Ensure the container takes full width */
+  }
+  
+  .cart__item {
+    position: relative; /* For absolute positioning of checkbox */
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0; /* Remove margin to reduce extra space */
+  }
+  
+  .cart__item-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    margin-top: 1rem; /* Add margin to ensure the checkbox doesn't overlap the image */
+  }
+  
+  .cart__item-details {
+    flex: 1;
+  }
+  
+  .cart__item-name {
+    font-size: 1.25rem;
+    color: #333; /* Dark grey for visibility */
+    margin-bottom: 0.5rem;
+  }
+  
+  .cart__item-price {
+    font-size: 1rem;
+    color: #333; /* Dark grey for visibility */
+    margin-bottom: 0.5rem;
+  }
+  
+  .cart__item-checkbox {
+    position: absolute;
+    top: 0.5rem; /* Align with the top padding of the cart item */
+    left: 1rem; /* Align with the left padding of the cart item */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .quantity-controls button {
+    background-color: #ddd;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
+  
+  .quantity-controls button:hover {
+    background-color: #bbb;
+  }
+  
+  .quantity-controls .quantity {
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+  }
+  
+  .cart__summary {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cart__summary-title {
+    font-size: 1.5rem;
+    color: #393939;
+    margin-bottom: 1rem;
+  }
+  
+  .cart__summary-details p {
+    font-size: 1rem;
+    color: #707070;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cart__summary-total {
+    font-size: 1.25rem;
+    color: #393939;
+    font-weight: 600;
+  }
+  
+  .cart__checkout {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  /* Payment Section */
+  .payment__options {
+    margin-bottom: 1rem;
+  }
+  
+  .payment__option {
+    margin-bottom: 0.5rem;
+  }
+  
+  .payment__confirm {
+    width: 100%;
+  }
+  
+  .order__history {
+    margin-top: 20px;
+  }
+  
+  .order__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .order__table th,
+  .order__table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .order__table th {
+    background-color: #f2f2f2;
+  }
+  
+  .current-order {
+    margin-top: 20px;
+  }
+  
+  .cancel-order {
+    background-color: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .cancel-order:hover {
+    background-color: #cc0000;
+  }
+  
+  .customer__details {
+    margin-top: 20px;
+  }
+  
+  .customer__details input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .order__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .order__table th,
+  .order__table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .order__table th {
+    background-color: #f2f2f2;
+  }
+  
+  .clear__orders {
+    background-color: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .clear__orders:hover {
+    background-color: #cc0000;
+  }
+  
+  /* Add styles for empty cart display */
+  .empty-cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: transparent; /* Remove the dark background */
+  }
+  
+  /* Ensure text color is black in both light and dark modes */
+  .empty-cart-container p {
+    font-size: 1.25rem;
+    text-align: center;
+    color: #000 !important; /* Black text in both modes */
+  }
+  
+  .empty-cart-image {
+    max-width: 150px;
+    margin-bottom: 10px;
+    display: block; /* Ensure the image is visible */
+    filter: none !important; /* Prevent any color filters (e.g., from home.css) */
+  }

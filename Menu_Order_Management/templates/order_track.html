@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Order Tracking & Confirmation</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e1e8ee 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
+
+        .tracking-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracking-container h2 {
+            font-size: 2rem;
+            color: #ff6347;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .tracking-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #ff6347;
+            border-radius: 5px;
+        }
+
+        .tracking-container p {
+            font-size: 1rem;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            position: relative;
+            min-height: 60px; /* Ensure enough space for the scooter */
+        }
+
+        .status::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 12.5%; /* Start at the center of the first icon */
+            width: 75%; /* Span to the center of the last icon */
+            height: 3px;
+            background: #28a745; /* Green color, always constant */
+            z-index: 0;
+        }
+
+        .status div {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            width: 25%;
+        }
+
+        .status .icon {
+            font-size: 2rem;
+            color: #ccc;
+            background: #fff;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status .icon.active {
+            color: #ff6347;
+            transform: scale(1.2);
+        }
+
+        .status div p {
+            margin: 5px 0 0;
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        #delivery-scooter {
+            position: absolute;
+            top: -7.5px; /* Moved slightly up to align tire with green line */
+            left: 12.5%; /* Start at the center of the first icon */
+            width: 30px; /* Increased size slightly */
+            height: 30px;
+            transition: left 6s ease-in-out; /* Default transition duration */
+            z-index: 2; /* Place above the green line */
+            transform: rotateY(0deg); /* Ensure facing right */
+        }
+
+        #smoke-icon {
+            position: absolute;
+            top: -2px; /* Align with scooter's top */
+            left: 10%; /* Slightly offset to the left of the scooter at Order Confirmed (12.5%) */
+            width: 30px;
+            height: 30px;
+            z-index: 2; /* Place behind the scooter */
+            display: none; /* Hidden by default */
+        }
+
+        #order-message {
+            display: none;
+            font-size: 1.1rem;
+            color: #ff6347;
+            margin-top: 20px;
+            font-weight: 500;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #transition-message {
+            font-size: 1rem;
+            color: #28a745; /* Green to match the theme */
+            margin-top: 10px;
+            font-weight: 500;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Keyframes for Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .tracking-container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .status div p {
+                font-size: 0.75rem;
+            }
+
+            .status::before {
+                left: 12.5%;
+                width: 75%;
+            }
+
+            #delivery-scooter {
+                top: -7.5px;
+                left: 14%;
+                width: 24px;
+                height: 24px;
+            }
+
+            #smoke-icon {
+                top: -2px;
+                left: 11.5%;
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tracking-container">
+        <h2>Food Order Tracking</h2>
+        <p>Order ID: <strong id="order-id"></strong></p>
+        <p>Expected Arrival: <span id="arrival-date" class="badge bg-primary"></span></p>
+        <p>Tracking ID: <span id="tracking-id" class="badge bg-danger"></span></p>
+        
+        <div class="status">
+            <div><span id="icon-confirmed" class="icon"><i class="fas fa-hourglass-start"></i></span><p>Order Confirmed</p></div>
+            <div><span id="icon-shipped" class="icon"><i class="fas fa-hourglass-start"></i></span><p>Order Picked</p></div>
+            <div><span id="icon-out-for-delivery" class="icon"><i class="fas fa-hourglass-start"></i></span><p>Out for Delivery</p></div>
+            <div><span id="icon-delivered" class="icon"><i class="fas fa-hourglass-start"></i></span><p>Order Delivered</p></div>
+            <img id="delivery-scooter" src="{{ url_for('static', filename='images/fast_shipping_delivery_agent_img.png') }}" alt="Delivery Scooter">
+            <img id="smoke-icon" src="{{ url_for('static', filename='images/smoke-30.png') }}" alt="Smoke Icon">
+        </div>
+
+        <p id="order-message">Your delicious meal is on the way! 🍔🚀</p>
+        <p id="transition-message"></p>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize order information
+            document.getElementById("order-id").innerText = "#" + generateOrderID();
+            document.getElementById("tracking-id").innerText = generateTrackingID();
+            document.getElementById("arrival-date").innerText = generateArrivalDate();
+
+            // Show initial message
+            let message = document.getElementById("order-message");
+            if (!message) {
+                console.error("Error: order-message element not found in DOM");
+                return;
+            }
+            message.style.display = "block";
+
+            // Immediately confirm the "Order Confirmed" icon
+            confirmInitialIcon();
+
+            // Start the delivery process
+            startDeliveryProcess();
+        });
+
+        function confirmInitialIcon() {
+            console.log("Confirming initial Order Confirmed icon...");
+            const icons = {
+                confirmed: document.getElementById("icon-confirmed"),
+                shipped: document.getElementById("icon-shipped"),
+                out_for_delivery: document.getElementById("icon-out-for-delivery"),
+                delivered: document.getElementById("icon-delivered")
+            };
+
+            if (!icons.confirmed) {
+                console.error("Error: icon-confirmed element not found in DOM");
+                return;
+            }
+
+            for (let key in icons) {
+                if (icons[key]) {
+                    icons[key].innerHTML = '<i class="fas fa-hourglass-start"></i>';
+                    icons[key].classList.remove("active");
+                }
+            }
+
+            // Update the "Order Confirmed" icon immediately
+            icons.confirmed.innerHTML = '<i class="fas fa-check-circle"></i>';
+            icons.confirmed.classList.add("active");
+
+            // Set initial transition message
+            const transitionMessageElement = document.getElementById("transition-message");
+            if (!transitionMessageElement) {
+                console.error("Error: transition-message element not found in DOM");
+                return;
+            }
+            transitionMessageElement.innerText = "Order Confirmed!";
+            console.log("Order Confirmed icon updated");
+        }
+
+        function generateRandomName() {
+            const names = ["Alex", "Sam", "Jordan", "Taylor", "Chris", "Morgan", "Riley", "Jamie"];
+            return names[Math.floor(Math.random() * names.length)];
+        }
+
+        function startDeliveryProcess() {
+            console.log("Starting delivery process...");
+            // Start status updates with synchronized steps
+            setTimeout(() => {
+                console.log("Moving directly to Order Picked...");
+                const scooter = document.getElementById("delivery-scooter");
+                if (!scooter) {
+                    console.error("Error: delivery-scooter element not found in DOM");
+                    return;
+                }
+                scooter.style.transition = "left 6s ease-in-out"; // Total 6 seconds to move from Order Confirmed to Order Picked
+                const orderPickedPosition = 37.5; // Center of "Order Picked"
+                const newLeft = `calc(${orderPickedPosition}% - 15px)`; // Scooter's position (30px width / 2 = 15px offset)
+                console.log(`Setting scooter left to Order Picked: ${newLeft}`);
+                scooter.style.left = newLeft;
+
+                // Show smoke icon when scooter starts moving
+                const smokeIcon = document.getElementById("smoke-icon");
+                if (!smokeIcon) {
+                    console.error("Error: smoke-icon element not found in DOM");
+                    return;
+                }
+                smokeIcon.style.display = "block";
+                console.log("Smoke icon displayed");
+
+                // Hide smoke icon after 1 second
+                setTimeout(() => {
+                    smokeIcon.style.display = "none";
+                    console.log("Smoke icon hidden");
+                }, 1000); // 1 second after movement starts
+
+                // After reaching Order Picked, continue to the next stages
+                setTimeout(() => {
+                    console.log("Updating to shipped stage...");
+                    updateProgressAndIcon("shipped", 0); // Immediate icon update (no additional movement)
+
+                    setTimeout(() => {
+                        console.log("Updating to out_for_delivery stage...");
+                        updateProgressAndIcon("out_for_delivery", 6); // 6 seconds for this transition
+                
+                        setTimeout(() => {
+                            console.log("Updating to delivered stage...");
+                            updateProgressAndIcon("delivered", 8); // 8 seconds for this transition
+                            // Hide initial message when delivered
+                            document.getElementById("order-message").style.display = "none";
+                        }, 8000); // Match the longer transition duration (8 seconds)
+                    }, 6000); // 6 seconds
+                }, 6000); // 6 seconds to reach Order Picked
+            }, 3000); // Initial delay of 3 seconds before scooter starts moving
+        }
+
+        function updateProgressAndIcon(status, transitionDuration) {
+            let scooterPosition = 0; // For the delivery scooter position
+            let transitionMessage = ""; // For the transition message
+            
+            // Update scooter position
+            switch (status) {
+                case "shipped":
+                    scooterPosition = 37.5; // Center of "Order Picked"
+                    transitionMessage = "Order Picked Up!";
+                    break;
+                case "out_for_delivery":
+                    scooterPosition = 62.5; // Center of "Out for Delivery"
+                    transitionMessage = "Out for Delivery!";
+                    break;
+                case "delivered":
+                    scooterPosition = 87.5; // Center of "Order Delivered"
+                    transitionMessage = "Order Delivered!";
+                    break;
+                default:
+                    return; // Shouldn't happen, but prevents errors
+            }
+            
+            // Update the scooter's transition duration dynamically
+            const scooter = document.getElementById("delivery-scooter");
+            if (!scooter) {
+                console.error("Error: delivery-scooter element not found in DOM during updateProgressAndIcon");
+                return;
+            }
+            scooter.style.transition = `left ${transitionDuration}s ease-in-out`;
+
+            // Update the scooter's position
+            console.log(`Status: ${status}, Scooter Position: ${scooterPosition}%, Transition Duration: ${transitionDuration}s`);
+            const newLeft = `calc(${scooterPosition}% - 15px)`; // Adjust for centering (30px / 2 = 15px)
+            console.log(`Setting scooter left to: ${newLeft}`);
+            scooter.style.left = newLeft;
+
+            // Delay the transition message and icon update until after the scooter movement completes
+            setTimeout(() => {
+                // Update the transition message
+                const transitionMessageElement = document.getElementById("transition-message");
+                if (!transitionMessageElement) {
+                    console.error("Error: transition-message element not found in DOM");
+                    return;
+                }
+                transitionMessageElement.innerText = transitionMessage;
+                console.log(`Updated transition message to: ${transitionMessage}`);
+
+                // Update the icons
+                const icons = {
+                    confirmed: document.getElementById("icon-confirmed"),
+                    shipped: document.getElementById("icon-shipped"),
+                    out_for_delivery: document.getElementById("icon-out-for-delivery"),
+                    delivered: document.getElementById("icon-delivered")
+                };
+
+                for (let key in icons) {
+                    if (icons[key]) {
+                        icons[key].innerHTML = '<i class="fas fa-hourglass-start"></i>';
+                        icons[key].classList.remove("active");
+                    } else {
+                        console.error(`Error: ${key} icon element not found in DOM`);
+                    }
+                }
+
+                switch (status) {
+                    case "shipped":
+                        if (icons.confirmed && icons.shipped) {
+                            icons.confirmed.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            icons.shipped.innerHTML = '<i class="fas fa-hand-holding"></i>';
+                            icons.confirmed.classList.add("active");
+                            icons.shipped.classList.add("active");
+                            console.log("Updated icons for shipped");
+                        }
+                        break;
+                    case "out_for_delivery":
+                        if (icons.confirmed && icons.shipped && icons.out_for_delivery) {
+                            icons.confirmed.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            icons.shipped.innerHTML = '<i class="fas fa-hand-holding"></i>';
+                            icons.out_for_delivery.innerHTML = '<i class="fas fa-motorcycle"></i>';
+                            icons.confirmed.classList.add("active");
+                            icons.shipped.classList.add("active");
+                            icons.out_for_delivery.classList.add("active");
+                            console.log("Updated icons for out_for_delivery");
+                        }
+                        break;
+                    case "delivered":
+                        if (icons.confirmed && icons.shipped && icons.out_for_delivery && icons.delivered) {
+                            icons.confirmed.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            icons.shipped.innerHTML = '<i class="fas fa-hand-holding"></i>';
+                            icons.out_for_delivery.innerHTML = '<i class="fas fa-motorcycle"></i>';
+                            icons.delivered.innerHTML = '<i class="fas fa-home"></i>';
+                            icons.confirmed.classList.add("active");
+                            icons.shipped.classList.add("active");
+                            icons.out_for_delivery.classList.add("active");
+                            icons.delivered.classList.add("active");
+                            console.log("Updated icons for delivered");
+                        }
+                        break;
+                }
+            }, transitionDuration * 1000); // Delay matches the scooter's transition duration
+        }
+
+        function generateOrderID() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
+        }
+
+        function generateTrackingID() {
+            return Math.floor(10000000 + Math.random() * 90000000);
+        }
+
+        function generateArrivalDate() {
+            let today = new Date();
+            let arrival = new Date(today);
+            arrival.setDate(today.getDate() + Math.floor(Math.random() * 5) + 1);
+
+            // Generate a random time between 9:00 AM and 9:00 PM
+            let hours = Math.floor(Math.random() * 12) + 9; // 9 AM to 9 PM
+            let minutes = Math.floor(Math.random() * 60);
+            let timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+            // Format the date and time
+            let dateString = arrival.toISOString().split('T')[0];
+            return `${dateString}, ${timeString}`;
+        }
+    </script>
+</body>
+</html>

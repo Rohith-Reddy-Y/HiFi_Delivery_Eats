@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <!--========== CUSTOM CSS FOR DROPDOWN (Copied from home.html) ==========-->
+    <style>
+        /* Dropdown container */
+        .nav__dropdown {
+          position: relative;
+          display: inline-block;
+        }
+  
+        /* Dropdown content (hidden by default) */
+        .nav__dropdown-content {
+          display: none;
+          position: absolute;
+          background-color: #069c54;
+          background-image: url('https://www.transparenttextures.com/patterns/food.png');
+          background-size: cover;
+          background-position: center;
+          background-blend-mode: overlay;
+          min-width: 100px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          z-index: 1;
+          border-radius: 15px;
+        }
+  
+        /* Dropdown links */
+        .nav__dropdown-content a {
+          color: #333;
+          padding: 12px 12px;
+          text-decoration: none;
+          display: block;
+          font-size: 14px;
+          border-radius: 15px;
+          transition: transform 0.3s ease;
+          transform: scale(1);
+        }
+  
+        /* Change color and scale of dropdown links on hover */
+        .nav__dropdown-content a:hover {
+          background-color: rgba(255, 255, 255, 0.5);
+          transform: scale(1.1);
+        }
+  
+        /* Show the dropdown menu on hover */
+        .nav__dropdown:hover .nav__dropdown-content {
+          display: block;
+        }
+  
+        /* Style the dropdown button */
+        .nav__dropdown .nav__link {
+          cursor: pointer;
+        }
+    </style>
+
+    <title>Menu Management</title>
+  </head>
+  <body>
+    <!--========== HEADER (Copied from home.html) ==========-->
+    <header class="l-header" id="header">
+        <nav class="nav bd-container">
+          <a href="#" class="nav__logo">Hifi Delivery Eats</a>
+  
+          <div class="nav__menu" id="nav-menu">
+            <ul class="nav__list">
+              <li class="nav__item">
+              </li>
+              <li class="nav__item">
+                <a href="{{ url_for('index') }}" class="nav__link">Home</a>
+              </li>
+              <!-- Modified "Menu" link to include a dropdown -->
+              <li class="nav__item nav__dropdown">
+                <a href="#" class="nav__link">Menu</a>
+                <div class="nav__dropdown-content">
+                  <a href="{{ url_for('show_menu') }}">Show Menu</a>
+                </div>
+              </li>
+              <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
+            </ul>
+          </div>
+  
+          <div class="nav__toggle" id="nav-toggle">
+            <i class="bx bx-menu"></i>
+          </div>
+        </nav>
+      </header>
+  
+    <div id="notification" class="hidden"></div>
+    <!-- Existing content wrapped in <main class="l-main"> for proper spacing -->
+        <main class="l-main">
+            <h2>Add New Menu Item</h2>
+            <form id="menu-form">
+              <label>Item Name:</label>
+              <input type="text" id="item-name" name="item-name" required /><br /><br />
+      
+              <label>Description:</label>
+              <textarea id="description" name="description" required></textarea><br /><br />
+      
+              <label>Price:</label>
+              <input type="number" id="price" name="price" step="0.01" required /><br /><br />
+      
+              <label>Category:</label>
+              <select id="category" name="category" required>
+                <option value="">CATEGORY</option>
+                <option value="veg">VEG</option>
+                <option value="non-veg">NON-VEG</option>
+              </select><br /><br />
+      
+              <label>Subcategory:</label>
+              <select id="subcategory" name="subcategory" required>
+                <option value="">SUB-CATEGORY</option>
+                <option value="Starter">Starter</option>
+                <option value="Soups">Soups</option>
+                <option value="Salads">Salads</option>
+                <option value="Breads">Breads</option>
+                <option value="Main Course">Main Course</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Biryani">Biryani</option>
+                <option value="Icecreams">Icecreams</option>
+              </select><br /><br />
+      
+              <label>Discount (%):</label>
+              <input type="number" id="discount" name="discount" min="0" max="100" /><br /><br />
+      
+              <label>Upload Image:</label>
+              <input type="file" id="image" name="image" accept="image/*" required /><br /><br />
+              
+              <label>Best Seller:</label>
+              <input type="radio" name="best_seller" value="yes" /> Yes
+              <input type="radio" name="best_seller" value="no" checked /> No
+              <br /><br />
+      
+              <label>Stock Available:</label>
+              <input type="number" id="stock-available" name="stock-available" min="0" required /><br /><br />
+      
+              <button type="submit">Add Item</button>
+            </form>
+      
+            <hr />
+      
+            <h2>Menu Items</h2>
+            <table border="1">
+              <thead>
+                <tr>
+                  <th>Item ID</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Category</th>
+                  <th>Subcategory</th>
+                  <th>Discount</th>
+                  <th>Image</th>
+                  <th>Best Seller</th>
+                  <th>Stock Available</th>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="menu-table-body">
+                <!-- Rows will be added dynamically here -->
+              </tbody>
+            </table>
+          </main>
+
+    <!--========== SCROLL TOP (Moved outside main) ==========-->
+    <a href="#" class="scrolltop" id="scroll-top">
+        <i class="bx bx-chevron-up scrolltop__icon"></i>
+    </a>
+    <!--========== SCROLL REVEAL ==========-->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+  </body>
+</html>

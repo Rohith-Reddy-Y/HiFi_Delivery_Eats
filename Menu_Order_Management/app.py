@@ -32,6 +32,25 @@ def menu():
     """Render the Menu page."""
     return render_template('menu.html')
 
+@app.route('/show_menu')
+def show_menu():
+    """Render the Menu page."""
+    return render_template('show_menu.html')
+
+
+@app.route('/order')
+def order():
+    """Render the Menu page."""
+    return render_template('order.html')
+
+# http://127.0.0.1:5000/order_track use this for accessing this webpage.
+@app.route('/order_track')
+def order_track():
+    """Render the Menu page."""
+    return render_template('order_track.html')
+
+
+
 @app.route('/add_item', methods=["POST"])
 def add_item():
     try:
@@ -70,7 +89,7 @@ def add_item():
             discount_percentage=discount
         )
         
-        return jsonify({"success": True, "message": "Item added successfully", "item_id": new_item.menu_item_id,"image_url":new_item.image_url})
+        return jsonify({"success": True, "message": "Item added successfully", "menu_item_id": new_item.menu_item_id,"image_url":new_item.image_url})
     except Exception as e:
         session.rollback()
         session.close()

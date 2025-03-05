@@ -1,7 +1,7 @@
-/* /===== GOOGLE FONTS =====/ */
+/*===== GOOGLE FONTS =====*/
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
 
-/* /===== VARIABLES CSS =====/ */
+/*===== VARIABLES CSS =====*/
 :root {
   --header-height: 3rem;
 
@@ -64,24 +64,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/*========== Variables Dark theme ==========*/
-body.dark-theme {
-  --title-color: #f1f3f2;
-  --text-color: #c7d1cc;
-  --body-color: #1d2521;
-  --container-color: #27302c;
-}
-
-/*========== Button Dark/Light ==========*/
-.change-theme {
-  position: absolute;
-  right: 1rem;
-  top: 1.8rem;
-  color: var(--text-color);
-  font-size: 1rem;
-  cursor: pointer;
-}
-
 body {
   margin: var(--header-height) 0 0 0;
   font-family: var(--body-font);
@@ -137,10 +119,6 @@ img {
   margin-bottom: var(--mb-1);
 }
 
-.home__subtitle {
-  font-size: 20px !important;
-}
-
 /*========== LAYOUT ==========*/
 .bd-container {
   max-width: 960px;
@@ -165,27 +143,11 @@ img {
 
 /*========== NAV ==========*/
 .nav {
-  max-width: 1024px;
+  max-width: 1104px;
   height: var(--header-height);
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-@media screen and (max-width: 768px) {
-  .nav__menu {
-    position: fixed;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    padding: 1.5rem 0 1rem;
-    text-align: center;
-    background-color: var(--body-color);
-    transition: 0.4s;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 0 0 1rem 1rem;
-    z-index: var(--z-fixed);
-  }
 }
 
 .nav__item {
@@ -193,8 +155,7 @@ img {
 }
 
 .nav__link,
-.nav__logo,
-.nav__toggle {
+.nav__logo {
   color: var(--text-color);
   font-weight: var(--font-medium);
 }
@@ -209,81 +170,6 @@ img {
 
 .nav__link:hover {
   color: var(--first-color);
-}
-
-.nav__toggle {
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
-/* Show menu */
-.show-menu {
-  top: var(--header-height);
-}
-
-/* Active menu */
-.active-link {
-  color: var(--first-color);
-}
-
-/* Change background header */
-.scroll-header {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Scroll top */
-.scrolltop {
-  position: fixed;
-  right: 1rem;
-  bottom: -20%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.3rem;
-  background: rgba(6, 156, 84, 0.5);
-  border-radius: 0.4rem;
-  z-index: var(--z-tooltip);
-  transition: 0.4s;
-  visibility: hidden;
-}
-
-.scrolltop:hover {
-  background-color: var(--first-color-alt);
-}
-
-.scrolltop__icon {
-  font-size: 1.8rem;
-  color: var(--body-color);
-}
-
-/* Show scrolltop */
-.show-scroll {
-  visibility: visible;
-  bottom: 1.5rem;
-}
-
-/*========== HOME ==========*/
-.home__container {
-  height: calc(100vh - var(--header-height));
-  align-content: center;
-}
-
-.home__title {
-  font-size: var(--biggest-font-size);
-  color: var(--first-color);
-  margin-bottom: var(--mb-1);
-}
-
-.home__subtitle {
-  font-size: var(--h1-font-size);
-  color: var(--title-color);
-  margin-bottom: var(--mb-4);
-}
-
-.home__img {
-  width: 300px;
-  padding-top: 50px;
-  justify-self: center;
 }
 
 /*========== BUTTONS ==========*/
@@ -317,10 +203,13 @@ img {
 }
 
 .menu__img {
-  width: 100px;
-  align-self: center;
-  margin-bottom: var(--mb-2);
-}
+    width: 200px; /* Original width */
+    height: 100px; /* Match width for a perfect circle */
+    border-radius: 37%; /* Make the image round */
+    object-fit: cover; /* Prevent distortion */
+    align-self: center; /* Original alignment */
+    margin-bottom: var(--mb-2); /* Original margin */
+  }
 
 .menu__name,
 .menu__preci {
@@ -351,38 +240,6 @@ img {
 }
 
 /*========== MEDIA QUERIES ==========*/
-@media screen and (min-width: 576px) {
-  .home__container,
-  .about__container,
-  .app__container {
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
-  }
-
-  .about__data,
-  .about__initial,
-  .app__data,
-  .app__initial,
-  .contact__container,
-  .contact__initial {
-    text-align: initial;
-  }
-
-  .about__img,
-  .app__img {
-    width: 380px;
-    order: -1;
-  }
-
-  .contact__container {
-    grid-template-columns: 1.75fr 1fr;
-    align-items: center;
-  }
-  .contact__button {
-    justify-self: center;
-  }
-}
-
 @media screen and (min-width: 768px) {
   body {
     margin: 0;
@@ -402,24 +259,6 @@ img {
     margin-left: var(--mb-5);
     margin-bottom: 0;
   }
-  .nav__toggle {
-    display: none;
-  }
-
-  .change-theme {
-    position: initial;
-    margin-left: var(--mb-2);
-  }
-
-  .home__container {
-    height: 100vh;
-    justify-items: center;
-  }
-
-  .services__container,
-  .menu__container {
-    margin-top: var(--mb-6);
-  }
 
   .menu__container {
     grid-template-columns: repeat(3, 210px);
@@ -431,34 +270,58 @@ img {
   .menu__img {
     width: 130px;
   }
-
-  .app__store {
-    margin: 0 var(--mb-1) 0 0;
-  }
 }
+/* Existing CSS remains unchanged, adding styles for the filter options */
+.filter-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-group label {
+    font-size: var(--normal-font-size);
+    color: var(--text-color);
+  }
+  
+  .filter-group select {
+    padding: 5px;
+    border: 1px solid var(--text-color-light);
+    border-radius: 5px;
+    font-size: var(--normal-font-size);
+    background-color: var(--container-color);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .filter-options {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .filter-group {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .filter-group select {
+      width: 80%;
+    }
+  }
 
 @media screen and (min-width: 960px) {
   .bd-container {
     margin-left: auto;
     margin-right: auto;
   }
-
-  .home__img {
-    width: 500px;
-  }
-
-  .about__container,
-  .app__container {
-    column-gap: 7rem;
-  }
 }
 
-/* For tall screens on mobiles y desktop*/
-@media screen and (min-height: 721px) {
-  .home__container {
-    height: 640px;
-  }
-}
 /* Search Bar Styles */
 .search-form {
   display: flex;
@@ -511,14 +374,22 @@ img {
     width: 100%;
   }
 }
-/*========== last week orders ==========*/
-.delivered-text {
-  font-size: 1.2rem;
-  font-weight: 200;
-  padding-top: 25px;
+
+.category-title {
+  text-align: center;
+  padding-top: 50px;
 }
 
-.delivered-text span {
-  color: #388e3c; /* Darker Green */
-  font-weight: 400;
+/* Style for the search results heading */
+#menu-heading.no-results {
+  color: red;
+  text-align: center;
+}
+
+/* Style for no items message */
+.no-items-message {
+  font-size: var(--normal-font-size);
+  color: var(--text-color);
+  text-align: center;
+  margin-top: 1rem;
 }

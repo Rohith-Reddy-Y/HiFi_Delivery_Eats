@@ -1,15 +1,22 @@
-
-// script.js
-
+// Utility function to format timestamp as YYYY-MM-DD HH:mm:ss
+// ! TIMESTAMP FORMAT NEED TO CONSIDER.
+function formatTimestamp(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector("form");
-  const tableBody = document.querySelector("table tbody");
+    const form = document.getElementById("menu-form");
+    const tableBody = document.getElementById("menu-table-body");
 
    function fetchItemsFromDB() {
     fetch("/get_items")
       .then(response => response.json())
       .then(data => {
-        const tableBody = document.querySelector("table tbody");
         const baseUrl = "https://HiFiDeliveryEats.com/";
         const staticImagePath = "/static/images/";
         tableBody.innerHTML = ""; // Clear previous data
@@ -23,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         data.forEach(item => {
           const newRow = document.createElement("tr");
           newRow.innerHTML = `
+            <td>${item.menu_item_id}</td>
             <td>${item.name}</td>
             <td>${item.description}</td>
             <td>${item.price}</td>
@@ -32,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <td><img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" width="50"></td>
             <td>${item.is_best_seller ? "Yes" : "No"}</td>
             <td>${item.is_out_of_stock ? "Out of Stock" : "Available"}</td>
+            <td></td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn">Edit</button>
@@ -80,15 +89,15 @@ function showNotification(message, type) {
     event.preventDefault(); // Prevent the form from submitting
 
     // Get form values
-    const itemName = document.querySelector('input[type="text"]').value.trim();
-    const description = document.querySelector("textarea").value.trim();
-    const price = document.querySelector('input[type="number"][step="0.01"]').value.trim();
-    const category = document.querySelector("select").value;
-    const subcategory = document.querySelectorAll("select")[1].value;
-    const discount =document.querySelector('input[type="number"][min="0"][max="100"]').value.trim() || 0; // Default to 0 if empty
-    const imageFile = document.querySelector('input[type="file"]').files[0];
-    const bestSeller = document.querySelector('input[name="best_seller"]:checked')?.value;
-    const stockAvailable = document.querySelector('input[type="number"][min="0"]').value.trim();
+    const itemName = document.getElementById("item-name").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const price = document.getElementById("price").value.trim();
+    const category = document.getElementById("category").value;
+    const subcategory = document.getElementById("subcategory").value;
+    const discount = document.getElementById("discount").value.trim() || "0";
+    const imageFile = document.getElementById("image").files[0];
+    const bestSeller = document.querySelector('input[name="best_seller"]:checked')?.value || "no";
+    const stockAvailable = document.getElementById("stock-available").value.trim();
 
     // Validate required fields
     if (!itemName || !description || !price || !category || !subcategory || !bestSeller || !stockAvailable || !imageFile){ 
@@ -126,6 +135,7 @@ function showNotification(message, type) {
 
           // Add cells to the row
           newRow.innerHTML = `
+            <td>${data.menu_item_id}</td>
             <td>${itemName}</td>
             <td>${description}</td>
             <td>${price}</td>
@@ -135,6 +145,7 @@ function showNotification(message, type) {
             <td><img src="${staticImagePath}${data.image_url ? data.image_url.split('/').pop() : ''}" alt="${itemName}" width="50"></td>
             <td>${bestSeller}</td>
             <td>${stockAvailable}</td>
+            <td></td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn">Edit</button>
@@ -180,7 +191,7 @@ function showNotification(message, type) {
   // Function to show edit popup
 function showEditPopup(row, deleteButton, editButton) {
     const cells = row.querySelectorAll("td");
-    const ORINGINAL_NAME = cells[0].textContent.trim();
+    const ORINGINAL_NAME = cells[1].textContent.trim();
 
     fetch(`/get_item_by_name/${ORINGINAL_NAME}`)
     .then(response => response.json())
@@ -281,11 +292,14 @@ function showEditPopup(row, deleteButton, editButton) {
             }).then(response => response.json())
             .then((data) => {
                 // alert('Updated item successfully')
-                showNotification("Item Updated successfully!", "success");
+                showNotification(`Item ${MI}  Updated successfully!`, "success");
+                // Delay reload to let the notification be visible
+                setTimeout(() => {
+                    location.reload();
+                }, 5000); // Reload after 2 seconds (adjust timing as needed)
                 document.body.removeChild(popup);
                 deleteButton.disabled = false;
                 editButton.disabled = false;
-                location.reload();  // Refresh to reflect updates
             });
         });
 
@@ -305,7 +319,7 @@ function showEditPopup(row, deleteButton, editButton) {
 
   // Function to show delete confirmation popup
   function showDeleteConfirmation(row, editButton) {
-    const itemName = row.cells[0].innerText;
+    const itemName = row.cells[1].innerText;
 
     const popup = document.createElement("div");
     popup.style.position = "fixed";
