@@ -144,459 +144,74 @@
         <div class="menu-category" data-category="Starter">
           <h3 class="category-title">Starter</h3>
           <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Paneer Tikka" data-price="150.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Paneer Tikka</h3>
-              <span class="menu__detail">Grilled cottage cheese</span><br/>
-              <span class="menu__preci">₹ 150.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chicken Lollipop" data-price="180.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Lollipop</h3>
-              <span class="menu__detail">Spicy chicken appetizer</span><br/>
-              <span class="menu__preci">₹ 180.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Vegetable Spring Rolls" data-price="120.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Vegetable Spring Rolls</h3>
-              <span class="menu__detail">Crispy rolls with veggie filling</span><br/>
-              <span class="menu__preci">₹ 120.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mushroom Manchurian" data-price="140.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mushroom Manchurian</h3>
-              <span class="menu__detail">Spicy Indo-Chinese mushroom dish</span><br/>
-              <span class="menu__preci">₹ 140.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Fish Fingers" data-price="200.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Fish Fingers</h3>
-              <span class="menu__detail">Crispy fried fish sticks</span><br/>
-              <span class="menu__preci">₹ 200.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Prawn Tempura" data-price="220.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Prawn Tempura</h3>
-              <span class="menu__detail">Lightly battered fried prawns</span><br/>
-              <span class="menu__preci">₹ 220.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
+            <!-- Dynamically add new entries -->
           </div>
         </div>
+
+        <!-- Category: Soups -->
+        <div class="menu-category" data-category="Soup">
+            <h3 class="category-title">Soups</h3>
+            <div class="menu__container bd-grid">
+                <!-- Dynamically add new entries and fetch from db -->
+            </div>
+          </div>
+
+        <!-- Category: Salads -->
+        <div class="menu-category" data-category="Salad">
+            <h3 class="category-title">Salads</h3>
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries and fetch from db -->
+            </div>
+          </div>
+
+        <!-- Category: Breads -->
+        <div class="menu-category" data-category="Bread">
+            <h3 class="category-title">Breads</h3>
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries and fetch from db -->
+            </div>
+          </div>
+
+        <!-- Category: Main Course -->
+        <div class="menu-category" data-category="Main Course">
+            <h3 class="category-title">Main Course</h3>
+            <div class="menu__container bd-grid">
+            <!-- Dynamically add new entries and fetch from db -->
+            </div>
+          </div>
+  
+        <!-- Category: Beverages -->
+        <div class="menu-category" data-category="Beverage">
+            <h3 class="category-title">Beverages</h3>
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries and fetch from db -->
+            </div>
+        </div>
+
+        <!-- Category: Breakfast -->
+        <div class="menu-category" data-category="Breakfast">
+            <h3 class="category-title">Breakfast</h3>
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries and fetch from db -->
+            </div>
+          </div>
 
         <!-- Category: Biryani -->
         <div class="menu-category" data-category="Biryani">
           <h3 class="category-title">Biryani</h3>
           <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Chicken Biryani" data-price="200.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Biryani</h3>
-              <span class="menu__detail">Spicy chicken biryani</span><br/>
-              <span class="menu__preci">₹ 200.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Veg Biryani" data-price="150.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Veg Biryani</h3>
-              <span class="menu__detail">Vegetable biryani</span><br/>
-              <span class="menu__preci">₹ 150.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mutton Biryani" data-price="250.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mutton Biryani</h3>
-              <span class="menu__detail">Spicy mutton biryani</span><br/>
-              <span class="menu__preci">₹ 250.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Paneer Biryani" data-price="170.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Paneer Biryani</h3>
-              <span class="menu__detail">Biryani with paneer chunks</span><br/>
-              <span class="menu__preci">₹ 170.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mushroom Biryani" data-price="160.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mushroom Biryani</h3>
-              <span class="menu__detail">Biryani with fresh mushrooms</span><br/>
-              <span class="menu__preci">₹ 160.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Fish Biryani" data-price="230.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Fish Biryani</h3>
-              <span class="menu__detail">Spicy biryani with fish</span><br/>
-              <span class="menu__preci">₹ 230.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category: Soups -->
-        <div class="menu-category" data-category="Soups">
-          <h3 class="category-title">Soups</h3>
-          <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Tomato Soup" data-price="80.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Tomato Soup</h3>
-              <span class="menu__detail">Classic tomato soup</span><br/>
-              <span class="menu__preci">₹ 80.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Hot & Sour Soup" data-price="90.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Hot & Sour Soup</h3>
-              <span class="menu__detail">Spicy and tangy soup</span><br/>
-              <span class="menu__preci">₹ 90.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Cream of Spinach Soup" data-price="85.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Cream of Spinach Soup</h3>
-              <span class="menu__detail">Creamy spinach and herb soup</span><br/>
-              <span class="menu__preci">₹ 85.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Sweet Corn Soup" data-price="80.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Sweet Corn Soup</h3>
-              <span class="menu__detail">Corn soup with vegetables</span><br/>
-              <span class="menu__preci">₹ 80.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chicken Noodle Soup" data-price="100.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Noodle Soup</h3>
-              <span class="menu__detail">Hearty soup with chicken and noodles</span><br/>
-              <span class="menu__preci">₹ 100.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mutton Broth" data-price="110.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mutton Broth</h3>
-              <span class="menu__detail">Flavorful mutton soup</span><br/>
-              <span class="menu__preci">₹ 110.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category: Salads -->
-        <div class="menu-category" data-category="Salads">
-          <h3 class="category-title">Salads</h3>
-          <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Greek Salad" data-price="120.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Greek Salad</h3>
-              <span class="menu__detail">Fresh and healthy</span><br/>
-              <span class="menu__preci">₹ 120.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Caesar Salad" data-price="130.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Caesar Salad</h3>
-              <span class="menu__detail">Classic Caesar salad</span><br/>
-              <span class="menu__preci">₹ 130.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Cucumber Avocado Salad" data-price="110.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Cucumber Avocado Salad</h3>
-              <span class="menu__detail">Refreshing cucumber and avocado mix</span><br/>
-              <span class="menu__preci">₹ 110.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Pasta Salad" data-price="115.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Pasta Salad</h3>
-              <span class="menu__detail">Pasta with veggies and dressing</span><br/>
-              <span class="menu__preci">₹ 115.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chicken Caesar Salad" data-price="140.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Caesar Salad</h3>
-              <span class="menu__detail">Caesar salad with grilled chicken</span><br/>
-              <span class="menu__preci">₹ 140.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Shrimp Salad" data-price="150.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Shrimp Salad</h3>
-              <span class="menu__detail">Fresh shrimp with mixed greens</span><br/>
-              <span class="menu__preci">₹ 150.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category: Breads -->
-        <div class="menu-category" data-category="Breads">
-          <h3 class="category-title">Breads</h3>
-          <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Garlic Naan" data-price="40.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Garlic Naan</h3>
-              <span class="menu__detail">Buttery garlic bread</span><br/>
-              <span class="menu__preci">₹ 40.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Butter Roti" data-price="30.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Butter Roti</h3>
-              <span class="menu__detail">Soft and buttery</span><br/>
-              <span class="menu__preci">₹ 30.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Aloo Paratha" data-price="50.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Aloo Paratha</h3>
-              <span class="menu__detail">Stuffed bread with spiced potatoes</span><br/>
-              <span class="menu__preci">₹ 50.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Plain Naan" data-price="35.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Plain Naan</h3>
-              <span class="menu__detail">Soft and fluffy Indian bread</span><br/>
-              <span class="menu__preci">₹ 35.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Keema Naan" data-price="60.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Keema Naan</h3>
-              <span class="menu__detail">Naan stuffed with spiced minced meat</span><br/>
-              <span class="menu__preci">₹ 60.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chicken Stuffed Kulcha" data-price="65.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Stuffed Kulcha</h3>
-              <span class="menu__detail">Kulcha with shredded chicken filling</span><br/>
-              <span class="menu__preci">₹ 65.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category: Main Course -->
-        <div class="menu-category" data-category="Main Course">
-          <h3 class="category-title">Main Course</h3>
-          <div class="menu__container bd-grid">
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Paneer Butter Masala" data-price="220.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Paneer Butter Masala</h3>
-              <span class="menu__detail">Paneer in rich tomato gravy</span><br/>
-              <span class="menu__preci">₹ 220.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Dal Makhani" data-price="180.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Dal Makhani</h3>
-              <span class="menu__detail">Creamy black lentils with butter</span><br/>
-              <span class="menu__preci">₹ 180.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Vegetable Korma" data-price="190.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Vegetable Korma</h3>
-              <span class="menu__detail">Mixed veggies in creamy gravy</span><br/>
-              <span class="menu__preci">₹ 190.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Butter Chicken" data-price="250.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Butter Chicken</h3>
-              <span class="menu__detail">Chicken in creamy tomato sauce</span><br/>
-              <span class="menu__preci">₹ 250.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mutton Rogan Josh" data-price="280.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mutton Rogan Josh</h3>
-              <span class="menu__detail">Spicy mutton curry</span><br/>
-              <span class="menu__preci">₹ 280.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Fish Curry" data-price="260.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Fish Curry</h3>
-              <span class="menu__detail">Fish in spicy coconut gravy</span><br/>
-              <span class="menu__preci">₹ 260.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category: Beverages -->
-        <div class="menu-category" data-category="Beverages">
-          <h3 class="category-title">Beverages</h3>
-          <div class="menu__container bd-grid">
-            <!-- New Items (Total 6: All Veg) -->
-            <div class="menu__content" data-name="Mango Lassi" data-price="60.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mango Lassi</h3>
-              <span class="menu__detail">Sweet yogurt-based mango drink</span><br/>
-              <span class="menu__preci">₹ 60.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Lemonade" data-price="40.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Lemonade</h3>
-              <span class="menu__detail">Refreshing lemon drink</span><br/>
-              <span class="menu__preci">₹ 40.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Mint Cooler" data-price="50.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mint Cooler</h3>
-              <span class="menu__detail">Chilled mint and lime drink</span><br/>
-              <span class="menu__preci">₹ 50.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Iced Tea" data-price="45.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Iced Tea</h3>
-              <span class="menu__detail">Cold tea with lemon flavor</span><br/>
-              <span class="menu__preci">₹ 45.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Coconut Water" data-price="55.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Coconut Water</h3>
-              <span class="menu__detail">Fresh and hydrating coconut drink</span><br/>
-              <span class="menu__preci">₹ 55.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Orange Juice" data-price="50.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Orange Juice</h3>
-              <span class="menu__detail">Freshly squeezed orange juice</span><br/>
-              <span class="menu__preci">₹ 50.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
+            <!-- Dynamically add new entries and fetch from db -->
           </div>
         </div>
 
         <!-- Category: Icecreams -->
-        <div class="menu-category" data-category="Icecreams">
+        <div class="menu-category" data-category="Icecream">
           <h3 class="category-title">Icecreams</h3>
           <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Vanilla Icecream" data-price="60.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Vanilla Icecream</h3>
-              <span class="menu__detail">Classic vanilla flavor</span><br/>
-              <span class="menu__preci">₹ 60.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chocolate Icecream" data-price="70.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chocolate Icecream</h3>
-              <span class="menu__detail">Rich chocolate flavor</span><br/>
-              <span class="menu__preci">₹ 70.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Strawberry Icecream" data-price="80.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Strawberry Icecream</h3>
-              <span class="menu__detail">Fresh strawberry flavor</span><br/>
-              <span class="menu__preci">₹ 80.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <!-- Note: Icecreams are typically veg, but some can have non-veg ingredients like gelatin -->
-            <div class="menu__content" data-name="Mango Sorbet" data-price="75.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Mango Sorbet</h3>
-              <span class="menu__detail">Refreshing mango ice dessert</span><br/>
-              <span class="menu__preci">₹ 75.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Butterscotch Icecream" data-price="70.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Butterscotch Icecream</h3>
-              <span class="menu__detail">Creamy with crunchy bits</span><br/>
-              <span class="menu__preci">₹ 70.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Rocky Road Icecream" data-price="85.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Rocky Road Icecream</h3>
-              <span class="menu__detail">Chocolate with marshmallows (contains gelatin)</span><br/>
-              <span class="menu__preci">₹ 85.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
+            <!-- Dynamically add new entries and fetch from db -->
           </div>
         </div>
 
-        <!-- Category: Breakfast -->
-        <div class="menu-category" data-category="Breakfast">
-          <h3 class="category-title">Breakfast</h3>
-          <div class="menu__container bd-grid">
-            <!-- Existing Items -->
-            <div class="menu__content" data-name="Masala Dosa" data-price="50.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Masala Dosa</h3>
-              <span class="menu__detail">Crispy rice crepe with potato filling</span><br/>
-              <span class="menu__preci">₹ 50.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Poha" data-price="40.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Poha</h3>
-              <span class="menu__detail">Flattened rice with spices and vegetables</span><br/>
-              <span class="menu__preci">₹ 40.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Idli Sambar" data-price="45.00" data-type="veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Idli Sambar</h3>
-              <span class="menu__detail">Steamed rice cakes with lentil soup</span><br/>
-              <span class="menu__preci">₹ 45.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <!-- New Items (Total 6: 3 Veg, 3 Non-Veg) -->
-            <div class="menu__content" data-name="Cheese Omelette" data-price="60.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Cheese Omelette</h3>
-              <span class="menu__detail">Fluffy eggs with melted cheese</span><br/>
-              <span class="menu__preci">₹ 60.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Chicken Sausage" data-price="70.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Chicken Sausage</h3>
-              <span class="menu__detail">Grilled sausages with toast</span><br/>
-              <span class="menu__preci">₹ 70.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-            <div class="menu__content" data-name="Egg Bhurji" data-price="55.00" data-type="non-veg">
-              <img src="{{ url_for('static', filename='images/Veg-curry-3.jpg') }}" alt="" class="menu__img" />
-              <h3 class="menu__name">Egg Bhurji</h3>
-              <span class="menu__detail">Spicy scrambled eggs with spices</span><br/>
-              <span class="menu__preci">₹ 55.00</span>
-              <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
-            </div>
-          </div>
-        </div>
       </section>
     </main>
 

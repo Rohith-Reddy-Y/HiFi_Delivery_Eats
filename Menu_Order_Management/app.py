@@ -50,7 +50,7 @@ def order_track():
     return render_template('order_track.html')
 
 
-
+# MENU MANAGEMENT FUNCTIONS 
 @app.route('/add_item', methods=["POST"])
 def add_item():
     try:
@@ -250,5 +250,57 @@ def delete_item():
         logger.error(f"Error deleting menu item: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+
+
+
+
+
+# ORDER MANAGEMENT FUNCTIONS
+@app.route('/api/menu_items', methods=['GET'])
+def get_menu_items_api():
+    try:
+        # Fetch all menu items with their category and subcategory details
+        items = (
+            session.query(
+                MenuItem.menu_item_id,
+                MenuItem.name,
+                MenuItem.description,
+                MenuItem.price,
+                MenuItem.image_url,
+                MenuItem.is_best_seller,
+                MenuItem.is_out_of_stock,
+                Category.name.label("category_name"),
+                Subcategory.name.label("subcategory_name")
+            )
+            .join(Category, MenuItem.category_id == Category.category_id, isouter=True)  # Left join for category
+            .join(Subcategory, MenuItem.subcategory_id == Subcategory.subcategory_id, isouter=True)  # Left join for subcategory
+            .filter(MenuItem.is_out_of_stock == False)  # Filter out-of-stock items
+            .all()
+        )
+
+
+        # Format the response data
+        items_list = [
+            {
+                "menu_item_id": item.menu_item_id,
+                "name": item.name,
+                "description": item.description,
+                "price": float(item.price),  # Convert DECIMAL to float
+                "category_name": item.category_name if item.category_name else "Uncategorized",
+                "subcategory_name": item.subcategory_name if item.subcategory_name else "Uncategorized",
+                "image_url": item.image_url,
+                "is_best_seller": item.is_best_seller,
+                "is_out_of_stock": item.is_out_of_stock,
+            }
+            for item in items
+        ]
+
+        session.close()
+        return jsonify(items_list)
+
+    except Exception as e:
+        session.close()
+        logger.error(f"Error fetching menu items: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)

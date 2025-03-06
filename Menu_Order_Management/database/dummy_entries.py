@@ -24,13 +24,12 @@ default_subcategories = {
     "ISC003": ("IC002", "Salad"),
     "ISC004": ("IC001", "Dessert"),
     "ISC005": ("IC001", "Starter"),
-    "ISC006": ("IC001", "Soups"),
-    "ISC007": ("IC001", "Salads"),
-    "ISC008": ("IC001", "Breads"),
-    "ISC009": ("IC001", "Main Course"),
-    "ISC010": ("IC001", "Beverages"),
-    "ISC011": ("IC001", "Breakfast"),
-    "ISC012": ("IC001", "Icecreams")
+    "ISC006": ("IC001", "Soup"),
+    "ISC007": ("IC001", "Bread"),
+    "ISC008": ("IC001", "Main Course"),
+    "ISC009": ("IC001", "Beverage"),
+    "ISC010": ("IC001", "Breakfast"),
+    "ISC011": ("IC001", "Icecream")
 }
 
 for subcategory_id, (category_id, name) in default_subcategories.items():

@@ -5,6 +5,19 @@ from datetime import datetime
 # Database Connection
 engine = create_engine("sqlite:///hifi_database.db", echo=True)
 
+'''
+PRIMARY KEY ID MAPPING:
+-----------------------
+    U001 for user
+    IC001 for category
+    ISC001 for subcategory
+    MI001 for menu_item
+    O001 for orders
+    OI001 for order_item
+    C001 for cart. 
+    D001 for delivery_agent
+'''
+
 # Base Class
 class Base(DeclarativeBase):
     pass
@@ -46,7 +59,7 @@ class Subcategory(Base):
     __table_args__ = {'extend_existing': True}
     __tablename__ = "subcategories"
     subcategory_id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=False)
     category_id: Mapped[str] = mapped_column(ForeignKey("categories.category_id", ondelete="CASCADE"), nullable=False)
     menu_items = relationship("MenuItem", back_populates="subcategory")  # Relationship with MenuItem
 

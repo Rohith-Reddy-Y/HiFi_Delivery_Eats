@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, and_
 from datetime import datetime
 from sqlalchemy.sql import func
 from database.create_database import *
@@ -61,9 +61,9 @@ class MenuService:
                     self.session.flush()  # Ensures category_id is available before use
 
                 # Fetch or create subcategory
-                subcategory = self.session.execute(
-                    select(Subcategory).where(Subcategory.name == subcategory_name)
-                ).scalar_one_or_none()
+                subcategory = self.session.execute(select(Subcategory).where(
+                    and_(Subcategory.name == subcategory_name, Subcategory.category_id == category.category_id)
+                    )).scalar_one_or_none()
 
                 if not subcategory:
                     latest_subcategory_id = self.get_latest_id(Subcategory.subcategory_id)
