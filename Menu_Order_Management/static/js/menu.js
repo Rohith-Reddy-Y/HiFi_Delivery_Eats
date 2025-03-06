@@ -239,8 +239,8 @@ function showEditPopup(row, deleteButton, editButton) {
           <input type="number" id="edit-price" step="0.01" value="${price}" required><br><br>
           <label>Category:</label>
           <select id="edit-category" required>
-            <option value="veg" ${category === "veg" ? "selected" : ""}>VEG</option>
-            <option value="non-veg" ${category === "non-veg" ? "selected" : ""}>NON-VEG</option>
+            <option value="Veg" ${category === "Veg" ? "selected" : ""}>VEG</option>
+            <option value="Non-Veg" ${category === "Non-Veg" ? "selected" : ""}>NON-VEG</option>
           </select><br><br>
           <label>Subcategory:</label>
           <select id="edit-subcategory" required>
