@@ -13,69 +13,6 @@
     <!--========== CSS ==========-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
-    <!--========== CUSTOM CSS FOR DROPDOWN AND MENU IMAGES ==========-->
-    <style>
-      /* Dropdown container */
-      .nav__dropdown {
-        position: relative;
-        display: inline-block;
-      }
-
-      /* Dropdown content (hidden by default) */
-      .nav__dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #069c54; /* Light green background to match theme */
-        background-image: url('https://www.transparenttextures.com/patterns/food.png'); /* Subtle food texture */
-        background-size: cover;
-        background-position: center;
-        background-blend-mode: overlay; /* Blend the background color and image */
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        border-radius: 15px;
-      }
-
-      /* Dropdown links */
-      .nav__dropdown-content a {
-        color: #333; /* Darker text for better contrast */
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        font-size: 14px;
-        border-radius: 15px;
-        /* Add transition for smooth scaling */
-        transition: transform 0.3s ease;
-        transform: scale(1); /* Normal size */
-      }
-
-      /* Change color and scale of dropdown links on hover */
-      .nav__dropdown-content a:hover {
-        background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white on hover */
-        transform: scale(1.1); /* Increase size on hover */
-      }
-
-      /* Show the dropdown menu on hover */
-      .nav__dropdown:hover .nav__dropdown-content {
-        display: block;
-      }
-
-      /* Style the dropdown button */
-      .nav__dropdown .nav__link {
-        cursor: pointer;
-      }
-
-      /* Make menu item images round with original properties */
-      .menu__img {
-        width: 100px; /* Original width */
-        height: 100px; /* Match width for a perfect circle */
-        border-radius: 50%; /* Make the image round */
-        object-fit: cover; /* Prevent distortion */
-        align-self: center; /* Original alignment */
-        margin-bottom: var(--mb-2); /* Original margin */
-      }
-    </style>
-
     <title>HiFi Delivery Website</title>
   </head>
   <body>
@@ -166,145 +103,37 @@
         <span class="section-subtitle">Special</span>
         <h2 class="section-title">Menu Items</h2>
 
-        <div class="menu__container bd-grid">
-          <div
-            class="menu__content"
-            data-name="Barbecue Salad"
-            data-price="100.00"
-          >
-            <img src="{{ url_for('static', filename='images/caesar_salad.jpg') }}" alt="Barbecue Salad" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/barbecue_salad.jpg');" />
-            <h3 class="menu__name">Barbecue Salad</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 100.00</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Salad with Fish"
-            data-price="12.00"
-          >
-            <img src="{{ url_for('static', filename='images/Biryani-4.jpg') }}" alt="Salad with Fish" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/salad_with_fish.jpg');" />
-            <h3 class="menu__name">Salad with Fish</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 12.00</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Spinach Salad"
-            data-price="9.50"
-          >
-            <img src="{{ url_for('static', filename='images/grilled_chicken.jpg') }}" alt="Spinach Salad" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/spinach_salad.jpg');" />
-            <h3 class="menu__name">Spinach Salad</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 9.50</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Fish Fillet"
-            data-price="80.00"
-          >
-            <img src="{{ url_for('static', filename='images/Fish-1.jpg') }}" alt="Fish Fillet" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/Fish-1.jpg');" />
-            <h3 class="menu__name">Fish Fillet</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 80.00</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Grilled Steak"
-            data-price="120.00"
-          >
-            <img src="{{ url_for('static', filename='images/Grill-1.jpg') }}" alt="Grilled Steak" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/Grill-1.jpg');" />
-            <h3 class="menu__name">Grilled Steak</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 120.00</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Hyderabadi Biryani"
-            data-price="120.99"
-          >
-            <img src="{{ url_for('static', filename='images/Dessert-1.jpg') }}" alt="Hyderabadi Biryani" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/hyderabadi_biryani.jpg');" />
-            <h3 class="menu__name">Hyderabadi Biryani</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 120.99</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Burger"
-            data-price="120.99"
-          >
-            <img src="{{ url_for('static', filename='images/Burger-1.jpg') }}" alt="Burger" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/Burger-1.jpg');" />
-            <h3 class="menu__name">Burger</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 120.99</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Bun Sandwich"
-            data-price="120.99"
-          >
-            <img src="{{ url_for('static', filename='images/Bun-1.jpg') }}" alt="Bun Sandwich" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/Bun-1.jpg');" />
-            <h3 class="menu__name">Bun Sandwich</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 120.99</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
-
-          <div
-            class="menu__content"
-            data-name="Breakfast Platter"
-            data-price="120.99"
-          >
-            <img src="{{ url_for('static', filename='images/Breakfast-3.jpg') }}" alt="Breakfast Platter" class="menu__img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Failed to load image at ./images/Breakfast-3.jpg');" />
-            <h3 class="menu__name">Breakfast Platter</h3>
-            <span class="menu__detail">Delicious dish</span>
-            <span class="menu__preci">₹ 120.99</span>
-            <a href="#" class="button menu__button"
-              ><i class="bx bx-cart-alt"></i
-            ></a>
-          </div>
+        <div class="menu-category" data-category="Starter">
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries -->
+            </div>
+        </div>
+        
+        <div class="menu-category" data-category="Icecream">
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries -->
+            </div>
         </div>
 
+        <!-- <div class="menu-category" data-category="Starter">
+            <div class="menu__container bd-grid">
+              Dynamically add new entries 
+            </div>
+        </div> -->
+
+        
         <!-- Add "Show More" button centered below the menu items -->
         <div style="text-align: center; margin-top: 20px;">
           <a href="{{ url_for('show_menu') }}" class="button" style="background-color: green;">Show More</a>
         </div>
       </section>
     </main>
-fast_shipping_delivery_agent_img.png
+
     <!--========== SCROLL REVEAL ==========-->
     <script src="https://unpkg.com/scrollreveal"></script>
 
     <!--========== MAIN JS ==========-->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/show_menu.js') }}"></script>
   </body>
 </html>
