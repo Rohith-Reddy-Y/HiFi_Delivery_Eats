@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-from database.create_database import MenuItem, Category, Subcategory
+from database.create_database import MenuItem, Category, Subcategory, Cart, User, Order, OrderItem
 from database.services import MenuService
 import os
 import logging
@@ -302,5 +302,136 @@ def get_menu_items_api():
         session.close()
         logger.error(f"Error fetching menu items: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+# # Endpoint to add item to cart
+# @app.route('/api/add_to_cart', methods=['POST'])
+# def add_to_cart():
+#     try:
+#         data = request.json
+#         user_id = data.get("user_id")
+#         menu_item_id = data.get("menu_item_id")
+#         quantity = data.get("quantity", 1)
+
+#         if not user_id or not menu_item_id:
+#             return jsonify({"success": False, "message": "User ID and Menu Item ID are required"}), 400
+
+#         # Check if the item already exists in the cart
+#         existing_cart_item = session.query(Cart).filter_by(user_id=user_id, menu_item_id=menu_item_id).first()
+#         if existing_cart_item:
+#             existing_cart_item.quantity += quantity
+#         else:
+#             cart_id = generate_custom_id("C", session.query(Cart).count() + 1)
+#             new_cart_item = Cart(
+#                 cart_id=cart_id,
+#                 user_id=user_id,
+#                 menu_item_id=menu_item_id,
+#                 quantity=quantity
+#             )
+#             session.add(new_cart_item)
+
+#         session.commit()
+#         return jsonify({"success": True, "message": "Item added to cart"}), 200
+
+#     except Exception as e:
+#         session.rollback()
+#         logger.error(f"Error adding item to cart: {e}", exc_info=True)
+#         return jsonify({"success": False, "message": str(e)}), 500
+
+# # Endpoint to get cart items for a user
+# @app.route('/api/get_cart_items/<string:user_id>', methods=['GET'])
+# def get_cart_items(user_id):
+#     try:
+#         cart_items = (
+#             session.query(Cart, MenuItem)
+#             .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+#             .filter(Cart.user_id == user_id)
+#             .all()
+#         )
+
+#         cart_items_list = [
+#             {
+#                 "cart_id": item.Cart.cart_id,
+#                 "menu_item_id": item.MenuItem.menu_item_id,
+#                 "name": item.MenuItem.name,
+#                 "price": float(item.MenuItem.price),
+#                 "quantity": item.Cart.quantity,
+#                 "image_url": item.MenuItem.image_url,
+#             }
+#             for item in cart_items
+#         ]
+
+#         return jsonify(cart_items_list), 200
+
+#     except Exception as e:
+#         logger.error(f"Error fetching cart items: {e}", exc_info=True)
+#         return jsonify({"success": False, "message": str(e)}), 500
+
+# # Endpoint to place an order
+# @app.route('/api/place_order', methods=['POST'])
+# def place_order():
+#     try:
+#         data = request.json
+#         user_id = data.get("user_id")
+#         delivery_details = data.get("delivery_details")
+#         payment_method = data.get("payment_method")
+
+#         if not user_id or not delivery_details or not payment_method:
+#             return jsonify({"success": False, "message": "User ID, delivery details, and payment method are required"}), 400
+
+#         # Fetch cart items for the user
+#         cart_items = session.query(Cart).filter_by(user_id=user_id).all()
+#         if not cart_items:
+#             return jsonify({"success": False, "message": "Cart is empty"}), 400
+
+#         # Calculate total price
+#         total_price = 0
+#         order_items = []
+#         for cart_item in cart_items:
+#             menu_item = session.query(MenuItem).filter_by(menu_item_id=cart_item.menu_item_id).first()
+#             total_price += float(menu_item.price) * cart_item.quantity
+#             order_items.append({
+#                 "menu_item_id": menu_item.menu_item_id,
+#                 "quantity": cart_item.quantity,
+#                 "price": float(menu_item.price),
+#             })
+
+#         # Create order
+#         order_id = generate_custom_id("O", session.query(Order).count() + 1)
+#         new_order = Order(
+#             order_id=order_id,
+#             user_id=user_id,
+#             total_price=total_price,
+#             delivery_location=delivery_details,
+#             status="Pending"
+#         )
+#         session.add(new_order)
+
+#         # Create order items
+#         for item in order_items:
+#             order_item_id = generate_custom_id("OI", session.query(OrderItem).count() + 1)
+#             new_order_item = OrderItem(
+#                 order_item_id=order_item_id,
+#                 order_id=order_id,
+#                 menu_item_id=item["menu_item_id"],
+#                 quantity=item["quantity"],
+#                 price=item["price"]
+#             )
+#             session.add(new_order_item)
+
+#         # Clear the user's cart
+#         session.query(Cart).filter_by(user_id=user_id).delete()
+#         session.commit()
+
+#         return jsonify({"success": True, "message": "Order placed successfully", "order_id": order_id}), 200
+
+#     except Exception as e:
+#         session.rollback()
+#         logger.error(f"Error placing order: {e}", exc_info=True)
+#         return jsonify({"success": False, "message": str(e)}), 500
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
