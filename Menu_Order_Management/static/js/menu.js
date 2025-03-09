@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <td><img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" width="50"></td>
             <td>${item.is_best_seller ? "Yes" : "No"}</td>
             <td>${item.is_out_of_stock ? "Out of Stock" : "Available"}</td>
-            <td></td>
+            <td>${formatTimestamp(new Date())}</td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn">Edit</button>
@@ -144,8 +144,8 @@ function showNotification(message, type) {
             <td>${discount}%</td>
             <td><img src="${staticImagePath}${data.image_url ? data.image_url.split('/').pop() : ''}" alt="${itemName}" width="50"></td>
             <td>${bestSeller}</td>
-            <td>${stockAvailable}</td>
-            <td></td>
+            <td>${stockAvailable ? "Out of Stock" : "Available"}</td>
+            <td>${formatTimestamp(new Date())}</td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn">Edit</button>
@@ -245,14 +245,14 @@ function showEditPopup(row, deleteButton, editButton) {
           <label>Subcategory:</label>
           <select id="edit-subcategory" required>
             <option value="Starter" ${subcategory === "Starter" ? "selected" : ""}>Starter</option>
-            <option value="Soups" ${subcategory === "Soups" ? "selected" : ""}>Soups</option>
-            <option value="Salads" ${subcategory === "Salads" ? "selected" : ""}>Salads</option>
-            <option value="Breads" ${subcategory === "Breads" ? "selected" : ""}>Breads</option>
+            <option value="Soup" ${subcategory === "Soup" ? "selected" : ""}>Soups</option>
+            <option value="Salad" ${subcategory === "Salad" ? "selected" : ""}>Salads</option>
+            <option value="Bread" ${subcategory === "Bread" ? "selected" : ""}>Breads</option>
             <option value="Main Course" ${subcategory === "Main Course" ? "selected" : ""}>Main Course</option>
-            <option value="Beverages" ${subcategory === "Beverages" ? "selected" : ""}>Beverages</option>
+            <option value="Beverage" ${subcategory === "Beverage" ? "selected" : ""}>Beverages</option>
             <option value="Breakfast" ${subcategory === "Breakfast" ? "selected" : ""}>Breakfast</option>
             <option value="Biryani" ${subcategory === "Biryani" ? "selected" : ""}>Biryani</option>
-            <option value="Icecreams" ${subcategory === "Icecreams" ? "selected" : ""}>Icecreams</option>
+            <option value="Icecream" ${subcategory === "Icecream" ? "selected" : ""}>Icecreams</option>
           </select><br><br>
           <label>Discount (%):</label>
           <input type="number" id="edit-discount" min="0" max="100" value="${discount}"><br><br>
