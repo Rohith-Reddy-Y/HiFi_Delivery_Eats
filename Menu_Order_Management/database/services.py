@@ -47,6 +47,7 @@ class MenuService:
             with self.session.begin():  # Ensures atomic transactions
                 latest_menu_id = self.get_latest_id(MenuItem.menu_item_id)
                 menu_item_id = generate_next_id(latest_menu_id, "MI")
+                scheduled_update_time = scheduled_update_time.isoformat() if scheduled_update_time else None
 
                 # Fetch or create category
                 category = self.session.execute(

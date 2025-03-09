@@ -68,7 +68,7 @@ class MenuItem(Base):
     __table_args__ = {'extend_existing': True}
     __tablename__ = "menu_items"
     menu_item_id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     price: Mapped[float] = mapped_column(DECIMAL(10,2), nullable=False)
     image_url: Mapped[str] = mapped_column(String(500), nullable=False)
