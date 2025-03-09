@@ -3,12 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart - HIFI Delivery Eats</title>
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet" />
+    <title>Cart - HiFi Delivery Eats</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <!-- Add Leaflet CSS and JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
       .nav__dropdown {
@@ -18,44 +24,84 @@
       .nav__dropdown-content {
         display: none;
         position: absolute;
-        background-color: #069c54;
-        background-image: url('https://www.transparenttextures.com/patterns/food.png');
-        background-size: cover;
-        background-position: center;
-        background-blend-mode: overlay;
-        min-width: 105px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        background: linear-gradient(
+          135deg,
+          #069c54,
+          #34c759
+        ); /* Green gradient */
+        min-width: 140px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         z-index: 1;
-        border-radius: 15px;
-      }
-      .nav__dropdown-content a {
-        color: #333;
-        padding: 12px 12px;
-        text-decoration: none;
-        display: block;
-        font-size: 14px;
-        border-radius: 15px;
-        transition: transform 0.3s ease;
-        transform: scale(1);
-      }
-      .nav__dropdown-content a:hover {
-        background-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.1);
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 0.5rem 0;
+        transform: translateY(10px);
+        opacity: 0;
+        transition: all 0.3s ease;
       }
       .nav__dropdown:hover .nav__dropdown-content {
         display: block;
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .nav__dropdown-content a {
+        color: #ffffff; /* White text for contrast */
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        font-family: "Playfair Display", serif;
+        font-size: 14px;
+        transition: background-color 0.3s ease, padding-left 0.3s ease;
+      }
+      .nav__dropdown-content a:hover {
+        background-color: rgba(255, 255, 255, 0.2); /* Subtle hover effect */
+        padding-left: 20px; /* Slight shift for elegance */
       }
       .nav__dropdown .nav__link {
         cursor: pointer;
+        position: relative;
+        padding-right: 20px; /* Space for arrow */
+      }
+      .nav__dropdown .nav__link::after {
+        content: "\25BC"; /* Down arrow */
+        font-size: 10px;
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #069c54; /* Green arrow */
+        transition: color 0.3s ease;
+      }
+      .nav__dropdown:hover .nav__link::after {
+        color: #34c759; /* Lighter green on hover */
+      }
+      .dark-theme .nav__dropdown .nav__link::after {
+        color: #ffffff; /* White arrow in dark mode */
+      }
+      .dark-theme .nav__dropdown:hover .nav__link::after {
+        color: #34c759; /* Lighter green on hover in dark mode */
       }
     </style>
   </head>
   <body>
     <header class="l-header" id="header">
       <nav class="nav bd-container">
-        <a href="#" class="nav__logo">HIFI Delivery Eats</a>
+        <a href="#" class="nav__logo">HiFi Delivery Eats</a>
         <div class="nav__menu" id="nav-menu">
           <ul class="nav__list">
+            <li class="nav__item">
+              <form class="search-form">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search..."
+                  aria-label="Search"
+                />
+                <button type="submit" class="search-button">
+                  <i class="bx bx-search"></i>
+                </button>
+              </form>
+            </li>
             <li class="nav__item">
               <a href="{{ url_for('index') }}" class="nav__link">Home</a>
             </li>
@@ -66,9 +112,15 @@
               </div>
             </li>
             <li class="nav__item">
-              <a href="{{ url_for('order') }}" class="nav__link active-link">Cart(<span class="nav__cart-count">0</span>)</a>
+              <a href="{{ url_for('order') }}" class="nav__link active-link"
+                >Cart(<span class="nav__cart-count">0</span>)</a
+              >
             </li>
+            <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
           </ul>
+        </div>
+        <div class="nav__toggle" id="nav-toggle">
+          <i class="bx bx-menu"></i>
         </div>
       </nav>
     </header>
@@ -105,30 +157,57 @@
             <!-- Customer Details Form -->
             <div class="customer__details">
               <h3>Delivery Details</h3>
-              <label>Name<input
+              <label
+                >Name<input
                   type="text"
                   id="name"
                   placeholder="Eg: Rahul"
                   required
-                /></label>
-              <label>Phone Number<input
+              /></label>
+              <label
+                >Phone Number<input
                   type="tel"
                   id="phone"
                   placeholder="Eg: +918892234567"
                   required
-                /></label>
-              <label>Street<input
+              /></label>
+              <label
+                >Street<input
                   type="text"
                   id="street"
                   placeholder="Eg: #23/3/2, 2nd Cross, Gaandhi Nagar"
                   required
-                /></label>
-              <label>City<input type="text" id="city" placeholder="Eg: Bengaluru" required /></label>
-              <label>State<input type="text" id="state" placeholder="Eg: Karnataka" required /></label>
-              <label>PIN Code<input type="text" id="pincode" placeholder="Eg: 560062" required /></label>
-              <label>Coordinates<input type="text" id="coordinates" placeholder="Coordinates" readonly /> </label>
-              <!-- Map container with updated dimensions -->
-              <div id="map" style="width: 520px; height: 356px; margin-top: 10px;"></div>
+              /></label>
+              <label
+                >City<input
+                  type="text"
+                  id="city"
+                  placeholder="Eg: Bengaluru"
+                  required
+              /></label>
+              <label
+                >State<input
+                  type="text"
+                  id="state"
+                  placeholder="Eg: Karnataka"
+                  required
+              /></label>
+              <label
+                >PIN Code<input
+                  type="text"
+                  id="pincode"
+                  placeholder="Eg: 560062"
+                  required
+              /></label>
+              <label
+                >Coordinates<input
+                  type="text"
+                  id="coordinates"
+                  placeholder="Coordinates"
+                  readonly
+              /></label>
+              <!-- Map container -->
+              <div id="map"></div>
             </div>
 
             <!-- Payment Options -->
@@ -178,7 +257,11 @@
               <!-- Current order details will be inserted here -->
             </tbody>
           </table>
-          <button class="button cancel-order" id="cancel-order-button" style="margin-top: 20px">
+          <button
+            class="button cancel-order"
+            id="cancel-order-button"
+            style="margin-top: 20px"
+          >
             Cancel Order
           </button>
         </div>

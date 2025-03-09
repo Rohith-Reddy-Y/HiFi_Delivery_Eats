@@ -3,18 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!--========== BOX ICONS ==========-->
     <link
       href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
       rel="stylesheet"
     />
-
-    <!--========== CSS ==========-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/show_menu.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-
-    <!--========== CUSTOM CSS FOR DROPDOWN ==========-->
     <style>
       .nav__dropdown {
         position: relative;
@@ -23,97 +17,114 @@
       .nav__dropdown-content {
         display: none;
         position: absolute;
-        background-color: #069c54;
-        background-image: url('https://www.transparenttextures.com/patterns/food.png');
-        background-size: cover;
-        background-position: center;
-        background-blend-mode: overlay;
-        min-width: 100px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        background: linear-gradient(
+          135deg,
+          #069c54,
+          #34c759
+        ); /* Green gradient */
+        min-width: 140px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         z-index: 1;
-        border-radius: 15px;
-      }
-      .nav__dropdown-content a {
-        color: #333;
-        padding: 12px 12px;
-        text-decoration: none;
-        display: block;
-        font-size: 14px;
-        border-radius: 15px;
-        transition: transform 0.3s ease;
-        transform: scale(1);
-      }
-      .nav__dropdown-content a:hover {
-        background-color: rgba(255, 255, 255, 0.5);
-        transform: scale(1.1);
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 0.5rem 0;
+        transform: translateY(10px);
+        opacity: 0;
+        transition: all 0.3s ease;
       }
       .nav__dropdown:hover .nav__dropdown-content {
         display: block;
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .nav__dropdown-content a {
+        color: #ffffff; /* White text for contrast */
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        font-family: "Playfair Display", serif;
+        font-size: 14px;
+        transition: background-color 0.3s ease, padding-left 0.3s ease;
+      }
+      .nav__dropdown-content a:hover {
+        background-color: rgba(255, 255, 255, 0.2); /* Subtle hover effect */
+        padding-left: 20px; /* Slight shift for elegance */
       }
       .nav__dropdown .nav__link {
         cursor: pointer;
+        position: relative;
+        padding-right: 20px; /* Space for arrow */
+      }
+      .nav__dropdown .nav__link::after {
+        content: "\25BC"; /* Down arrow */
+        font-size: 10px;
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #069c54; /* Green arrow */
+        transition: color 0.3s ease;
+      }
+      .nav__dropdown:hover .nav__link::after {
+        color: #34c759; /* Lighter green on hover */
+      }
+      .dark-theme .nav__dropdown .nav__link::after {
+        color: #ffffff; /* White arrow in dark mode */
+      }
+      .dark-theme .nav__dropdown:hover .nav__link::after {
+        color: #34c759; /* Lighter green on hover in dark mode */
       }
     </style>
-
-    <title>More Menu - HIFI Delivery Eats</title>
+    <title>More Menu - HiFi Delivery Eats</title>
   </head>
   <body>
-    <!--========== SCROLL TOP ==========-->
     <a href="#" class="scrolltop" id="scroll-top">
       <i class="bx bx-chevron-up scrolltop__icon"></i>
     </a>
-
-    <!--========== HEADER ==========-->
     <header class="l-header" id="header">
-        <nav class="nav bd-container">
-          <a href="#" class="nav__logo">Hifi Delivery Eats</a>
-      
-          <div class="nav__menu" id="nav-menu">
-            <ul class="nav__list">
-              <li class="nav__item">
-                <form class="search-form">
-                  <input
-                    type="text"
-                    class="search-input"
-                    placeholder="Search..."
-                    aria-label="Search"
-                  />
-                  <button type="submit" class="search-button">
-                    <i class="bx bx-search"></i>
-                  </button>
-                </form>
-              </li>
-              <li class="nav__item">
-                <a href="{{ url_for('index') }}" class="nav__link">Home</a>
-              </li>
-              <li class="nav__item nav__dropdown">
-                <a href="#" class="nav__link">Menu</a>
-                <div class="nav__dropdown-content">
-                  <a href="{{ url_for('menu') }}">Add Menu</a>
-                </div>
-              </li>
-              <li class="nav__item">
-                <a href="{{ url_for('order') }}" class="nav__link">Cart(<span class="nav__cart-count">0</span>)</a>
-              </li>
-              <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
-            </ul>
-          </div>
-      
-          <div class="nav__toggle" id="nav-toggle">
-            <i class="bx bx-menu"></i>
-          </div>
-        </nav>
-      </header>
-
-    <!--========== MORE MENU ==========-->
+      <nav class="nav bd-container">
+        <a href="#" class="nav__logo">HiFi Delivery Eats</a>
+        <div class="nav__menu" id="nav-menu">
+          <ul class="nav__list">
+            <li class="nav__item">
+              <form class="search-form">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search..."
+                  aria-label="Search"
+                />
+                <button type="submit" class="search-button">
+                  <i class="bx bx-search"></i>
+                </button>
+              </form>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('index') }}" class="nav__link">Home</a>
+            </li>
+            <li class="nav__item nav__dropdown">
+              <a href="#" class="nav__link">Menu</a>
+              <div class="nav__dropdown-content">
+                <a href="{{ url_for('menu') }}">Add Menu</a>
+              </div>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('order') }}" class="nav__link"
+                >Cart(<span class="nav__cart-count">0</span>)</a
+              >
+            </li>
+            <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
+          </ul>
+        </div>
+        <div class="nav__toggle" id="nav-toggle">
+          <i class="bx bx-menu"></i>
+        </div>
+      </nav>
+    </header>
     <main class="l-main">
       <section class="menu section bd-container" id="more-menu">
         <span class="section-subtitle">Explore Our Menu</span>
-
-        <!-- Heading to be updated dynamically -->
         <h2 class="section-title" id="menu-heading">All Menu Items</h2>
-
-        <!-- Filter Options -->
         <div class="filter-options">
           <div class="filter-group">
             <label for="veg-nonveg-filter">Filter by Type:</label>
@@ -128,98 +139,1323 @@
             <select id="sub-category">
               <option value="">All Subcategories</option>
               <option value="Starter">Starter</option>
-              <option value="Soups">Soups</option>
-              <option value="Salads">Salads</option>
-              <option value="Breads">Breads</option>
+              <option value="Soup">Soups</option>
+              <option value="Salad">Salads</option>
+              <option value="Bread">Breads</option>
               <option value="Main Course">Main Course</option>
-              <option value="Beverages">Beverages</option>
+              <option value="Beverage">Beverages</option>
               <option value="Breakfast">Breakfast</option>
               <option value="Biryani">Biryani</option>
-              <option value="Icecreams">Icecreams</option>
+              <option value="Icecream">Icecreams</option>
             </select>
           </div>
         </div>
 
         <!-- Category: Starter -->
         <div class="menu-category" data-category="Starter">
-          <h3 class="category-title">Starter</h3>
-          <div class="menu__container bd-grid">
-            <!-- Dynamically add new entries -->
-          </div>
-        </div>
-
-        <!-- Category: Soups -->
-        <div class="menu-category" data-category="Soup">
-            <h3 class="category-title">Soups</h3>
+            <h3 class="category-title">Starter</h3>
             <div class="menu__container bd-grid">
-                <!-- Dynamically add new entries and fetch from db -->
-            </div>
-          </div>
-
-        <!-- Category: Salads -->
-        <div class="menu-category" data-category="Salad">
-            <h3 class="category-title">Salads</h3>
-            <div class="menu__container bd-grid">
-              <!-- Dynamically add new entries and fetch from db -->
-            </div>
-          </div>
-
-        <!-- Category: Breads -->
-        <div class="menu-category" data-category="Bread">
-            <h3 class="category-title">Breads</h3>
-            <div class="menu__container bd-grid">
-              <!-- Dynamically add new entries and fetch from db -->
-            </div>
-          </div>
-
-        <!-- Category: Main Course -->
-        <div class="menu-category" data-category="Main Course">
-            <h3 class="category-title">Main Course</h3>
-            <div class="menu__container bd-grid">
-            <!-- Dynamically add new entries and fetch from db -->
+              <!-- Dynamically add new entries -->
             </div>
           </div>
   
-        <!-- Category: Beverages -->
-        <div class="menu-category" data-category="Beverage">
-            <h3 class="category-title">Beverages</h3>
+          <!-- Category: Soups -->
+          <div class="menu-category" data-category="Soup">
+              <h3 class="category-title">Soups</h3>
+              <div class="menu__container bd-grid">
+                  <!-- Dynamically add new entries and fetch from db -->
+              </div>
+            </div>
+  
+          <!-- Category: Salads -->
+          <div class="menu-category" data-category="Salad">
+              <h3 class="category-title">Salads</h3>
+              <div class="menu__container bd-grid">
+                <!-- Dynamically add new entries and fetch from db -->
+              </div>
+            </div>
+  
+          <!-- Category: Breads -->
+          <div class="menu-category" data-category="Bread">
+              <h3 class="category-title">Breads</h3>
+              <div class="menu__container bd-grid">
+                <!-- Dynamically add new entries and fetch from db -->
+              </div>
+            </div>
+  
+          <!-- Category: Main Course -->
+          <div class="menu-category" data-category="Main Course">
+              <h3 class="category-title">Main Course</h3>
+              <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries and fetch from db -->
+              </div>
+            </div>
+    
+          <!-- Category: Beverages -->
+          <div class="menu-category" data-category="Beverage">
+              <h3 class="category-title">Beverages</h3>
+              <div class="menu__container bd-grid">
+                <!-- Dynamically add new entries and fetch from db -->
+              </div>
+          </div>
+  
+          <!-- Category: Breakfast -->
+          <div class="menu-category" data-category="Breakfast">
+              <h3 class="category-title">Breakfast</h3>
+              <div class="menu__container bd-grid">
+                <!-- Dynamically add new entries and fetch from db -->
+              </div>
+            </div>
+  
+          <!-- Category: Biryani -->
+          <div class="menu-category" data-category="Biryani">
+            <h3 class="category-title">Biryani</h3>
             <div class="menu__container bd-grid">
               <!-- Dynamically add new entries and fetch from db -->
             </div>
-        </div>
-
-        <!-- Category: Breakfast -->
-        <div class="menu-category" data-category="Breakfast">
-            <h3 class="category-title">Breakfast</h3>
+          </div>
+  
+          <!-- Category: Icecreams -->
+          <div class="menu-category" data-category="Icecream">
+            <h3 class="category-title">Icecreams</h3>
             <div class="menu__container bd-grid">
               <!-- Dynamically add new entries and fetch from db -->
             </div>
           </div>
 
-        <!-- Category: Biryani -->
+          
+      </section>
+    </main>
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <!--========== MAIN JS ==========-->
+    <script src="{{ url_for('static', filename='js/show_menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- <script src="show_menu.js?v=1.0.1"></script>
+    <script src="../home/home.js"></script> -->
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  for static menu items  -->
+        <!-- Category: Starter
+        <div class="menu-category" data-category="Starter">
+          <h3 class="category-title">Starter</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Paneer Tikka"
+              data-price="150.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Paneer Tikka.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Paneer Tikka</h3>
+              <span class="menu__detail">Grilled cottage cheese</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 150.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chicken Lollipop"
+              data-price="180.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Lollipop.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Lollipop</h3>
+              <span class="menu__detail">Spicy chicken appetizer</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 180.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Vegetable Spring Rolls"
+              data-price="120.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Vegetable Spring Rolls.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Vegetable Spring Rolls</h3>
+              <span class="menu__detail">Crispy rolls with veggie filling</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 120.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mushroom Manchurian"
+              data-price="140.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Mushroom Manchurian.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mushroom Manchurian</h3>
+              <span class="menu__detail">Spicy Indo-Chinese mushroom dish</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 140.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Fish Fingers"
+              data-price="200.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Fish Fingers.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Fish Fingers</h3>
+              <span class="menu__detail">Crispy fried fish sticks</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 200.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Prawn Tempura"
+              data-price="220.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Prawn Tempura.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Prawn Tempura</h3>
+              <span class="menu__detail">Lightly battered fried prawns</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 220.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+         Category: Biryani 
         <div class="menu-category" data-category="Biryani">
           <h3 class="category-title">Biryani</h3>
           <div class="menu__container bd-grid">
-            <!-- Dynamically add new entries and fetch from db -->
+            <div
+              class="menu__content"
+              data-name="Chicken Biryani"
+              data-price="200.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Biryani.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Biryani</h3>
+              <span class="menu__detail">Spicy chicken biryani</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 200.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Veg Biryani"
+              data-price="150.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Veg Biryani.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Veg Biryani</h3>
+              <span class="menu__detail">Vegetable biryani</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 150.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mutton Biryani"
+              data-price="250.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Mutton Biryani.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mutton Biryani</h3>
+              <span class="menu__detail">Spicy mutton biryani</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 250.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Paneer Biryani"
+              data-price="170.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Paneer Biryani.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Paneer Biryani</h3>
+              <span class="menu__detail">Biryani with paneer chunks</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 170.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mushroom Biryani"
+              data-price="160.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Mushroom Biryani.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mushroom Biryani</h3>
+              <span class="menu__detail">Biryani with fresh mushrooms</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 160.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Fish Biryani"
+              data-price="230.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Fish Biryani.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Fish Biryani</h3>
+              <span class="menu__detail">Spicy biryani with fish</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 230.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
           </div>
         </div>
-
-        <!-- Category: Icecreams -->
-        <div class="menu-category" data-category="Icecream">
+        <!-- Category: Soups 
+        <div class="menu-category" data-category="Soups">
+          <h3 class="category-title">Soups</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Tomato Soup"
+              data-price="80.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Tomato Soup.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Tomato Soup</h3>
+              <span class="menu__detail">Classic tomato soup</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 80.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Hot & Sour Soup"
+              data-price="90.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Hot & Sour Soup.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Hot & Sour Soup</h3>
+              <span class="menu__detail">Spicy and tangy soup</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 90.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Cream of Spinach Soup"
+              data-price="85.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Cream of Spinach Soup.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Cream of Spinach Soup</h3>
+              <span class="menu__detail">Creamy spinach and herb soup</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 85.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Sweet Corn Soup"
+              data-price="80.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Sweet Corn Soup.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Sweet Corn Soup</h3>
+              <span class="menu__detail">Corn soup with vegetables</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 80.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chicken Noodle Soup"
+              data-price="100.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Noodle Soup.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Noodle Soup</h3>
+              <span class="menu__detail"
+                >Hearty soup with chicken and noodles</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 100.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mutton Broth"
+              data-price="110.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Mutton Broth.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mutton Broth</h3>
+              <span class="menu__detail">Flavorful mutton soup</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 110.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Category: Salads 
+        <div class="menu-category" data-category="Salads">
+          <h3 class="category-title">Salads</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Greek Salad"
+              data-price="120.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Greek Salad.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Greek Salad</h3>
+              <span class="menu__detail">Fresh and healthy</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 120.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Caesar Salad"
+              data-price="130.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Caesar Salad.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Caesar Salad</h3>
+              <span class="menu__detail">Classic Caesar salad</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 130.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Cucumber Avocado Salad"
+              data-price="110.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Cucumber Avocado Salad.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Cucumber Avocado Salad</h3>
+              <span class="menu__detail"
+                >Refreshing cucumber and avocado mix</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 110.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Pasta Salad"
+              data-price="115.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Pasta Salad.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Pasta Salad</h3>
+              <span class="menu__detail">Pasta with veggies and dressing</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 115.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chicken Caesar Salad"
+              data-price="140.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Caesar Salad.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Caesar Salad</h3>
+              <span class="menu__detail"
+                >Caesar salad with grilled chicken</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 140.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Shrimp Salad"
+              data-price="150.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Shrimp Salad.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Shrimp Salad</h3>
+              <span class="menu__detail">Fresh shrimp with mixed greens</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 150.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Category: Breads 
+        <div class="menu-category" data-category="Breads">
+          <h3 class="category-title">Breads</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Garlic Naan"
+              data-price="40.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Garlic Naan.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Garlic Naan</h3>
+              <span class="menu__detail">Buttery garlic bread</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 40.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Butter Roti"
+              data-price="30.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Butter Roti.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Butter Roti</h3>
+              <span class="menu__detail">Soft and buttery</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 30.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Aloo Paratha"
+              data-price="50.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Aloo Paratha.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Aloo Paratha</h3>
+              <span class="menu__detail"
+                >Stuffed bread with spiced potatoes</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 50.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Plain Naan"
+              data-price="35.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Plain Naan.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Plain Naan</h3>
+              <span class="menu__detail">Soft and fluffy Indian bread</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 35.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Keema Naan"
+              data-price="60.00"
+              data-type="non-veg"
+            >
+              <img src="Menu_Images/Keema Naan.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Keema Naan</h3>
+              <span class="menu__detail"
+                >Naan stuffed with spiced minced meat</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 60.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chicken Stuffed Kulcha"
+              data-price="65.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Stuffed Kulcha.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Stuffed Kulcha</h3>
+              <span class="menu__detail"
+                >Kulcha with shredded chicken filling</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 65.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Category: Main Course 
+        <div class="menu-category" data-category="Main Course">
+          <h3 class="category-title">Main Course</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Paneer Butter Masala"
+              data-price="220.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Paneer Butter Masala.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Paneer Butter Masala</h3>
+              <span class="menu__detail">Paneer in rich tomato gravy</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 220.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Dal Makhani"
+              data-price="180.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Dal Makhani.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Dal Makhani</h3>
+              <span class="menu__detail">Creamy black lentils with butter</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 180.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Vegetable Korma"
+              data-price="190.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Vegetable Korma.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Vegetable Korma</h3>
+              <span class="menu__detail">Mixed veggies in creamy gravy</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 190.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Butter Chicken"
+              data-price="250.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Butter Chicken.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Butter Chicken</h3>
+              <span class="menu__detail">Chicken in creamy tomato sauce</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 250.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mutton Rogan Josh"
+              data-price="280.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Mutton Rogan Josh.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mutton Rogan Josh</h3>
+              <span class="menu__detail">Spicy mutton curry</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 280.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Fish Curry"
+              data-price="260.00"
+              data-type="non-veg"
+            >
+              <img src="Menu_Images/Fish Curry.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Fish Curry</h3>
+              <span class="menu__detail">Fish in spicy coconut gravy</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 260.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Category: Beverages 
+        <div class="menu-category" data-category="Beverages">
+          <h3 class="category-title">Beverages</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Mango Lassi"
+              data-price="60.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Mango Lassi.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Mango Lassi</h3>
+              <span class="menu__detail">Sweet yogurt-based mango drink</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 60.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Lemonade"
+              data-price="40.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Lemonade.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Lemonade</h3>
+              <span class="menu__detail">Refreshing lemon drink</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 40.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mint Cooler"
+              data-price="50.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Mint Cooler.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Mint Cooler</h3>
+              <span class="menu__detail">Chilled mint and lime drink</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 50.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Iced Tea"
+              data-price="45.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Iced Tea.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Iced Tea</h3>
+              <span class="menu__detail">Cold tea with lemon flavor</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 45.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Coconut Water"
+              data-price="55.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Coconut Water.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Coconut Water</h3>
+              <span class="menu__detail"
+                >Fresh and hydrating coconut drink</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 55.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Orange Juice"
+              data-price="50.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Orange Juice.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Orange Juice</h3>
+              <span class="menu__detail">Freshly squeezed orange juice</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 50.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Category: Icecreams 
+        <div class="menu-category" data-category="Icecreams">
           <h3 class="category-title">Icecreams</h3>
           <div class="menu__container bd-grid">
-            <!-- Dynamically add new entries and fetch from db -->
+            <div
+              class="menu__content"
+              data-name="Vanilla Icecream"
+              data-price="60.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Vanilla Icecream.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Vanilla Icecream</h3>
+              <span class="menu__detail">Classic vanilla flavor</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 60.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chocolate Icecream"
+              data-price="70.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Chocolate Icecream.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chocolate Icecream</h3>
+              <span class="menu__detail">Rich chocolate flavor</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 70.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Strawberry Icecream"
+              data-price="80.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Strawberry Icecream.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Strawberry Icecream</h3>
+              <span class="menu__detail">Fresh strawberry flavor</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 80.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Mango Sorbet"
+              data-price="75.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Mango Sorbet.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Mango Sorbet</h3>
+              <span class="menu__detail">Refreshing mango ice dessert</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 75.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Butterscotch Icecream"
+              data-price="70.00"
+              data-type="veg"
+            >
+              <img
+                src="Menu_Images/Butterscotch Icecream.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Butterscotch Icecream</h3>
+              <span class="menu__detail">Creamy with crunchy bits</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 70.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Rocky Road Icecream"
+              data-price="85.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Rocky Road Icecream.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Rocky Road Icecream</h3>
+              <span class="menu__detail"
+                >Chocolate with marshmallows (contains gelatin)</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 85.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
           </div>
         </div>
-
-      </section>
-    </main>
-
-    <!--========== SCROLL REVEAL ==========-->
-    <script src="https://unpkg.com/scrollreveal"></script>
-
-    <!--========== MAIN JS ==========-->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/show_menu.js') }}"></script>
-  </body>
-</html>
+        <!-- Category: Breakfast 
+        <div class="menu-category" data-category="Breakfast">
+          <h3 class="category-title">Breakfast</h3>
+          <div class="menu__container bd-grid">
+            <div
+              class="menu__content"
+              data-name="Masala Dosa"
+              data-price="50.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Masala Dosa.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Masala Dosa</h3>
+              <span class="menu__detail"
+                >Crispy rice crepe with potato filling</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 50.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Poha"
+              data-price="40.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Poha.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Poha</h3>
+              <span class="menu__detail"
+                >Flattened rice with spices and vegetables</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 40.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Idli Sambar"
+              data-price="45.00"
+              data-type="veg"
+            >
+              <img src="Menu_Images/Idli Sambar.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Idli Sambar</h3>
+              <span class="menu__detail"
+                >Steamed rice cakes with lentil soup</span
+              >
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 45.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Cheese Omelette"
+              data-price="60.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Cheese Omelette.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Cheese Omelette</h3>
+              <span class="menu__detail">Fluffy eggs with melted cheese</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 60.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Chicken Sausage"
+              data-price="70.00"
+              data-type="non-veg"
+            >
+              <img
+                src="Menu_Images/Chicken Sausage.jpg"
+                alt=""
+                class="menu__img"
+              />
+              <h3 class="menu__name">Chicken Sausage</h3>
+              <span class="menu__detail">Grilled sausages with toast</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 70.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+            <div
+              class="menu__content"
+              data-name="Egg Bhurji"
+              data-price="55.00"
+              data-type="non-veg"
+            >
+              <img src="Menu_Images/Egg Bhurji.jpg" alt="" class="menu__img" />
+              <h3 class="menu__name">Egg Bhurji</h3>
+              <span class="menu__detail">Spicy scrambled eggs with spices</span>
+              <div class="menu__price-row">
+                <span class="menu__preci">₹ 55.00</span>
+                <span class="menu__separator"></span>
+                <a href="#" class="button menu__button"
+                  ><i class="bx bx-cart-alt"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div> -->
