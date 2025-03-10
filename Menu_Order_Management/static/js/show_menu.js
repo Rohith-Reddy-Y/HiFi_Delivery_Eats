@@ -34,7 +34,8 @@ function getCartTotalItems() {
 // Function to update cart count in the navigation bar
 function updateCartCount() {
   const totalItems = getCartTotalItems();
-  const cartLink = document.querySelector('.nav__link[href="../static/templates/order.html"]');
+  const cartLink = document.querySelector('.nav__cart-count');
+//   alert(`${totalItems}`);
   if (cartLink) {
     const span = cartLink.querySelector('.nav__cart-count');
     if (span) {
@@ -42,10 +43,11 @@ function updateCartCount() {
     } else {
       const newSpan = document.createElement('span');
       newSpan.className = 'nav__cart-count';
+    //   alert(`cart count update : ${newSpan}`);
       newSpan.textContent = totalItems;
-      cartLink.textContent = 'Cart(';
+    //   cartLink.textContent = 'Cart(';
       cartLink.appendChild(newSpan);
-      cartLink.appendChild(document.createTextNode(')'));
+    //   cartLink.appendChild(document.createTextNode(')'));
     }
     console.log("Updated cart count to:", totalItems);
   } else {
@@ -74,37 +76,71 @@ function appendDynamicItems(menuItems) {
     console.log("No dynamic menu items to display.");
     return;
   }
+//   alert(menuItems[1]["name"]);
+  
 
   document.querySelectorAll(".menu__container .menu__content.dynamic").forEach(item => item.remove());
 
   menuItems.forEach((item) => {
-    const subcategory = item.subcategory_name?.toLowerCase();
+    const subcategory = item['subcategory_name'].toLowerCase();
+    // alert(subcategory);
     if (!subcategory) {
-      console.warn(`Item ${item.name} has no subcategory, skipping.`);
+      console.warn(`Item ${item['name']} has no subcategory, skipping.`);
       return;
     }
 
     const categorySection = Array.from(document.querySelectorAll(".menu-category")).find(
-      (category) => category.dataset.category.toLowerCase() === subcategory
+        (category) => category.getAttribute("data-category").toLowerCase() === subcategory.toLowerCase()
     );
-
+    // if (categorySection) {
+    //     alert(`Matched Category: ${categorySection?.getAttribute("data-category")}`);
+    //     console.log("Matched Category Name (data-category):", categorySection.getAttribute("data-category"));
+    // } else {
+    //     console.log("No matching category found for:", subcategory);
+    // }
     if (categorySection) {
       const menuContainer = categorySection.querySelector(".menu__container");
       const baseUrl = "https://HiFiDeliveryEats.com/";
       const staticImagePath = "/static/images/";
       if (menuContainer) {
+        // const cartItem = cart.find((ci) => ci.itemId === item.itemId);
+        // const quantity = cartItem ? cartItem.quantity : 0;
+        const quantity = 0;
+        const stockAvailable = item['is_out_of_stock'] ? 0 : 5;
+
         const menuItem = document.createElement("div");
         menuItem.classList.add("menu__content", "dynamic");
-        menuItem.setAttribute("data-name", item.name);
-        menuItem.setAttribute("data-price", item.price);
-        menuItem.setAttribute("data-type", item.category?.toLowerCase() || "");
-        menuItem.setAttribute("data-item-id", item.itemId || "");
+        menuItem.setAttribute("data-name", item['name']);
+        menuItem.setAttribute("data-price", item['price']);
+        menuItem.setAttribute("data-type", item['category_name']?.toLowerCase() || "");
+        menuItem.setAttribute("data-item-id", item['menu_item_id'] || "");
+
+        const cartControlHtml =
+        stockAvailable === 0
+          ? `<div class="cart-control"><span class="out-of-stock">Out of Stock</span></div>`
+          : quantity > 0
+          ? `
+            <div class="cart-control">
+              <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
+              <div class="quantity-control">
+                <button class="decrement">-</button>
+                <span class="item-count">${quantity}</span>
+                <button class="increment">+</button>
+              </div>
+            </div>
+          `
+          : `
+            <div class="cart-control">
+              <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
+            </div>
+          `;
+
         menuItem.innerHTML = `
           <img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" class="menu__img" />
           <h3 class="menu__name">${item.name}</h3>
           <span class="menu__detail">${item.description || ''}</span><br>
           <span class="menu__preci">₹ ${parseFloat(item.price).toFixed(2)}</span>
-          <a href="#" class="button menu__button"><i class="bx bx-cart-alt"></i></a>
+          ${cartControlHtml}
         `;
         menuContainer.appendChild(menuItem);
         console.log(`Added item "${item.name}" to subcategory "${subcategory}"`);
@@ -116,6 +152,190 @@ function appendDynamicItems(menuItems) {
     }
   });
 }
+
+
+// Function to show add-to-cart popup
+function showAddToCartPopup(item, menuItem) {
+    const popup = document.createElement("div");
+    popup.className = "popup-container";
+    popup.innerHTML = `
+      <p>Add "${item.name}" to cart?</p>
+      <div class="button-group">
+        <button id="confirm-add">OK</button>
+        <button id="cancel-add">Cancel</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+  
+    document.getElementById("confirm-add").addEventListener("click", () => {
+      updateQuantity(item, 1, menuItem);
+      document.body.removeChild(popup);
+    });
+  
+    document.getElementById("cancel-add").addEventListener("click", () => {
+      document.body.removeChild(popup);
+    });
+  }
+  
+  // Function to set up cart control event listeners
+  function setupCartControls(menuItem, item) {
+    const incrementBtn = menuItem.querySelector(".increment");
+    const decrementBtn = menuItem.querySelector(".decrement");
+    const countSpan = menuItem.querySelector(".item-count");
+  
+    if (incrementBtn) {
+      incrementBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        updateQuantity(item, 1, menuItem);
+      });
+    }
+  
+    if (decrementBtn) {
+      decrementBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        updateQuantity(item, -1, menuItem);
+      });
+    }
+  
+    if (decrementBtn && countSpan) {
+      decrementBtn.disabled = parseInt(countSpan.textContent) <= 0;
+    }
+  }
+  
+// ! NEED TO IMPLEMENT AS THE CART TABLE GET IMPLEMENTED.
+  // Function to update item quantity in cart with stock check and popup on limit
+  function updateQuantity(item, change, menuItem) {
+    // const existingItem = cart.find((cartItem) => cartItem.itemId === item.itemId);
+    // // let newQuantity = existingItem ? existingItem.quantity : 0;
+    // const stockAvailable =
+    //   parseInt(menuItems.find((i) => i.itemId === item.itemId)?.stockAvailable) ||
+    //   0;
+  
+    // const previousQuantity = newQuantity; // Store previous quantity for comparison
+    // newQuantity += change;
+  
+    // if (newQuantity < 0) {
+    //   newQuantity = 0; // Prevent negative quantity
+    // } else if (newQuantity >= stockAvailable) {
+    //   newQuantity = stockAvailable; // Cap at stock available
+    //   if (change > 0 && previousQuantity < stockAvailable) {
+    //     // Show popup only when incrementing to the limit
+    //     showStockAlert(item.name, stockAvailable);
+    //   } else if (change > 0 && previousQuantity === stockAvailable) {
+    //     // Show popup when trying to exceed the limit
+    //     showStockAlert(item.name, stockAvailable);
+    //     return; // Exit without updating if already at limit
+    //   }
+    // }
+  
+    // if (newQuantity === 0) {
+    //   cart = cart.filter((cartItem) => cartItem.itemId !== item.itemId);
+    // } else if (existingItem) {
+    //   existingItem.quantity = newQuantity;
+    // } else {
+    //   item.quantity = newQuantity;
+    //   cart.push({ ...item });
+    //   console.log("Added to cart:", { ...item });
+    // }
+  
+    // console.log("Current cart:", cart);
+  
+    const cartControl = menuItem.querySelector(".cart-control");
+    const previous_quantity = menuItem.querySelector(".item-count")?.textContent || "0";
+    // alert(`${previous_quantity}`);
+    const newQuantity = parseInt(previous_quantity) + change;
+    if(item.quantity!=newQuantity) item.quantity = newQuantity;   
+    if (newQuantity > 0) {
+      cartControl.innerHTML = `
+        <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
+        <div class="quantity-control">
+          <button class="decrement">-</button>
+          <span class="item-count">${newQuantity}</span>
+          <button class="increment">+</button>
+        </div>
+      `;
+      setupCartControls(menuItem, item);
+      // Disable increment button if at stock limit
+      const incrementBtn = menuItem.querySelector(".increment");
+      if (incrementBtn && newQuantity >= 5) {
+        incrementBtn.disabled = true;
+      }
+    } else {
+      cartControl.innerHTML = `
+        <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
+      `;
+      const cartButton = cartControl.querySelector(".menu__button");
+      if (cartButton) {
+        cartButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          showAddToCartPopup(item, menuItem);
+        });
+      }
+    }
+    
+    saveCart();
+    updateCartCount();
+  }
+  
+  // Function to show stock alert popup
+  function showStockAlert(itemName, stockAvailable) {
+    const popup = document.createElement("div");
+    popup.className = "popup-container";
+    popup.innerHTML = `
+      <p>"${itemName}" is limited to ${stockAvailable} units in stock.</p>
+      <div class="button-group">
+        <button id="close-alert">OK</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+  
+    document.getElementById("close-alert").addEventListener("click", () => {
+      document.body.removeChild(popup);
+    });
+  
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        document.body.removeChild(popup);
+      }
+    }, 3000);
+  }
+  
+  // Scroll-to-top functionality
+  function scrollTop() {
+    const scrollTop = document.getElementById("scroll-top");
+    if (window.scrollY >= 560) {
+      scrollTop.classList.add("show-scroll");
+    } else {
+      scrollTop.classList.remove("show-scroll");
+    }
+  }
+  
+  // Dark mode toggle functionality
+  function toggleTheme() {
+    document.body.classList.toggle("dark-theme");
+    const themeButton = document.getElementById("theme-button");
+    if (document.body.classList.contains("dark-theme")) {
+      themeButton.classList.remove("bx-moon");
+      themeButton.classList.add("bx-sun");
+      localStorage.setItem("theme", "dark");
+    } else {
+      themeButton.classList.remove("bx-sun");
+      themeButton.classList.add("bx-moon");
+      localStorage.setItem("theme", "light");
+    }
+  }
+  
+  // Apply saved theme on load
+  function applySavedTheme() {
+    const savedTheme = localStorage.getItem("theme");
+    const themeButton = document.getElementById("theme-button");
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark-theme");
+      themeButton.classList.remove("bx-moon");
+      themeButton.classList.add("bx-sun");
+    }
+  }
 
 document.addEventListener("DOMContentLoaded", function () {
   fetchMenuItems();
@@ -244,16 +464,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const existingItem = cart.find(cartItem => cartItem.name === item.name && cartItem.price === item.price);
         if (existingItem) existingItem.quantity += 1;
         else cart.push(item);
-  
+        
+
         saveCart();
         updateCartCount();
         console.log("Added to cart:", item);
-        alert(`${item.name} added to cart!`);
+        showAddToCartPopup(item, menuItem);
+        // alert(`${item.name} added to cart!`);
       }, { capture: true });
     }
-  
+
     // // Initialize page
     // fetchMenuItems();
-    updateCartCount();
+    // updateCartCount();
     // applyFilters();
   });
