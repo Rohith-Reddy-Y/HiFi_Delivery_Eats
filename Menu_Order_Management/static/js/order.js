@@ -68,42 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Cart link element not found.");
     }
   }
-  /* function updateCartCount() {
-    // Ensure cart is up-to-date by re-reading from localStorage
-    cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const totalItems = getCartTotalItems();
-    // Assuming the correct href is "order.html"
-    const cartLink = document.querySelector('.nav__link');
-    if (cartLink) {
-      const span = cartLink.querySelector('.nav__cart-count') || document.createElement('span');
-      span.className = 'nav__cart-count';
-      span.textContent = totalItems;
-      if (!cartLink.querySelector('.nav__cart-count')) {
-        // Find the position to insert the span
-        const textNode = cartLink.firstChild;
-        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-          const text = textNode.nodeValue;
-          const parts = text.split('(');
-          if (parts.length > 1) {
-            textNode.nodeValue = parts[0] + '(';
-            cartLink.insertBefore(span, textNode.nextSibling);
-            cartLink.appendChild(document.createTextNode(' )'));
-          } else {
-            console.error("Unable to parse the text for inserting span.");
-          }
-        } else {
-          console.error("Unable to find text node to insert span.");
-        }
-      } else {
-        span.textContent = totalItems;
-      }
-      console.log("Updated cart count to:", totalItems, "Cart state:", cart);
-      console.log("localStorage cart after update:", JSON.parse(localStorage.getItem("cart")));
-    } else {
-      console.error("Cart link element (.nav__link[href='order.html']) not found in the DOM.");
-    }
-  } */
-
+  
   // Initialize Leaflet Map
   let map;
   let marker;
@@ -253,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
       orders = orders.map((o) => (o.orderId === order.orderId ? order : o));
       localStorage.setItem("orders", JSON.stringify(orders));
       callback();
-    }, 10000);
+    }, 5000);
   }
 
   function displayCartItems() {
@@ -696,4 +661,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Force cart count update after all initial DOM updates
   updateCartCount();
+  displayOrderHistory();
 });
