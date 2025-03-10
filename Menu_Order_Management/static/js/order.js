@@ -43,14 +43,37 @@ document.addEventListener("DOMContentLoaded", function () {
   function getCartTotalItems() {
     return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   }
-
+  
   // Function to update cart count in the navigation bar (aligned with show_menu.js)
   function updateCartCount() {
+    cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const totalItems = getCartTotalItems();
+    const cartLink = document.querySelector('.nav__cart-count');
+  //   alert(`${totalItems}`);
+    if (cartLink) {
+      const span = cartLink.querySelector('.nav__cart-count');
+      if (span) {
+        span.textContent = totalItems;
+      } else {
+        const newSpan = document.createElement('span');
+        newSpan.className = 'nav__cart-count';
+      //   alert(`cart count update : ${newSpan}`);
+        newSpan.textContent = totalItems;
+      //   cartLink.textContent = 'Cart(';
+        cartLink.appendChild(newSpan);
+      //   cartLink.appendChild(document.createTextNode(')'));
+      }
+      console.log("Updated cart count to:", totalItems);
+    } else {
+      console.error("Cart link element not found.");
+    }
+  }
+  /* function updateCartCount() {
     // Ensure cart is up-to-date by re-reading from localStorage
     cart = JSON.parse(localStorage.getItem("cart")) || [];
     const totalItems = getCartTotalItems();
     // Assuming the correct href is "order.html"
-    const cartLink = document.querySelector('.nav__link[href="order.html"]');
+    const cartLink = document.querySelector('.nav__link');
     if (cartLink) {
       const span = cartLink.querySelector('.nav__cart-count') || document.createElement('span');
       span.className = 'nav__cart-count';
@@ -79,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       console.error("Cart link element (.nav__link[href='order.html']) not found in the DOM.");
     }
-  }
+  } */
 
   // Initialize Leaflet Map
   let map;
