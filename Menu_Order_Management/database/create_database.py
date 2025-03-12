@@ -1,9 +1,11 @@
 from sqlalchemy import create_engine, Integer, String, Text, Boolean, DECIMAL, TIMESTAMP, ForeignKey, DATETIME, Enum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from datetime import datetime
+from sqlalchemy import text
 
+# from sqlalchemy import create_engine
 # Database Connection
-engine = create_engine("sqlite:///hifi_database.db", echo=True)
+# engine = create_engine("sqlite:///hifi_database.db", echo=True)
 
 '''
 PRIMARY KEY ID MAPPING:
@@ -79,7 +81,8 @@ class MenuItem(Base):
     is_best_seller: Mapped[bool] = mapped_column(Boolean, default=False)
     is_out_of_stock: Mapped[bool] = mapped_column(Boolean, default=False)
     discount_percentage: Mapped[float] = mapped_column(DECIMAL(5,2), nullable=True)
-    scheduled_update_time: Mapped[datetime] = mapped_column(DATETIME, nullable=True)
+    stock_available: Mapped[int] = mapped_column(Integer, default=100)  # Added stock field
+    scheduled_update_time: Mapped[datetime] = mapped_column(DATETIME, nullable=True, default= datetime.utcnow)
     category = relationship("Category", back_populates="menu_items")
     subcategory = relationship("Subcategory", back_populates="menu_items")  # New relationship
     orders = relationship("OrderItem", back_populates="menu_item")
@@ -96,6 +99,8 @@ class Order(Base):
     status: Mapped[str] = mapped_column(Enum("Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled", name="order_status"), nullable=False, default="Pending")
     total_price: Mapped[float] = mapped_column(DECIMAL(10,2), nullable=False)
     delivery_location: Mapped[str] = mapped_column(Text, nullable=False)
+    payment_method: Mapped[str] = mapped_column(Enum("cod", "online", name="payment_methods"), nullable=False)  # Added payment method
+    coordinates: Mapped[str] = mapped_column(String(50), nullable=True)  # Added coordinates
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     # Explicitly specify foreign_keys for clarity
     user = relationship("User", back_populates="orders", foreign_keys=[user_id])  # Customer
@@ -137,4 +142,21 @@ class Cart(Base):
     
 # Creating Tables
 # print("Creating tables...")
-# Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)  # only create tables to the database if not exist else do nothing. 
+
+
+'''
+# For adding new attributes to the existing table
+with engine.connect() as connection:
+    connection.execute(text("ALTER TABLE menu_items ADD COLUMN stock_available INTEGER DEFAULT 100;"))
+    connection.commit()
+    print("Added stock available")
+    connection.execute(text("ALTER TABLE orders ADD COLUMN payment_method TEXT CHECK(payment_method IN ('cod', 'online')) NOT NULL DEFAULT 'cod';"));
+    connection.commit()
+    print("Added payment method")
+    connection.execute(text("ALTER TABLE orders ADD COLUMN coordinates TEXT DEFAULT NULL;"));
+    connection.commit()
+    print("Added coordinates")
+    
+print("Column added successfully.")
+'''

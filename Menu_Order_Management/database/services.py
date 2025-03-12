@@ -40,14 +40,14 @@ class MenuService:
     def add_menu_item(self, name: str, description: str, price: float, image_url: str,
                   category_name: str, subcategory_name: str, nutrient_value: str, calorie_count: int,
                   is_best_seller: bool = False, is_out_of_stock: bool = False, 
-                  discount_percentage: int = 0, scheduled_update_time: datetime = None):
+                  discount_percentage: int = 0,stock_available:int = 100):
         """Adds a new menu item and associates it with a category and subcategory."""
     
         try:
             with self.session.begin():  # Ensures atomic transactions
                 latest_menu_id = self.get_latest_id(MenuItem.menu_item_id)
                 menu_item_id = generate_next_id(latest_menu_id, "MI")
-                scheduled_update_time = scheduled_update_time.isoformat() if scheduled_update_time else None
+                # scheduled_update_time = scheduled_update_time.isoformat() if scheduled_update_time else None
 
                 # Fetch or create category
                 category = self.session.execute(
@@ -79,7 +79,7 @@ class MenuService:
                     image_url=image_url, category_id=category.category_id, subcategory_id=subcategory.subcategory_id,
                     nutrient_value=nutrient_value, calorie_count=calorie_count,
                     is_best_seller=is_best_seller, is_out_of_stock=is_out_of_stock,
-                    discount_percentage=discount_percentage, scheduled_update_time=scheduled_update_time
+                    discount_percentage=discount_percentage, stock_available=stock_available
                 )
 
                 self.session.add(new_item)
