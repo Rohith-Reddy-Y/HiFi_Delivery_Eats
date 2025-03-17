@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart - HiFi Delivery Eats</title>
+    <title>Cart - HIFI Delivery Eats</title>
     <link
       href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}" />
     <!-- Add Leaflet CSS and JS -->
     <link
       rel="stylesheet"
@@ -86,7 +86,7 @@
   <body>
     <header class="l-header" id="header">
       <nav class="nav bd-container">
-        <a href="#" class="nav__logo">HiFi Delivery Eats</a>
+        <a href="#" class="nav__logo">HIFI Delivery Eats</a>
         <div class="nav__menu" id="nav-menu">
           <ul class="nav__list">
             <li class="nav__item">
@@ -113,7 +113,7 @@
             </li>
             <li class="nav__item">
               <a href="{{ url_for('order') }}" class="nav__link active-link"
-                >Cart(<span class="nav__cart-count"></span>)</a
+                >Cart(<span class="nav__cart-count">0</span>)</a
               >
             </li>
             <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
@@ -324,8 +324,8 @@
       </section>
     </main>
 
-    <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/order.js') }}"></script>
+    <script src="https://unpkg.com/scrollreveal" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/order.js') }}" defer></script>
   </body>
 </html>
