@@ -13,6 +13,7 @@
     <!--========== CSS ==========-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- <script src="https://unpkg.com/scrollreveal"></script> -->
 
     <!--========== CUSTOM CSS FOR DROPDOWN (Copied from home.html) ==========-->
     <style>
@@ -210,9 +211,9 @@
     </a>
 
     <!--========== SCROLL REVEAL ==========-->
-    <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+    <script src="https://unpkg.com/scrollreveal" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
     <!-- Updated script with version parameter to avoid caching -->
     <!-- <script src="add_menu.js?v=1.0.1"></script> -->
     <!-- Added home.js for navigation bar functionality -->

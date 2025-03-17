@@ -62,9 +62,10 @@ async function fetchMenuItems() {
     if (!response.ok) {
       throw new Error('Failed to fetch menu items');
     }
-    const menuItems = await response.json();
+    const result = await response.json(); // Parse the JSON response
+    const menuItems = result.data; // Extract the 'data' array from your API response
+    console.log(menuItems); // Log to verify the data
     appendDynamicItems(menuItems);
-    applyFilters();
   } catch (error) {
     console.error("Error fetching menu items:", error);
   }
@@ -72,86 +73,81 @@ async function fetchMenuItems() {
 
 // Function to append dynamic items to the menu
 function appendDynamicItems(menuItems) {
-  if (!menuItems || menuItems.length === 0) {
-    console.log("No dynamic menu items to display.");
-    return;
-  }
-//   alert(menuItems[1]["name"]);
-  
-
-  document.querySelectorAll(".menu__container .menu__content.dynamic").forEach(item => item.remove());
-
-  menuItems.forEach((item) => {
-    const subcategory = item['subcategory_name'].toLowerCase();
-    // alert(subcategory);
-    if (!subcategory) {
-      console.warn(`Item ${item['name']} has no subcategory, skipping.`);
+    if (!menuItems || menuItems.length === 0) {
+      console.log("No dynamic menu items to display.");
       return;
     }
-
-    const categorySection = Array.from(document.querySelectorAll(".menu-category")).find(
+  
+    document.querySelectorAll(".menu__container .menu__content.dynamic").forEach(item => item.remove());
+  
+    menuItems.forEach((item) => {
+      const subcategory = item['subcategory_name'].toLowerCase();
+      if (!subcategory) {
+        console.warn(`Item ${item['name']} has no subcategory, skipping.`);
+        return;
+      }
+  
+      const categorySection = Array.from(document.querySelectorAll(".menu-category")).find(
         (category) => category.getAttribute("data-category").toLowerCase() === subcategory.toLowerCase()
-    );
-    // if (categorySection) {
-    //     alert(`Matched Category: ${categorySection?.getAttribute("data-category")}`);
-    //     console.log("Matched Category Name (data-category):", categorySection.getAttribute("data-category"));
-    // } else {
-    //     console.log("No matching category found for:", subcategory);
-    // }
-    if (categorySection) {
-      const menuContainer = categorySection.querySelector(".menu__container");
-      const baseUrl = "https://HiFiDeliveryEats.com/";
-      const staticImagePath = "/static/images/";
-      if (menuContainer) {
-        // const cartItem = cart.find((ci) => ci.itemId === item.itemId);
-        // const quantity = cartItem ? cartItem.quantity : 0;
-        const quantity = 0;
-        const stockAvailable = item['is_out_of_stock'] ? 0 : 5;
-
-        const menuItem = document.createElement("div");
-        menuItem.classList.add("menu__content", "dynamic");
-        menuItem.setAttribute("data-name", item['name']);
-        menuItem.setAttribute("data-price", item['price']);
-        menuItem.setAttribute("data-type", item['category_name']?.toLowerCase() || "");
-        menuItem.setAttribute("data-item-id", item['menu_item_id'] || "");
-
-        const cartControlHtml =
-        stockAvailable === 0
-          ? `<div class="cart-control"><span class="out-of-stock">Out of Stock</span></div>`
-          : quantity > 0
-          ? `
-            <div class="cart-control">
-              <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
-              <div class="quantity-control">
-                <button class="decrement">-</button>
-                <span class="item-count">${quantity}</span>
-                <button class="increment">+</button>
+      );
+  
+      if (categorySection) {
+        const menuContainer = categorySection.querySelector(".menu__container");
+        const baseUrl = "https://HiFiDeliveryEats.com/";
+        const staticImagePath = "/static/images/";
+        if (menuContainer) {
+          const cartItem = cart.find((ci) => ci.itemId === item.menu_item_id);
+          const quantity = cartItem ? cartItem.quantity : 0;
+          const stockAvailable = item.is_out_of_stock ? 0 : 5; // Adjust if stock data is available
+  
+          const menuItem = document.createElement("div");
+          menuItem.classList.add("menu__content", "dynamic");
+          menuItem.setAttribute("data-name", item['name']);
+          menuItem.setAttribute("data-price", item['price']);
+          menuItem.setAttribute("data-type", item['category_name']?.toLowerCase() || "");
+          menuItem.setAttribute("data-item-id", item['menu_item_id'] || "");
+  
+          const cartControlHtml = stockAvailable === 0
+            ? `<div class="cart-control"><span class="out-of-stock">Out of Stock</span></div>`
+            : quantity > 0
+            ? `
+              <div class="cart-control">
+                <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
+                <div class="quantity-control">
+                  <button class="decrement">-</button>
+                  <span class="item-count">${quantity}</span>
+                  <button class="increment">+</button>
+                </div>
               </div>
-            </div>
-          `
-          : `
-            <div class="cart-control">
-              <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
+            `
+            : `
+              <div class="cart-control">
+                <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
+              </div>
+            `;
+  
+          menuItem.innerHTML = `
+            <img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" class="menu__img" />
+            <h3 class="menu__name">${item.name}</h3>
+            <span class="menu__detail">${item.description || "No description available"}</span>
+            <div class="menu__price-row">
+              <span class="menu__preci">₹ ${parseFloat(item.price).toFixed(2)}</span>
+              ${cartControlHtml}
             </div>
           `;
-
-        menuItem.innerHTML = `
-          <img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" class="menu__img" />
-          <h3 class="menu__name">${item.name}</h3>
-          <span class="menu__detail">${item.description || ''}</span><br>
-          <span class="menu__preci">₹ ${parseFloat(item.price).toFixed(2)}</span>
-          ${cartControlHtml}
-        `;
-        menuContainer.appendChild(menuItem);
-        console.log(`Added item "${item.name}" to subcategory "${subcategory}"`);
+  
+          menuContainer.appendChild(menuItem);
+  
+          // Attach all cart-related event listeners
+          setupCartControls(menuItem, item);
+        } else {
+          console.error(`Menu container not found for subcategory: ${subcategory}`);
+        }
       } else {
-        console.error(`Menu container not found for subcategory: ${subcategory}`);
+        console.error(`Category section not found for subcategory: ${subcategory}`);
       }
-    } else {
-      console.error(`Category section not found for subcategory: ${subcategory}`);
-    }
-  });
-}
+    });
+  }
 
 
 // Function to show add-to-cart popup
@@ -182,7 +178,17 @@ function showAddToCartPopup(item, menuItem) {
     const incrementBtn = menuItem.querySelector(".increment");
     const decrementBtn = menuItem.querySelector(".decrement");
     const countSpan = menuItem.querySelector(".item-count");
+    const addToCartBtn = menuItem.querySelector(".cart-icon-wrapper.menu__button");
   
+    // Add to Cart button listener
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        showAddToCartPopup(item, menuItem);
+      });
+    }
+  
+    // Increment button listener
     if (incrementBtn) {
       incrementBtn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -190,6 +196,7 @@ function showAddToCartPopup(item, menuItem) {
       });
     }
   
+    // Decrement button listener
     if (decrementBtn) {
       decrementBtn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -197,82 +204,69 @@ function showAddToCartPopup(item, menuItem) {
       });
     }
   
+    // Disable decrement button if quantity is 0
     if (decrementBtn && countSpan) {
       decrementBtn.disabled = parseInt(countSpan.textContent) <= 0;
     }
   }
   
-// ! NEED TO IMPLEMENT AS THE CART TABLE GET IMPLEMENTED.
   // Function to update item quantity in cart with stock check and popup on limit
   function updateQuantity(item, change, menuItem) {
-    // const existingItem = cart.find((cartItem) => cartItem.itemId === item.itemId);
-    // // let newQuantity = existingItem ? existingItem.quantity : 0;
-    // const stockAvailable =
-    //   parseInt(menuItems.find((i) => i.itemId === item.itemId)?.stockAvailable) ||
-    //   0;
-  
-    // const previousQuantity = newQuantity; // Store previous quantity for comparison
-    // newQuantity += change;
-  
-    // if (newQuantity < 0) {
-    //   newQuantity = 0; // Prevent negative quantity
-    // } else if (newQuantity >= stockAvailable) {
-    //   newQuantity = stockAvailable; // Cap at stock available
-    //   if (change > 0 && previousQuantity < stockAvailable) {
-    //     // Show popup only when incrementing to the limit
-    //     showStockAlert(item.name, stockAvailable);
-    //   } else if (change > 0 && previousQuantity === stockAvailable) {
-    //     // Show popup when trying to exceed the limit
-    //     showStockAlert(item.name, stockAvailable);
-    //     return; // Exit without updating if already at limit
-    //   }
-    // }
-  
-    // if (newQuantity === 0) {
-    //   cart = cart.filter((cartItem) => cartItem.itemId !== item.itemId);
-    // } else if (existingItem) {
-    //   existingItem.quantity = newQuantity;
-    // } else {
-    //   item.quantity = newQuantity;
-    //   cart.push({ ...item });
-    //   console.log("Added to cart:", { ...item });
-    // }
-  
-    // console.log("Current cart:", cart);
-  
     const cartControl = menuItem.querySelector(".cart-control");
-    const previous_quantity = menuItem.querySelector(".item-count")?.textContent || "0";
-    // alert(`${previous_quantity}`);
-    const newQuantity = parseInt(previous_quantity) + change;
-    if(item.quantity!=newQuantity) item.quantity = newQuantity;   
-    if (newQuantity > 0) {
-      cartControl.innerHTML = `
-        <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
-        <div class="quantity-control">
-          <button class="decrement">-</button>
-          <span class="item-count">${newQuantity}</span>
-          <button class="increment">+</button>
+    const previousQuantity = parseInt(menuItem.querySelector(".item-count")?.textContent || "0");
+    const stockAvailable = item.is_out_of_stock ? 0 : 5; // Adjust if actual stock data is available
+    let newQuantity = previousQuantity + change;
+  
+    // Check if incrementing would exceed stock
+    if (change > 0 && newQuantity > stockAvailable) {
+      showStockAlert(item.name, stockAvailable); // Show popup instead of capping silently
+      return; // Exit without updating quantity
+    }
+  
+    // Prevent negative quantity
+    if (newQuantity < 0) newQuantity = 0;
+  
+    // Update cart
+    const cartItem = cart.find(ci => ci.itemId === item.menu_item_id);
+    if (newQuantity === 0 && cartItem) {
+      cart = cart.filter(ci => ci.itemId !== item.menu_item_id);
+    } else if (cartItem) {
+      cartItem.quantity = newQuantity;
+    } else if (newQuantity > 0) {
+      cart.push({
+        itemId: item.menu_item_id,
+        name: item.name,
+        price: item.price,
+        quantity: newQuantity
+      });
+    }
+  
+    // Update DOM
+    const cartControlHtml = stockAvailable === 0
+      ? `<div class="cart-control"><span class="out-of-stock">Out of Stock</span></div>`
+      : newQuantity > 0
+      ? `
+        <div class="cart-control">
+          <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
+          <div class="quantity-control">
+            <button class="decrement">-</button>
+            <span class="item-count">${newQuantity}</span>
+            <button class="increment">+</button>
+          </div>
+        </div>
+      `
+      : `
+        <div class="cart-control">
+          <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
         </div>
       `;
-      setupCartControls(menuItem, item);
-      // Disable increment button if at stock limit
-      const incrementBtn = menuItem.querySelector(".increment");
-      if (incrementBtn && newQuantity >= 5) {
-        incrementBtn.disabled = true;
-      }
-    } else {
-      cartControl.innerHTML = `
-        <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
-      `;
-      const cartButton = cartControl.querySelector(".menu__button");
-      if (cartButton) {
-        cartButton.addEventListener("click", (e) => {
-          e.preventDefault();
-          showAddToCartPopup(item, menuItem);
-        });
-      }
-    }
-    
+  
+    cartControl.innerHTML = cartControlHtml;
+  
+    // Re-attach event listeners
+    setupCartControls(menuItem, item);
+  
+    // Save and update UI
     saveCart();
     updateCartCount();
   }
@@ -337,14 +331,19 @@ function showAddToCartPopup(item, menuItem) {
     }
   }
 
-document.addEventListener("DOMContentLoaded", function () {
-  fetchMenuItems();
-  updateCartCount();
-});
 
 document.addEventListener("DOMContentLoaded", function () {
     // DOM Elements
     fetchMenuItems();
+    updateCartCount();
+    // applyFilters();
+    const themeButton = document.getElementById("theme-button");
+    if (themeButton) {
+      themeButton.addEventListener("click", toggleTheme);
+    } else {
+      console.error("Theme button not found in DOMContentLoaded");
+    }
+
     const searchInput = document.querySelector(".search-input");
     const vegNonVegFilter = document.getElementById("veg-nonveg-filter");
     const subCategoryFilter = document.getElementById("sub-category");
@@ -440,39 +439,39 @@ document.addEventListener("DOMContentLoaded", function () {
     subCategoryFilter?.addEventListener("change", applyFilters);
   
     // Add to Cart event delegation
-    if (menuSection) {
-      menuSection.addEventListener("click", function (event) {
-        const button = event.target.closest(".menu__button");
-        if (!button) return;
+    // if (menuSection) {
+    //   menuSection.addEventListener("click", function (event) {
+    //     const button = event.target.closest(".menu__button");
+    //     if (!button) return;
   
-        event.stopImmediatePropagation();
-        event.preventDefault();
+    //     event.stopImmediatePropagation();
+    //     event.preventDefault();
   
-        const menuItem = button.closest(".menu__content");
-        if (!menuItem) return console.error("Menu item not found for button.");
+    //     const menuItem = button.closest(".menu__content");
+    //     if (!menuItem) return console.error("Menu item not found for button.");
   
-        const item = {
-          itemId: menuItem.getAttribute("data-item-id") || "",
-          name: menuItem.getAttribute("data-name"),
-          price: menuItem.getAttribute("data-price"),
-          image: menuItem.querySelector(".menu__img")?.src || "",
-          quantity: 1,
-        };
+    //     const item = {
+    //       itemId: menuItem.getAttribute("data-item-id") || "",
+    //       name: menuItem.getAttribute("data-name"),
+    //       price: menuItem.getAttribute("data-price"),
+    //       image: menuItem.querySelector(".menu__img")?.src || "",
+    //       quantity: 1,
+    //     };
   
-        if (!item.name || !item.price) return alert("Error: Cannot add item to cart. Data incomplete.");
+    //     if (!item.name || !item.price) return alert("Error: Cannot add item to cart. Data incomplete.");
   
-        const existingItem = cart.find(cartItem => cartItem.name === item.name && cartItem.price === item.price);
-        if (existingItem) existingItem.quantity += 1;
-        else cart.push(item);
+    //     const existingItem = cart.find(cartItem => cartItem.name === item.name && cartItem.price === item.price);
+    //     if (existingItem) existingItem.quantity += 1;
+    //     else cart.push(item);
         
 
-        saveCart();
-        updateCartCount();
-        console.log("Added to cart:", item);
-        showAddToCartPopup(item, menuItem);
-        // alert(`${item.name} added to cart!`);
-      }, { capture: true });
-    }
+    //     saveCart();
+    //     updateCartCount();
+    //     console.log("Added to cart:", item);
+    //     showAddToCartPopup(item, menuItem);
+    //     // alert(`${item.name} added to cart!`);
+    //   }, { capture: true });
+    // }
 
     // // Initialize page
     // fetchMenuItems();

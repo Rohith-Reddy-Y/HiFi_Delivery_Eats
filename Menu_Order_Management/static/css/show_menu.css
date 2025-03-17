@@ -252,7 +252,7 @@ img {
 
 .menu__name {
   font-family: var(--title-font);
-  font-size: var(--h4-font-size);
+  font-size: var(--h3-font-size);
   font-weight: var(--font-bold);
   color: var(--primary-color);
   text-align: center;
@@ -565,6 +565,47 @@ img {
   margin: var(--mb-2) 0;
 }
 
+:root {
+  --primary-color-alt: #069c54; /* Green */
+  --secondary-color: #fff; /* White */
+  --title-font: 'YourFont', sans-serif; /* Define your font */
+  --small-font-size: 14px; /* Define your size */
+  --font-bold: 600; /* Define your weight */
+}
+
+/*========== DISCOUNT BADGE ==========*/
+.discount-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #069c54; /* Green background matching cart icon */
+  color: #fff; /* White text */
+  width: 30px; /* Match cart icon size */
+  height: 30px; /* Match cart icon size */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--title-font);
+  font-size: var(--small-font-size);
+  font-weight: var(--font-bold);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.discount-badge:hover {
+  transform: scale(1.1); /* Slight scale on hover */
+  background: #057b40; /* Darker green on hover */
+}
+
+.dark-theme .discount-badge {
+  background: #069c54; /* Ensure green in dark mode */
+}
+
+.dark-theme .discount-badge:hover {
+  background: #057b40; /* Darker green in dark mode */
+}
+
 /*========== MEDIA QUERIES ==========*/
 @media screen and (max-width: 768px) {
   .section {
@@ -633,3 +674,117 @@ img {
 .menu__separator {
   display: none; /* Hides the green dot */
 }
+
+/* Cart Control Container */
+.cart-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Reduced gap for compactness */
+  }
+  
+  /* Cart Icon Wrapper */
+  .cart-icon-wrapper {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  
+  .cart-icon-wrapper:hover {
+    background: var(--primary-color-alt);
+    transform: scale(1.1);
+  }
+  
+  .cart-icon {
+    font-size: 1.25rem; /* Slightly smaller than scrolltop__icon for balance */
+    color: var(--secondary-color); /* White to match your theme */
+  }
+  
+  /* Quantity Control Container */
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; /* Tight spacing for a cohesive look */
+  }
+  
+  /* Increment and Decrement Buttons */
+  .decrement,
+  .increment {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-color-alt)); /* Match your button gradient */
+    color: var(--secondary-color); /* White text */
+    border: none;
+    padding: 0.35rem 0.75rem; /* Smaller padding for compactness */
+    cursor: pointer;
+    font-size: var(--small-font-size); /* Consistent with your theme */
+    font-weight: var(--font-medium);
+    border-radius: 15px; /* Rounded like your buttons */
+    width: 28px; /* Fixed width for uniformity */
+    height: 28px; /* Fixed height for circular look */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .decrement:hover,
+  .increment:hover {
+    transform: translateY(-2px); /* Subtle lift like your .button */
+    box-shadow: 0 3px 10px rgba(6, 156, 84, 0.3); /* Green shadow */
+  }
+  
+  /* Item Count */
+  .item-count {
+    font-size: var(--small-font-size);
+    font-weight: var(--font-medium);
+    color: var(--primary-color);
+    background: var(--card-bg); /* White background for contrast */
+    border-radius: 5px;
+    min-width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+    box-shadow: 0 2px 5px var(--shadow-color);
+  }
+  
+  /* Out of Stock */
+  .out-of-stock {
+    font-size: var(--small-font-size);
+    font-weight: var(--font-bold);
+    color: #d32f2f; /* Red for emphasis, adjust if needed */
+    text-transform: uppercase;
+  }
+  
+  /* Adjust Price Row for Better Fit */
+  .menu__price-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Reduced gap to fit controls */
+    padding-top: var(--mb-1);
+    flex-wrap: nowrap; /* Prevent wrapping */
+  }
+  
+  /* Dark Theme Adjustments */
+  .dark-theme .cart-icon-wrapper {
+    background: var(--primary-color);
+  }
+  
+  .dark-theme .cart-icon-wrapper:hover {
+    background: var(--primary-color-alt);
+  }
+  
+  .dark-theme .item-count {
+    background: var(--card-bg); /* Darker card background */
+    color: var(--secondary-color); /* White text */
+  }
+  
+  .dark-theme .out-of-stock {
+    color: #ff6655; /* Lighter red for dark mode visibility */
+  }
