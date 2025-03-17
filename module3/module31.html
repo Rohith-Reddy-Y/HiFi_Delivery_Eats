@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" placeholder="Hinted search text">
+            <button class="icon-button">🔍</button>
+            <div class="nav-links">
+                <a href="#">View Orders</a>
+                <a href="#">Delivery Agents</a>
+                <a href="#">Review</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Customer Order Section -->
+            <div class="section customer-order">
+                <h2>Customer Order</h2>
+                <div class="order-item">
+                    <div class="order-details">
+                        <h3>Title</h3>
+                        <p>Body text.</p>
+                    </div>
+                    <div class="order-status">
+                        <button class="status-button">Status</button>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <button class="close-button">✖</button>
+                    </div>
+                </div>
+                <div class="order-item">
+                    <div class="order-details">
+                        <h3>Title</h3>
+                        <p>Body text.</p>
+                    </div>
+                    <div class="order-status">
+                        <button class="status-button">Status</button>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <button class="close-button">✖</button>
+                    </div>
+                </div>
+                <div class="order-item">
+                    <div class="order-details">
+                        <h3>Title</h3>
+                        <p>Body text.</p>
+                    </div>
+                    <div class="order-status">
+                        <button class="status-button">Status</button>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <button class="close-button">✖</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="section notifications">
+                <h2>Notifications <span class="bell-icon">🔔</span></h2>
+                <div class="notification-item">
+                    <h3>Getting Late</h3>
+                    <p>Description</p>
+                    <span class="time">9:41 AM</span>
+                </div>
+                <div class="notification-item">
+                    <h3>Title</h3>
+                    <p>Description</p>
+                    <span class="time">9:41 AM</span>
+                </div>
+                <div class="notification-item">
+                    <h3>Title</h3>
+                    <p>Description</p>
+                    <span class="time">9:41 AM</span>
+                </div>
+                <div class="notification-item">
+                    <h3>Title</h3>
+                    <p>Description</p>
+                    <span class="time">9:41 AM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary">
+            <div class="summary-item">
+                <span class="icon">📋</span>
+                <h3>342</h3>
+                <p>Total Orders</p>
+            </div>
+            <div class="summary-item">
+                <span class="icon">📦</span>
+                <h3>310</h3>
+                <p>Total Deliveries</p>
+            </div>
+            <div class="summary-item">
+                <span class="icon">🛵</span>
+                <h3>10</h3>
+                <p>In progress</p>
+            </div>
+            <div class="summary-item">
+                <span class="icon cancelled">✖</span>
+                <h3>20</h3>
+                <p>Total Cancelled</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
