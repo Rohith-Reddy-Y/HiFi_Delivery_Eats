@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from database.create_database import Base, MenuItem, Category, Subcategory, Cart, User, Order, OrderItem
@@ -17,10 +18,47 @@ session = Session()
 menu_service = MenuService(session)
 
 app = Flask(__name__)
+app.secret_key = 'ksfiwqy239478i32hkbqwmehrkasdf'  # Replace with a secure key
 
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+        
 UPLOAD_FOLDER = "static/images"  # Folder to store images
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+class FlaskUser(UserMixin):
+    def __init__(self, user):
+        self.id = user.user_id
+        self.role = user.role
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = session.get(User, user_id)
+    return FlaskUser(user) if user else None
+
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = session.query(User).filter_by(email=email).first()
+        if user and user.password == password:  # Direct comparison for now
+            login_user(FlaskUser(user))
+            return jsonify({'message': f'Logged in as {user.full_name}'})
+        return jsonify({'error': 'Invalid email or password'}), 401
+    return render_template('login.html')
+
+# Test protected route
+@app.route('/api/test', methods=['GET'])
+@login_required
+def test():
+    return jsonify({'message': f'Hello, {current_user.id}!'})
+
 
 @app.route('/')
 def index():
@@ -37,9 +75,9 @@ def show_menu():
     return render_template('show_menu.html')
 
 
-@app.route('/order')
-def order():
-    return render_template('order.html')
+# @app.route('/order')
+# def order():
+#     return render_template('order.html')
 
 # http://127.0.0.1:5000/order_track use this for accessing this webpage.
 @app.route('/order_track')
@@ -317,190 +355,79 @@ def get_menu_items_api():
         logger.error(f"Error fetching menu items: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
     
+# API to fetch and update cart
+@app.route('/api/cart', methods=['GET', 'POST'])
+@login_required
+def manage_cart():
+    if request.method == 'GET':
+        cart_items = (
+            session.query(
+                Cart.cart_id,
+                Cart.menu_item_id,
+                Cart.quantity,
+                MenuItem.name.label("menu_item_name"),
+                MenuItem.price
+            )
+            .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+            .filter(Cart.user_id == current_user.id)
+            .all()
+        )
+        data = [{
+            'cart_id': item.cart_id,
+            'menu_item_id': item.menu_item_id,
+            'name': item.menu_item_name,
+            'price': float(item.price),
+            'quantity': item.quantity
+        } for item in cart_items]
+        return jsonify({'ok':True,'data': data})
+    elif request.method == 'POST':
+        items = request.json.get('items', [])
+        # Clear existing cart for this user
+        session.query(Cart).filter_by(user_id=current_user.id).delete()
+        # Add new items
+        for i, item in enumerate(items, 1):
+            if item.get('quantity', 0) > 0:  # Only add items with quantity > 0
+                latest_cart_id = menu_service.get_latest_id(Cart.cart_id)
+                cart_item = Cart(
+                    cart_id=generate_next_id(latest_cart_id, "C"),
+                    # cart_id=f"C{str(i).zfill(3)}",  # Generate new cart_id (e.g., C001, C002)
+                    user_id=current_user.id,
+                    menu_item_id=item['menu_item_id'],
+                    quantity=item['quantity']
+                )
+                session.add(cart_item)
+        session.commit()
+        return jsonify({'data': items, 'message': 'Cart updated successfully'})
 
 
 # ORDER MANAGEMENT ENDPOINTS
 
-'''
-New Endpoints:
-- /api/get_cart_items/<user_id>: Retrieves cart items for a user.
-- /api/update_cart: Updates quantity or removes an item from the cart.
-- /api/clear_cart_items: Clears selected or all cart items for a user.
-- /api/place_order: Places an order, creates Order and OrderItem entries, and clears the cart.
-
-- /api/get_cart_items: to include discount and stock information.
-- /api/place_order: to use cart items from the database, include payment method and coordinates, and update stock.
-- /api/get_order_history: to fetch past orders for a user.
-'''
-@app.route('/api/get_cart_items/<string:user_id>', methods=['GET'])
-def get_cart_items(user_id):
-    try:
+# Order page route
+@app.route('/order')
+@login_required
+def order():
+    with Session(engine) as session:
         cart_items = (
-            session.query(Cart, MenuItem)
+            session.query(
+                Cart.cart_id,
+                Cart.menu_item_id,
+                Cart.quantity,
+                MenuItem.name.label("menu_item_name"),
+                MenuItem.price
+            )
             .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
-            .filter(Cart.user_id == user_id)
+            .filter(Cart.user_id == current_user.id)
             .all()
         )
-        cart_items_list = [
-            {
-                "cart_id": item.Cart.cart_id,
-                "menu_item_id": item.MenuItem.menu_item_id,
-                "name": item.MenuItem.name,
-                "price": float(item.MenuItem.price),
-                "quantity": item.Cart.quantity,
-                "image_url": item.MenuItem.image_url,
-                "discount_percentage": float(item.MenuItem.discount_percentage or 0.0),
-                "stock_available": item.MenuItem.stock_available
-            }
-            for item in cart_items
-        ]
-        return jsonify(cart_items_list), 200
-    except Exception as e:
-        logger.error(f"Error fetching cart items: {e}", exc_info=True)
-        return jsonify({"success": False, "message": str(e)}), 500
-@app.route('/api/update_cart', methods=['POST'])
-def update_cart():
-    try:
-        data = request.json
-        user_id = data.get("user_id")
-        cart_id = data.get("cart_id")
-        quantity = data.get("quantity")
-
-        cart_item = session.query(Cart).filter_by(cart_id=cart_id, user_id=user_id).first()
-        if not cart_item:
-            return jsonify({"success": False, "message": "Cart item not found"}), 404
-
-        menu_item = session.query(MenuItem).filter_by(menu_item_id=cart_item.menu_item_id).first()
-        if quantity > menu_item.stock_available:
-            return jsonify({"success": False, "message": f"Only {menu_item.stock_available} items available"}), 400
-
-        if quantity <= 0:
-            session.delete(cart_item)
-        else:
-            cart_item.quantity = quantity
-        session.commit()
-        return jsonify({"success": True, "message": "Cart updated"}), 200
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Error updating cart: {e}", exc_info=True)
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@app.route('/api/clear_cart_items', methods=['POST'])
-def clear_cart_items():
-    try:
-        data = request.json
-        user_id = data.get("user_id")
-        cart_ids = data.get("cart_ids", [])
-
-        if not cart_ids:
-            session.query(Cart).filter_by(user_id=user_id).delete()
-        else:
-            session.query(Cart).filter(Cart.user_id == user_id, Cart.cart_id.in_(cart_ids)).delete(synchronize_session=False)
-        session.commit()
-        return jsonify({"success": True, "message": "Selected cart items cleared"}), 200
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Error clearing cart items: {e}", exc_info=True)
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@app.route('/api/place_order', methods=['POST'])
-def place_order():
-    try:
-        data = request.json
-        user_id = data.get("user_id")
-        delivery_details = data.get("delivery_details")
-        payment_method = data.get("payment_method")
-        coordinates = data.get("coordinates")
-
-        cart_items = session.query(Cart, MenuItem)\
-            .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)\
-            .filter(Cart.user_id == user_id).all()
-
-        if not cart_items:
-            return jsonify({"success": False, "message": "Cart is empty"}), 400
-
-        # Calculate total price
-        total_price = 0
-        order_items_data = []
-        for cart, menu_item in cart_items:
-            if cart.quantity > menu_item.stock_available:
-                return jsonify({"success": False, "message": f"Insufficient stock for {menu_item.name}"}), 400
-            item_total = float(menu_item.price) * cart.quantity
-            discount = item_total * (float(menu_item.discount_percentage or 0) / 100)
-            total_price += (item_total - discount)
-            order_items_data.append({
-                "menu_item_id": menu_item.menu_item_id,
-                "quantity": cart.quantity,
-                "price": float(menu_item.price),
-                "name": menu_item.name
-            })
-
-        tax = total_price * 0.18
-        delivery_charge = 50.0
-        total_price += tax + delivery_charge
-
-        # Create order
-        latest_order_id = menu_service.get_latest_id(Order.order_id)
-        order_id = generate_next_id(latest_order_id, "O")
-        new_order = Order(
-            order_id=order_id,
-            user_id=user_id,
-            total_price=total_price,
-            delivery_location=delivery_details,
-            payment_method=payment_method,
-            coordinates=coordinates,
-            status="Pending"
-        )
-        session.add(new_order)
-
-        # Create order items and update stock
-        for item in order_items_data:
-            latest_order_item_id = menu_service.get_latest_id(OrderItem.order_item_id)
-            order_item_id = generate_next_id(latest_order_item_id, "OI")
-            new_order_item = OrderItem(
-                order_item_id=order_item_id,
-                order_id=order_id,
-                menu_item_id=item["menu_item_id"],
-                quantity=item["quantity"],
-                price=item["price"]
-            )
-            session.add(new_order_item)
-            menu_item = session.query(MenuItem).filter_by(menu_item_id=item["menu_item_id"]).first()
-            menu_item.stock_available -= item["quantity"]
-
-        # Clear cart
-        session.query(Cart).filter_by(user_id=user_id).delete()
-        session.commit()
-
-        return jsonify({"success": True, "message": "Order placed successfully", "order_id": order_id}), 200
-    except Exception as e:
-        session.rollback()
-        logger.error(f"Error placing order: {e}", exc_info=True)
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@app.route('/api/get_order_history/<string:user_id>', methods=['GET'])
-def get_order_history(user_id):
-    try:
-        orders = session.query(Order).filter_by(user_id=user_id).all()
-        order_history = []
-        for order in orders:
-            order_items = session.query(OrderItem, MenuItem)\
-                .join(MenuItem, OrderItem.menu_item_id == MenuItem.menu_item_id)\
-                .filter(OrderItem.order_id == order.order_id).all()
-            items = [{"name": item.MenuItem.name, "quantity": item.OrderItem.quantity, "price": float(item.OrderItem.price)} for item in order_items]
-            order_history.append({
-                "order_id": order.order_id,
-                "items": items,
-                "total_price": float(order.total_price),
-                "date": order.created_at.isoformat(),
-                "status": order.status
-            })
-        return jsonify(order_history), 200
-    except Exception as e:
-        logger.error(f"Error fetching order history: {e}", exc_info=True)
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
+        cart_data = [{
+            'cart_id': item.cart_id,
+            'menu_item_id': item.menu_item_id,
+            'name': item.menu_item_name,
+            'price': float(item.price),
+            'quantity': item.quantity
+        } for item in cart_items]
+        total_price = sum(item['price'] * item['quantity'] for item in cart_data)
+        return render_template('order.html', cart=cart_data, total_price=total_price)
 
 
 
