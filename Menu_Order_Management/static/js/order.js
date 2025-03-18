@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const cartItemsContainer = document.getElementById("cart-items");
     const orderSummary = document.getElementById("order-summary");
     const clearControlsContainer = document.getElementById("cart-clear-controls");
@@ -6,80 +6,101 @@ document.addEventListener("DOMContentLoaded", function () {
     const orderHistorySection = document.getElementById("order-history");
     const clearOrdersButton = document.getElementById("clear-orders-button");
   
-    // Load cart items, orders, and menu items from localStorage
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    // Initialize cart from Flask data
+    let cart = window.initialCart || [];
     let orders = JSON.parse(localStorage.getItem("orders")) || [];
-    let menuItems = JSON.parse(localStorage.getItem("menuItems")) || [];
+    let menuItems = [];
     let orderJustPlaced = false;
     let isSelectionMode = false;
   
-    // Debug: Log initial cart state
-    console.log("Initial cart state in order.js:", cart);
-    console.log("Initial localStorage cart:", JSON.parse(localStorage.getItem("cart")));
-    console.log("Initial menuItems:", menuItems);
+    console.log("Initial cart state in order.js (from Flask):", cart);
   
-    // Function to resolve image references
-    function resolveImage(image, itemId) {
-      console.log(`Resolving image for itemId: ${itemId}, image: ${image}`); // Debug log
-  
-      if (!image && !itemId) {
-        console.warn(`No image or itemId provided for itemId: ${itemId}`);
-        return "https://via.placeholder.com/150?text=Image+Not+Found";
-      }
-  
-      // Handle reference images (e.g., "ref:ITEM-XXXXX")
-      if (image && image.startsWith("ref:")) {
-        const id = image.split("ref:")[1];
-        const menuItem = menuItems.find((item) => item.itemId === id);
-        if (menuItem) {
-          console.log(`Resolved ref:${id} to menuItem image: ${menuItem.image}`);
-          return resolveImage(menuItem.image, id);
-        } else {
-          console.warn(`Menu item not found for ref:${id}`);
-          return "https://via.placeholder.com/150?text=Image+Not+Found";
+    async function fetchMenuItems() {
+      try {
+        const response = await fetch('/api/menu_items', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch menu items: ' + response.statusText);
         }
+        const result = await response.json();
+        menuItems = result.data || [];
+        console.log("Fetched menuItems from /api/menu_items:", menuItems);
+      } catch (error) {
+        console.error("Error fetching menu items:", error);
+        menuItems = [];
       }
+    }
   
-      // Handle base64-encoded images (used for newly added items)
-      if (image && image.startsWith("data:image/")) {
-        console.log(`Using base64 image for itemId: ${itemId}`);
-        return image;
-      }
-  
-      // Handle relative paths (e.g., "Menu_Images/..." or "../Menu_Images/...")
-      if (image && image.includes("Menu_Images/")) {
-        // Normalize the path by removing any "../" and ensuring consistent format
-        let cleanPath = image.replace(/\.\.\//g, ""); // Remove any "../" prefixes
-        cleanPath = cleanPath.replace(/^Menu_Images\//, ""); // Remove "Menu_Images/" prefix for consistency
-        // URL-encode the filename to handle spaces and special characters
-        cleanPath = encodeURI(cleanPath);
-        // Adjust path to go up one level from order/ to menu/ and then to Menu_Images
-        const adjustedPath = `../menu/Menu_Images/${cleanPath}`;
-        console.log(`Adjusted relative path for itemId: ${itemId} to ${adjustedPath}`);
-        return adjustedPath;
-      }
-  
-      // Fallback: Look up the image in menuItems based on itemId
-      const menuItem = menuItems.find((item) => item.itemId === itemId);
-      if (menuItem && menuItem.image) {
-        console.log(`Fallback: Using menuItem.image for itemId: ${itemId}, image: ${menuItem.image}`);
-        if (menuItem.image.startsWith("data:image/")) {
-          return menuItem.image;
-        } else if (menuItem.image.includes("Menu_Images/")) {
-          let cleanPath = menuItem.image.replace(/\.\.\//g, ""); // Remove any "../" prefixes
-          cleanPath = cleanPath.replace(/^Menu_Images\//, ""); // Remove "Menu_Images/" prefix
-          cleanPath = encodeURI(cleanPath); // URL-encode the filename
-          const adjustedPath = `../menu/Menu_Images/${cleanPath}`;
-          console.log(`Adjusted fallback path for itemId: ${itemId} to ${adjustedPath}`);
-          return adjustedPath;
+    async function fetchCart() {
+      try {
+        const response = await fetch('/api/cart', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch cart: ' + response.statusText);
         }
+        const result = await response.json();
+        cart = result.data || [];
+        console.log("Fetched cart from /api/cart:", cart);
+        return cart;
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+        cart = [];
+        return cart;
       }
+    }
   
-      // If all else fails, use a placeholder image
-      console.warn(`Image resolution failed for itemId: ${itemId}, image: ${image}`);
+    async function saveCart() {
+      console.log("Saving cart to server:", cart);
+      try {
+        const cartData = cart.map(item => ({
+          menu_item_id: item.menu_item_id,
+          quantity: item.quantity,
+          name: item.name,
+          price: item.price
+        }));
+        const response = await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ items: cartData })
+        });
+        if (!response.ok) {
+          throw new Error('Failed to save cart: ' + response.statusText);
+        }
+        const result = await response.json();
+        cart = result.data || cart;
+        console.log("Cart saved to server:", cart);
+      } catch (error) {
+        console.error("Error saving cart:", error);
+      }
+    }
+  
+    function resolveImage(image, menuItemId) {
+      
+      const baseUrl = "https://HiFiDeliveryEats.com/";
+      const staticImagePath = "/static/images/";
+    //   <img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" class="menu__img" />
+      const menuItem = menuItems.find(item => item.menu_item_id === menuItemId);
+      console.log(`Resolving image for menu_item_id: ${menuItemId}, image: ${menuItem.image_url}`);
+
+      if (menuItem && menuItem.image_url) {
+        console.log(`Resolved image for ${menuItemId}: ${menuItem.image_url}`);
+        return `${staticImagePath}${menuItem.image_url.replace(baseUrl, '')}`;
+      }
+      console.warn(`Image resolution failed for menu_item_id: ${menuItemId}, image: ${image}`);
       return "https://via.placeholder.com/150?text=Image+Not+Found";
     }
   
+    // Initial fetches
+    await fetchMenuItems();
+    await fetchCart();
+    console.log("Cart after initial fetch:", cart);
+    updateCartCount();
+
     // Function to show stock alert popup
     function showStockAlert(itemName, stockAvailable) {
       const popup = document.createElement("div");
@@ -105,41 +126,24 @@ document.addEventListener("DOMContentLoaded", function () {
       return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     }
   
-    // Function to update cart count in the navigation bar (aligned with show_menu.js)
+    // Function to update cart count in the navigation bar (update href)
     function updateCartCount() {
-      cart = JSON.parse(localStorage.getItem("cart")) || [];
       const totalItems = getCartTotalItems();
-      const cartLink = document.querySelector('.nav__link[href="order.html"]');
+      const cartLink = document.querySelector('.nav__link[href="/order"]'); // Updated from 'order.html'
       if (cartLink) {
-        const span = cartLink.querySelector(".nav__cart-count") || document.createElement("span");
-        span.className = "nav__cart-count";
-        span.textContent = totalItems;
-        if (!cartLink.querySelector(".nav__cart-count")) {
-          const textNode = cartLink.firstChild;
-          if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-            const text = textNode.nodeValue;
-            const parts = text.split("(");
-            if (parts.length > 1) {
-              textNode.nodeValue = parts[0] + "(";
-              cartLink.insertBefore(span, textNode.nextSibling);
-              cartLink.appendChild(document.createTextNode(" )"));
-            } else {
-              console.error("Unable to parse the text for inserting span.");
-            }
-          } else {
-            console.error("Unable to find text node to insert span.");
-          }
-        } else {
+        const span = cartLink.querySelector(".nav__cart-count");
+        if (span) {
           span.textContent = totalItems;
+          console.log("Updated cart count to:", totalItems);
+        } else {
+          console.error("Cart count span not found in nav__link.");
         }
-        console.log("Updated cart count to:", totalItems, "Cart state:", cart);
-        console.log("localStorage cart after update:", JSON.parse(localStorage.getItem("cart")));
       } else {
-        console.error("Cart link element (.nav__link[href='order.html']) not found in the DOM.");
+        console.error("Cart link element (.nav__link[href='/order']) not found.");
       }
     }
   
-    function mergeCartItems(cart) {
+    /* function mergeCartItems(cart) {
       const mergedCart = [];
       cart.forEach((item) => {
         // Ensure itemName and image are included by fetching from menuItems if not present
@@ -161,9 +165,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   
     cart = mergeCartItems(cart);
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("cart", JSON.stringify(cart)); // Temporary, we'll remove this later
     console.log("Cart after mergeCartItems:", cart);
-    updateCartCount();
+    updateCartCount(); */
   
     function toggleSelectionMode() {
       isSelectionMode = !isSelectionMode;
@@ -179,31 +183,31 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 10000);
     }
   
+  // Updated displayCartItems
     function displayCartItems() {
-      cartItemsContainer.innerHTML = "";
-      clearControlsContainer.innerHTML = "";
-  
-      console.log("Cart state before displayCartItems:", cart);
-  
-      if (cart.length === 0) {
-        if (!orderJustPlaced) {
-          cartItemsContainer.innerHTML = `
-            <div class="empty-cart-container">
-              <img src="./static/images/cart.png" alt="Empty Cart" class="empty-cart-image" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Cart+Image+Not+Found'; console.log('Failed to load cart.png at ../images/cart.png');" />
-              <p>Your cart is empty.</p>
-            </div>
-          `;
-        } else {
-          cartItemsContainer.style.display = "none";
+        cartItemsContainer.innerHTML = "";
+        clearControlsContainer.innerHTML = "";
+
+        console.log("Cart state before displayCartItems:", cart);
+
+        if (cart.length === 0) {
+          if (!orderJustPlaced) {
+            cartItemsContainer.innerHTML = `
+              <div class="empty-cart-container">
+                <img src="./static/images/cart.png" alt="Empty Cart" class="empty-cart-image" onerror="this.src='https://via.placeholder.com/150?text=Cart+Image+Not+Found';" />
+                <p>Your cart is empty.</p>
+              </div>
+            `;
+          } else {
+            cartItemsContainer.style.display = "none";
+          }
+          orderSummary.style.display = "none";
+          return;
         }
-        orderSummary.style.display = "none";
-        return;
-      }
-  
-      cartItemsContainer.style.display = "block";
-      orderSummary.style.display = "block";
-  
-      if (cart.length > 0) {
+
+        cartItemsContainer.style.display = "block";
+        orderSummary.style.display = "block";
+
         if (!isSelectionMode) {
           clearControlsContainer.innerHTML = `
             <div style="flex: 1;"></div>
@@ -221,63 +225,55 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
           `;
         }
-  
+
         const clearCartButton = document.getElementById("clear-cart-button");
         const clearSelectedButton = document.getElementById("clear-selected");
         const cancelClearButton = document.getElementById("cancel-clear");
         const selectAllCheckbox = document.getElementById("select-all");
-  
+
         if (clearCartButton) {
           clearCartButton.addEventListener("click", toggleSelectionMode);
         }
-  
         if (cancelClearButton) {
           cancelClearButton.addEventListener("click", toggleSelectionMode);
         }
-  
         if (clearSelectedButton) {
-          clearSelectedButton.addEventListener("click", function () {
-            const selectedItems = Array.from(document.querySelectorAll(".cart__item-checkbox input:checked")).map((input) => parseInt(input.value));
+          clearSelectedButton.addEventListener("click", async function () {
+            const selectedItems = Array.from(document.querySelectorAll(".cart__item-checkbox input:checked")).map(input => parseInt(input.value));
             cart = cart.filter((_, index) => !selectedItems.includes(index));
-            localStorage.setItem("cart", JSON.stringify(cart));
-            isSelectionMode = false;
+            await saveCart();
             displayCartItems();
             updateCartCount();
           });
         }
-  
         if (selectAllCheckbox) {
           selectAllCheckbox.addEventListener("change", function () {
             const checkboxes = document.querySelectorAll(".cart__item-checkbox input");
-            checkboxes.forEach((checkbox) => {
-              checkbox.checked = this.checked;
-            });
+            checkboxes.forEach(checkbox => { checkbox.checked = this.checked; });
           });
         }
-  
+
         const updateSelectAllState = () => {
           const checkboxes = document.querySelectorAll(".cart__item-checkbox input");
-          const allChecked = Array.from(checkboxes).every((checkbox) => checkbox.checked);
+          const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
           selectAllCheckbox.checked = allChecked;
         };
-  
+        // <input type="checkbox" id="cart-item-${index}" value="${index}" />
+            
         cart.forEach((item, index) => {
           const cartItem = document.createElement("div");
           cartItem.classList.add("cart__item");
-          const adjustedImagePath = resolveImage(item.image, item.itemId);
+          const adjustedImagePath = resolveImage(null, item.menu_item_id); // Use menu_item_id
           cartItem.innerHTML = `
-            ${isSelectionMode
-              ? `
+            ${isSelectionMode ? `
               <div class="cart__item-checkbox">
-                <input type="checkbox" id="cart-item-${index}" value="${index}" />
+                <input type="checkbox" id="cart-item SHRINK-${index}" value="${index}" />
                 <label for="cart-item-${index}"></label>
               </div>
-            `
-              : ""
-            }
-            <img src="${adjustedImagePath}" alt="${item.itemName || item.name}" class="cart__item-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Not+Found'; console.log('Image failed to load for ${item.itemName || item.name}: ${adjustedImagePath}');" />
+            ` : ""}
+            <img src="${adjustedImagePath}" alt="${item.name}" class="cart__item-img" onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';" />
             <div class="cart__item-details">
-              <h3 class="cart__item-name">${item.itemName || item.name}</h3>
+              <h3 class="cart__item-name">${item.name}</h3>
               <p class="cart__item-price">₹ ${parseFloat(item.price).toFixed(2)}</p>
             </div>
             <div class="quantity-controls">
@@ -288,16 +284,15 @@ document.addEventListener("DOMContentLoaded", function () {
           `;
           cartItemsContainer.appendChild(cartItem);
         });
-  
+
         if (isSelectionMode) {
           const checkboxes = document.querySelectorAll(".cart__item-checkbox input");
-          checkboxes.forEach((checkbox) => {
+          checkboxes.forEach(checkbox => {
             checkbox.addEventListener("change", updateSelectAllState);
           });
         }
-  
+
         updateOrderSummary();
-      }
     }
   
     cartItemsContainer.addEventListener("click", (event) => {
@@ -309,42 +304,49 @@ document.addEventListener("DOMContentLoaded", function () {
         increaseQuantity(index);
       }
     });
-  
-    function increaseQuantity(index) {
-      const item = cart[index];
-      const stockAvailable = parseInt(menuItems.find((i) => i.itemId === item.itemId)?.stockAvailable) || 0;
-      const currentQuantity = item.quantity || 1;
-  
-      if (currentQuantity + 1 > stockAvailable) {
-        showStockAlert(item.itemName || item.name, stockAvailable);
-        return;
+    
+    console.log("Current menuItems state before increase:", menuItems);
+    async function increaseQuantity(index) {
+        console.log("Starting increaseQuantity for index:", index);
+        const item = cart[index];
+        console.log(item);
+        if (!item) {
+          console.error("No item found at index:", index, "Cart:", cart);
+          return;
+        }
+        const menuItem = menuItems.find(i => i.menu_item_id === item.menu_item_id);
+        console.log("Found menuItem:", menuItem);
+        const stockAvailable = menuItem ? (parseInt(menuItem.stock_available) || 0) : 100;
+        const currentQuantity = item.quantity || 1;
+        console.log("Stock available:", stockAvailable, "Current quantity:", currentQuantity);
+
+        if (currentQuantity + 1 > stockAvailable) {
+          console.log("Stock limit reached, showing alert");
+          showStockAlert(item.name, stockAvailable);
+          return;
+        }
+      
+        item.quantity = currentQuantity + 1;
+        console.log("Updated item quantity:", item.quantity);
+        await saveCart();
+        console.log("After saveCart, cart:", cart);
+        displayCartItems();
+        updateCartCount();
       }
   
-      item.quantity = currentQuantity + 1;
-      cart = mergeCartItems(cart);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      console.log("Cart after increaseQuantity:", cart);
-      displayCartItems();
-      updateCartCount();
-    }
-  
-    function decreaseQuantity(index) {
-      if (cart[index].quantity > 1) {
-        cart[index].quantity -= 1;
-      } else {
-        cart.splice(index, 1);
-      }
-      cart = mergeCartItems(cart);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      console.log("Cart after decreaseQuantity:", cart);
-      displayCartItems();
-      updateCartCount();
+    async function decreaseQuantity(index) {
+        const item = cart[index];
+        if (item.quantity > 1) {
+          item.quantity -= 1;
+        } else {
+          cart.splice(index, 1);
+        }
+        await saveCart();
+        displayCartItems();
+        updateCartCount();
     }
   
     function updateOrderSummary() {
-      // Refresh menuItems to ensure we have the latest discounts
-      menuItems = JSON.parse(localStorage.getItem("menuItems")) || [];
-  
       let subtotal = 0;
       let totalDiscount = 0;
   
@@ -364,7 +366,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="summary-details" id="summary-details"></div>
         <div class="place-order-section" id="place-order-section"></div>
       `;
-  
+      
+      
       const tbody = document.getElementById("order-items");
       const summaryDetails = document.getElementById("summary-details");
       const placeOrderSection = document.getElementById("place-order-section");

@@ -324,6 +324,11 @@
       </section>
     </main>
 
+    <!-- Pass cart data from Flask to JavaScript -->
+    <script>
+        window.initialCart = {{ cart_json | safe }} || [];
+        console.log("Initial cart from Flask:", window.initialCart); // Debug log
+      </script>
     <script src="https://unpkg.com/scrollreveal" defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/order.js') }}" defer></script>

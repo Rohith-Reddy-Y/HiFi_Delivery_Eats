@@ -320,6 +320,7 @@ def get_menu_items_api():
                 MenuItem.is_best_seller,
                 MenuItem.is_out_of_stock,
                 MenuItem.stock_available,
+                MenuItem.discount_percentage,
                 Category.name.label("category_name"),
                 Subcategory.name.label("subcategory_name")
             )
@@ -343,6 +344,7 @@ def get_menu_items_api():
                 "is_best_seller": item.is_best_seller,
                 "is_out_of_stock": item.is_out_of_stock,
                 "stock_available": item.stock_available,
+                "discount_percentage": float(item.discount_percentage) if item.discount_percentage else 0,
             }
             for item in items
         ]
@@ -403,34 +405,36 @@ def manage_cart():
 # ORDER MANAGEMENT ENDPOINTS
 
 # Order page route
+
 @app.route('/order')
 @login_required
 def order():
-    with Session(engine) as session:
-        cart_items = (
-            session.query(
-                Cart.cart_id,
-                Cart.menu_item_id,
-                Cart.quantity,
-                MenuItem.name.label("menu_item_name"),
-                MenuItem.price
-            )
-            .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
-            .filter(Cart.user_id == current_user.id)
-            .all()
+    cart_items = (
+        session.query(
+            Cart.cart_id,
+            Cart.menu_item_id,
+            Cart.quantity,
+            MenuItem.name.label("menu_item_name"),
+            MenuItem.price
         )
-        cart_data = [{
-            'cart_id': item.cart_id,
-            'menu_item_id': item.menu_item_id,
-            'name': item.menu_item_name,
-            'price': float(item.price),
-            'quantity': item.quantity
-        } for item in cart_items]
-        total_price = sum(item['price'] * item['quantity'] for item in cart_data)
-        return render_template('order.html', cart=cart_data, total_price=total_price)
+        .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+        .filter(Cart.user_id == current_user.id)
+        .all()
+    )
+    cart_data = [{
+        'cart_id': item.cart_id,
+        'menu_item_id': item.menu_item_id,
+        'name': item.menu_item_name,
+        'price': float(item.price),
+        'quantity': item.quantity
+    } for item in cart_items]
+    total_price = sum(item['price'] * item['quantity'] for item in cart_data)
+    print("\n\n\n\n\n\nCart data in Flask:", cart_data,"\n\n\n\n\n")
+    # Pass cart_data as JSON string to the template
+    import json
+    return render_template('order.html', cart_json=json.dumps(cart_data), total_price=total_price)
 
-
-
+ 
 
 
 
