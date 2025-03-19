@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Confirmation</title>
+</head>
+<body>
+  <h1>Order Confirmation</h1>
+  <p>Thank you! Your order ({{ order.order_id }}) has been placed successfully.</p>
+  <p>Total: ₹{{ "%.2f"|format(order.total_price) }}</p>
+  <p>Status: {{ order.status }}</p>
+  <p>Delivery Location: {{ order.delivery_location }}</p>
+  <p>Payment Method: {{ order.payment_method }}</p>
+  <a href="/order">Back to Orders</a>
+</body>
+</html>
