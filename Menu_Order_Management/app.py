@@ -6,6 +6,8 @@ from database.create_database import Base, MenuItem, Category, Subcategory, Cart
 from database.services import MenuService, generate_next_id
 import os
 import logging
+import json
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -86,9 +88,9 @@ def order_track():
 
 
 # http://127.0.0.1:5000/delivery_details.html
-@app.route('/delivery_details')
-def delivery_details():
-    return render_template('delivery_details.html')
+# @app.route('/delivery_details')
+# def delivery_details():
+#     return render_template('delivery_details.html')
     
 
 
@@ -406,16 +408,58 @@ def manage_cart():
 
 # Order page route
 
-@app.route('/order')
+@app.route('/order', methods=['GET', 'POST'])
 @login_required
 def order():
+    if request.method == 'GET':
+        cart_items = (
+            session.query(
+                Cart.cart_id,
+                Cart.menu_item_id,
+                Cart.quantity,
+                MenuItem.name.label("menu_item_name"),
+                MenuItem.price,
+                MenuItem.discount_percentage
+            )
+            .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+            .filter(Cart.user_id == current_user.id)
+            .all()
+        )
+        cart_data = [{
+            'cart_id': item.cart_id,
+            'menu_item_id': item.menu_item_id,
+            'name': item.menu_item_name,
+            'price': float(item.price),
+            'quantity': item.quantity,
+            'discount_percentage': float(item.discount_percentage) if item.discount_percentage else 0
+        } for item in cart_items]
+        # Calculate totals
+        subtotal = 0
+        total_discount = 0
+        for item in cart_data:
+            item_total = item['price'] * item['quantity']
+            item_discount = (item_total * item['discount_percentage']) / 100
+            subtotal += item_total
+            total_discount += item_discount
+        tax = (subtotal - total_discount) * 0.18
+        delivery_charge = 50.0
+        total = subtotal - total_discount + tax + delivery_charge
+        return render_template('order.html', cart_json=json.dumps(cart_data), total=total, subtotal=subtotal - total_discount, tax=tax, delivery_charge=delivery_charge)
+    elif request.method == 'POST':
+        # Redirect to delivery_details when "Place Order" is clicked
+        return redirect(url_for('delivery_details'))
+
+@app.route('/delivery_details')
+@login_required
+def delivery_details():
     cart_items = (
         session.query(
             Cart.cart_id,
             Cart.menu_item_id,
             Cart.quantity,
             MenuItem.name.label("menu_item_name"),
-            MenuItem.price
+            MenuItem.price,
+            MenuItem.discount_percentage
         )
         .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
         .filter(Cart.user_id == current_user.id)
@@ -426,19 +470,155 @@ def order():
         'menu_item_id': item.menu_item_id,
         'name': item.menu_item_name,
         'price': float(item.price),
-        'quantity': item.quantity
+        'quantity': item.quantity,
+        'discount_percentage': float(item.discount_percentage) if item.discount_percentage else 0
     } for item in cart_items]
-    total_price = sum(item['price'] * item['quantity'] for item in cart_data)
-    print("\n\n\n\n\n\nCart data in Flask:", cart_data,"\n\n\n\n\n")
-    # Pass cart_data as JSON string to the template
-    import json
-    return render_template('order.html', cart_json=json.dumps(cart_data), total_price=total_price)
+    if not cart_data:
+        return redirect(url_for('order'))  # Redirect back if cart is empty
+    # Calculate totals
+    subtotal = 0
+    total_discount = 0
+    for item in cart_data:
+        item_total = item['price'] * item['quantity']
+        item_discount = (item_total * item['discount_percentage']) / 100
+        subtotal += item_total
+        total_discount += item_discount
+    tax = (subtotal - total_discount) * 0.18
+    delivery_charge = 50.0
+    total = subtotal - total_discount + tax + delivery_charge
+    return render_template('delivery_details.html', cart_json=json.dumps(cart_data), total=total, subtotal=subtotal - total_discount, tax=tax, delivery_charge=delivery_charge)
 
- 
+@app.route('/api/orders', methods=['POST'])
+@login_required
+def place_customer_order():
+    data = request.get_json()
+    try:
+        total = float(data.get('total', 0))
+        subtotal = float(data.get('subtotal', 0))
+        tax = float(data.get('tax', 0))
+        delivery_charge = float(data.get('delivery_charge', 0))
+        delivery_details = data.get('delivery_details', {})
+        if total <= 0 or subtotal <= 0:
+            return jsonify({"error": "Invalid total or subtotal"}), 400
+        # Fetch cart from database
+        cart_items = (
+            session.query(Cart, MenuItem)
+            .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+            .filter(Cart.user_id == current_user.id)
+            .all()
+        )
+        if not cart_items:
+            return jsonify({"error": "Cart is empty"}), 400
+        # Check stock
+        for cart_item, menu_item in cart_items:
+            if menu_item.stock_available < cart_item.quantity:
+                return jsonify({"error": f"Insufficient stock for {menu_item.name}"}), 400
+        # Create order
+        latest_order_id = menu_service.get_latest_id(Order.order_id)
+        order_id = generate_next_id(latest_order_id, "O")
+        new_order = Order(
+            order_id=order_id,
+            user_id=current_user.id,
+            delivery_agent_id=None,
+            status="Pending",
+            total_price=total,
+            delivery_location=f"{delivery_details.get('street', '')}, {delivery_details.get('city', '')}, {delivery_details.get('state', '')} {delivery_details.get('pincode', '')}",
+            payment_method=delivery_details.get('payment_method', 'cod'),
+            coordinates=delivery_details.get('coordinates', ''),
+            created_at=datetime.utcnow()
+        )
+        session.add(new_order)
+        # Create order items and update stock
+        for cart_item, menu_item in cart_items:
+            latest_order_item_id = menu_service.get_latest_id(OrderItem.order_item_id)
+            order_item_id = generate_next_id(latest_order_item_id, "OI")
+            order_item = OrderItem(
+                order_item_id=order_item_id,
+                order_id=order_id,
+                menu_item_id=cart_item.menu_item_id,
+                quantity=cart_item.quantity,
+                price=float(menu_item.price)
+            )
+            menu_item.stock_available -= cart_item.quantity
+            session.add(order_item)
+        # Clear cart
+        session.query(Cart).filter_by(user_id=current_user.id).delete()
+        session.commit()
+        return jsonify({"message": "Order placed successfully", "order_id": order_id}), 201
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error placing order: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
+@app.route('/order_confirmation')
+@login_required
+def order_confirmation():
+    order_id = request.args.get('order_id')
+    if not order_id:
+        return "Order ID not provided", 400
 
+    # Fetch order details from the database
+    order = (
+        session.query(Order)
+        .filter(Order.order_id == order_id, Order.user_id == current_user.id)
+        .first()
+    )
+    if not order:
+        return "Order not found", 404
 
+    # Fetch order items with menu item details
+    order_items = (
+        session.query(OrderItem, MenuItem)
+        .join(MenuItem, OrderItem.menu_item_id == MenuItem.menu_item_id)
+        .filter(OrderItem.order_id == order_id)
+        .all()
+    )
+
+    # Prepare cart_items data for the template
+    cart_data = [{
+        'menu_item_id': item.OrderItem.menu_item_id,
+        'name': item.MenuItem.name,
+        'quantity': item.OrderItem.quantity,
+        'price': float(item.OrderItem.price),  # Ensure price is float
+        'discount_percentage': float(item.MenuItem.discount_percentage) if item.MenuItem.discount_percentage else 0
+    } for item in order_items]
+
+    # Convert Decimal to float for calculations
+    total_price = float(order.total_price)  # Convert Decimal to float
+
+    # Prepare order data for the template
+    delivery_details = {
+        'street': order.delivery_location.split(', ')[0] if order.delivery_location else '',
+        'city': order.delivery_location.split(', ')[1] if order.delivery_location and len(order.delivery_location.split(', ')) > 1 else '',
+        'state': order.delivery_location.split(', ')[2].split(' ')[0] if order.delivery_location and len(order.delivery_location.split(', ')) > 2 else '',
+        'pincode': order.delivery_location.split(', ')[2].split(' ')[1] if order.delivery_location and len(order.delivery_location.split(', ')) > 2 else '',
+        'coordinates': order.coordinates,
+        'payment_method': order.payment_method
+    }
+
+    order_data = {
+        'order_id': order.order_id,
+        'ordered_at': order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+        'payment_method': order.payment_method,
+        'total': total_price,
+        'subtotal': total_price - (total_price * 0.18) - 50.0,  # Reverse calculate subtotal (all floats now)
+        'tax': total_price * 0.18,  # 18% tax as float
+        'delivery_charge': 50.0,  # Fixed delivery charge
+        'delivery_details': delivery_details,
+        'tracking_id': order.order_id  # Using order_id as tracking_id for simplicity
+    }
+
+    # Mock agent data (replace with actual logic if you have a DeliveryAgent table)
+    agent_data = {
+        'name': "Ravi Kumar",
+        'contact': "+91 98765 43210"
+    }
+
+    return render_template('order_confirmation.html',
+                          order_json=order_data,
+                          cart_items_json=cart_data,
+                          agent_json=agent_data)
 
 
 if __name__ == '__main__':

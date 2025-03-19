@@ -491,7 +491,7 @@
       <h3 class="section-title">Payment Method</h3>
       <div class="payment-options">
         <div class="payment-option">
-          <input type="radio" name="payment" id="cash" value="cash" checked />
+          <input type="radio" name="payment" id="cash" value="cod" checked />
           <label for="cash">Cash on Delivery</label>
         </div>
         <div class="payment-option">
@@ -516,45 +516,15 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="{{ url_for('static', filename='js/delivery_details.js') }}" defer></script>
   <script>
-    // Theme toggle and navigation setup
-    document.addEventListener("DOMContentLoaded", function () {
-      const themeButton = document.getElementById("theme-button");
-      const body = document.body;
-      const cartCount = document.getElementById("cart-count");
-      const navToggle = document.getElementById("nav-toggle");
-      const navMenu = document.getElementById("nav-menu");
-
-      // Theme toggle
-      body.classList.add("dark-theme"); // Default to dark theme
-      themeButton.addEventListener("click", () => {
-        body.classList.toggle("dark-theme");
-        themeButton.classList.toggle("bx-moon");
-        themeButton.classList.toggle("bx-sun");
-        localStorage.setItem("dark-mode", body.classList.contains("dark-theme"));
-      });
-
-      const savedTheme = localStorage.getItem("dark-mode");
-      if (savedTheme === "true") {
-        body.classList.add("dark-theme");
-        themeButton.classList.remove("bx-moon");
-        themeButton.classList.add("bx-sun");
-      } else {
-        body.classList.remove("dark-theme");
-        themeButton.classList.remove("bx-sun");
-        themeButton.classList.add("bx-moon");
-      }
-
-      // Update cart count
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      cartCount.innerText = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-
-      // Mobile Menu Toggle
-      navToggle.addEventListener("click", () => {
-        navMenu.classList.toggle("show-menu");
-      });
-    });
+    window.initialCart = {{ cart_json | safe }} || [];
+    window.total = {{ total }};
+    window.subtotal = {{ subtotal }};
+    window.tax = {{ tax }};
+    window.deliveryCharge = {{ delivery_charge }};
   </script>
+  
+  <script src="{{ url_for('static', filename='js/delivery_details.js') }}" defer></script>
+  
 </body>
 </html>

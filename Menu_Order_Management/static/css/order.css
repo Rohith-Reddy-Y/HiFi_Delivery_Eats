@@ -58,6 +58,7 @@
     rgba(255, 255, 255, 0.85)
   );
   border-bottom: 1px solid var(--primary-color-alt);
+  border-radius: 15px;
 }
 
 .cart__clear-button {

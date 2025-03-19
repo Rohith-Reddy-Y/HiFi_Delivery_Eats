@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Order Tracking - HIFI Delivery Eats</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Boxicons for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            transition: background 0.3s;
+        }
+
+        .dark-theme body {
+            background: #1e2a25 !important;
+            color: #ffffff;
+        }
+
+        /* Existing styles from order_track.html */
+        .l-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: #1f2a25;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav__logo {
+            color: #a5d6a7;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .nav__menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav__list {
+            display: flex;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav__item {
+            margin-left: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+            background: #ffffff;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .dark-theme .search-input {
+            background: #2a3d2f;
+            color: #ffffff;
+        }
+
+        .search-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 0 20px 20px 0;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dark-theme .search-button {
+            background: #2e7d32;
+        }
+
+        .search-button:hover {
+            background: #45a049;
+        }
+
+        .nav__link {
+            color: #a5d6a7;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .dark-theme .nav__link {
+            color: #a5d6a7;
+        }
+
+        .nav__link:hover {
+            color: #4CAF50;
+        }
+
+        .dark-theme .nav__link:hover {
+            color: #81c784;
+        }
+
+        .nav__cart-count {
+            color: #4CAF50;
+            margin-left: 5px;
+        }
+
+        .dark-theme .nav__cart-count {
+            color: #81c784;
+        }
+
+        .change-theme {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a5d6a7;
+            transition: color 0.3s;
+        }
+
+        .dark-theme .change-theme {
+            color: #81c784;
+        }
+
+        .change-theme:hover {
+            color: #4CAF50;
+        }
+
+        .nav__toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a5d6a7;
+        }
+
+        .dark-theme .nav__toggle {
+            color: #81c784;
+        }
+
+        /* New navbar styles from show_menu.html */
+        .nav__dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav__dropdown-content {
+            display: none;
+            position: absolute;
+            background: linear-gradient(135deg, #069c54, #34c759);
+            min-width: 140px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 0.5rem 0;
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav__dropdown:hover .nav__dropdown-content {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .nav__dropdown-content a {
+            color: #ffffff;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            font-family: "Playfair Display", serif;
+            font-size: 14px;
+            transition: background-color 0.3s ease, padding-left 0.3s ease;
+        }
+
+        .nav__dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding-left: 20px;
+        }
+
+        .nav__dropdown .nav__link {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px;
+        }
+
+        .nav__dropdown .nav__link::after {
+            content: "\25BC";
+            font-size: 10px;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #069c54;
+            transition: color 0.3s ease;
+        }
+
+        .nav__dropdown:hover .nav__link::after {
+            color: #34c759;
+        }
+
+        .dark-theme .nav__dropdown .nav__link::after {
+            color: #ffffff;
+        }
+
+        .dark-theme .nav__dropdown:hover .nav__link::after {
+            color: #34c759;
+        }
+
+        /* Rest of the existing styles */
+        .tracking-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 80px 20px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .dark-theme .tracking-container {
+            background: #263a2e;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tracking-container h2 {
+            background: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .dark-theme .tracking-container h2 {
+            background: #2e7d32;
+        }
+
+        .tracking-container h2::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background: #fff;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .dark-theme .tracking-container h2::after {
+            background: #e0e0e0;
+        }
+
+        .split-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .order-details-table, .agent-details {
+            background: #f1f8e9;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            min-width: 300px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-theme .order-details-table, .dark-theme .agent-details {
+            background: #2a3d2f;
+            color: #a5d6a7;
+        }
+
+        .order-details-table {
+            flex: 3;
+            min-width: 500px;
+        }
+
+        .agent-details {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .order-details-table h3, .agent-details h3 {
+            color: #2e7d32;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .dark-theme .order-details-table h3, .dark-theme .agent-details h3 {
+            color: #a5d6a7;
+            background: #2e7d32;
+        }
+
+        .order-details-table h3::before {
+            content: '🍔';
+            margin-right: 8px;
+        }
+
+        .agent-details h3::before {
+            content: '🚴';
+        }
+
+        .order-details-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .order-details-table th {
+            background: #4CAF50;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .dark-theme .order-details-table th {
+            background: #2e7d32;
+        }
+
+        .order-details-table td {
+            padding: 16px;
+            border-bottom: 1px solid #ddd;
+            transition: border-color 0.3s;
+            font-size: 1rem;
+        }
+
+        .dark-theme .order-details-table td {
+            border-bottom: 1px solid #3d5a40;
+        }
+
+        .bill-summary p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+            color: #2e7d32;
+        }
+
+        .dark-theme .bill-summary p {
+            color: #a5d6a7;
+        }
+
+        .bill-summary .summary-label {
+            font-weight: 600;
+        }
+
+        .bill-summary .total {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .dark-theme .bill-summary .total {
+            color: #81c784;
+        }
+
+        .order-info {
+            padding: 20px;
+            background: #f1f8e9;
+            border-radius: 10px;
+            margin: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-theme .order-info {
+            background: #2a3d2f;
+            color: #a5d6a7;
+        }
+
+        .order-info h3 {
+            color: #2e7d32;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark-theme .order-info h3 {
+            color: #a5d6a7;
+        }
+
+        .order-info h3::before {
+            content: 'ℹ️';
+            margin-right: 8px;
+        }
+
+        .order-info p {
+            font-size: 1rem;
+            color: #2e7d32;
+            margin: 5px 0;
+        }
+
+        .dark-theme .order-info p {
+            color: #a5d6a7;
+        }
+
+        .order-info p strong {
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        /* Tracking Section */
+        .tracking-section {
+            padding: 20px;
+            background: #f1f8e9;
+            border-radius: 10px;
+            margin: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-theme .tracking-section {
+            background: #2a3d2f;
+            color: #a5d6a7;
+        }
+
+        .tracking-section h3 {
+            color: #2e7d32;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark-theme .tracking-section h3 {
+            color: #a5d6a7;
+        }
+
+        .tracking-section h3::before {
+            content: '🚚';
+            margin-right: 8px;
+        }
+
+        .status {
+            display: flex;
+            position: relative;
+            margin: 30px 0;
+            min-height: 60px;
+        }
+
+        .status::before {
+            content: '';
+            position: absolute;
+            top: 25px; /* Centered with icons */
+            left: 5%; /* Start at the first icon */
+            width: 95%; /* Span from 5% to 95%, connecting all 4 points */
+            height: 3px;
+            background: #4CAF50;
+            z-index: 0;
+        }
+
+        .dark-theme .status::before {
+            background: #2e7d32;
+        }
+
+        .status div {
+            text-align: center;
+            position: absolute;
+            z-index: 2;
+        }
+
+        .status div:nth-child(1) {
+            left: 0%; /* Start closer to the left edge */
+        }
+
+        .status div:nth-child(2) {
+            left: 35%; /* Evenly spaced between 5% and 65% */
+        }
+
+        .status div:nth-child(3) {
+            left: 65%; /* Middle-right */
+        }
+
+        .status div:nth-child(4) {
+            left: 95%; /* End near the right edge */
+        }
+
+        .status .icon {
+            font-size: 1.5rem;
+            color: #ccc;
+            background: #fff;
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dark-theme .status .icon {
+            background: #2a3d2f;
+        }
+
+        .status .icon.active {
+            color: #4CAF50;
+            transform: scale(1.2);
+        }
+
+        .dark-theme .status .icon.active {
+            color: #81c784;
+        }
+
+        .status div p {
+            margin: 5px 0 0;
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .dark-theme .status div p {
+            color: #a5d6a7;
+        }
+
+        #delivery-scooter {
+            position: absolute;
+            top: -7.5px;
+            left: 5%; /* Adjusted to match the new starting position */
+            width: 30px;
+            height: 30px;
+            z-index: 2;
+        }
+
+        #smoke-icon {
+            position: absolute;
+            top: -2px;
+            left: 5%; /* Adjusted to match the new starting position */
+            width: 30px;
+            height: 30px;
+            z-index: 1;
+            display: none;
+        }
+
+        #order-message {
+            display: none;
+            font-size: 1.1rem;
+            color: #4CAF50;
+            margin: 20px 0;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dark-theme #order-message {
+            color: #81c784;
+        }
+
+        #transition-message {
+            font-size: 1rem;
+            color: #4CAF50;
+            margin: 10px 0;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dark-theme #transition-message {
+            color: #81c784;
+        }
+
+        #feedback-section {
+            margin: 20px;
+            text-align: center;
+            display: none;
+            padding: 20px;
+            background: #f1f8e9;
+            border-radius: 10px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-theme #feedback-section {
+            background: #2a3d2f;
+            color: #a5d6a7;
+        }
+
+        #feedback-section h5 {
+            color: #2e7d32;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-theme #feedback-section h5 {
+            color: #81c784;
+        }
+
+        #feedback-section h5::before {
+            content: '⭐';
+            margin-right: 8px;
+        }
+
+        .star-rating {
+            font-size: 1.5rem;
+            color: #ccc;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .dark-theme .star-rating {
+            color: #2a3d2f;
+        }
+
+        .star-rating .fas {
+            transition: color 0.3s;
+            margin: 0 5px;
+        }
+
+        .star-rating .fas.active {
+            color: #4CAF50;
+        }
+
+        .dark-theme .star-rating .fas.active {
+            color: #81c784;
+        }
+
+        .btn-custom {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dark-theme .btn-custom {
+            background: #2e7d32;
+        }
+
+        .btn-custom:hover {
+            background: #45a049;
+        }
+
+        .dark-theme .btn-custom:hover {
+            background: #1b5e20;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .tracking-container {
+                margin: 80px 10px 20px;
+            }
+
+            .split-section {
+                flex-direction: column;
+            }
+
+            .nav__list {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #1f2a25;
+                display: none;
+            }
+
+            .nav__menu.show-menu .nav__list {
+                display: flex;
+            }
+
+            .nav__item {
+                margin: 10px 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav__toggle {
+                display: block;
+            }
+
+            .status div p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Updated header from show_menu.html -->
+    <header class="l-header" id="header">
+      <nav class="nav bd-container">
+        <a href="#" class="nav__logo">HIFI Delivery Eats</a>
+        <div class="nav__menu" id="nav-menu">
+          <ul class="nav__list">
+            <li class="nav__item">
+              <form class="search-form">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search..."
+                  aria-label="Search"
+                />
+                <button type="submit" class="search-button">
+                  <i class="bx bx-search"></i>
+                </button>
+              </form>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('index') }}" class="nav__link">Home</a>
+            </li>
+            <li class="nav__item nav__dropdown">
+              <a href="#" class="nav__link">Menu</a>
+              <div class="nav__dropdown-content">
+                <a href="{{ url_for('show_menu') }}">Show Menu</a>
+              </div>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('order') }}" class="nav__link"
+                >Cart(<span class="nav__cart-count" id="cart-count">0</span> )</a
+              >
+            </li>
+            <li><i class="bx bx-moon change-theme" id="theme-button"></i></li>
+          </ul>
+        </div>
+        <div class="nav__toggle" id="nav-toggle">
+          <i class="bx bx-menu"></i>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Everything below remains unchanged -->
+    <div class="tracking-container">
+        <h2>Food Order Tracking</h2>
+
+        <div class="split-section">
+            <div class="order-details-table">
+                <h3>Your Order</h3>
+                <table id="order-items-table">
+                    <tr>
+                        <th>Item ID</th>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Amount</th>
+                    </tr>
+                </table>
+                <div class="bill-summary" id="bill-summary"></div>
+            </div>
+
+            <div class="agent-details">
+                <h3>Delivery Agent</h3>
+                <p><strong>Name:</strong> <span id="agent-name"></span></p>
+                <p><strong>Contact:</strong> <span id="agent-contact"></span></p>
+            </div>
+        </div>
+
+        <div class="order-info">
+            <h3>Order Information</h3>
+            <p><strong>Order ID:</strong> <span id="order-id"></span></p>
+            <p><strong>Ordered At:</strong> <span id="ordered-at"></span></p>
+            <p><strong>Payment Mode:</strong> <span id="payment-mode"></span></p>
+            <p><strong>Delivery Address:</strong> <span id="delivery-address"></span></p>
+            <p><strong>Tracking ID:</strong> <span id="tracking-id" class="badge bg-danger"></span></p>
+            <p><strong>Order Status:</strong> <span id="order-status" class="badge bg-success">Order Confirmed</span></p>
+            <p><strong>Estimated Arrival:</strong> <span id="arrival-time"></span></p>
+            <button class="btn-custom" onclick="window.print()">Print Bill</button>
+        </div>
+
+        <div class="tracking-section">
+            <h3>Track Your Order</h3>
+            <div class="status">
+                <div><span id="icon-confirmed" class="icon active"><i class="fas fa-check"></i></span><p>Order Confirmed</p></div>
+                <div><span id="icon-shipped" class="icon"><i class="fas fa-shipping-fast"></i></span><p>Order Picked</p></div>
+                <div><span id="icon-out-for-delivery" class="icon"><i class="fas fa-truck"></i></span><p>Out for Delivery</p></div>
+                <div><span id="icon-delivered" class="icon"><i class="fas fa-box-open"></i></span><p>Order Delivered</p></div>
+                <img id="delivery-scooter" src="{{ url_for('static', filename='images/fast_shipping_delivery_agent_img.png') }}" alt="Delivery Scooter">
+                <img id="smoke-icon" src="{{ url_for('static', filename='images/smoke-30.png') }}" alt="Smoke Icon">
+            </div>
+            <p id="order-message">Your order is being prepared! 🍕</p>
+            <p id="transition-message">Order Confirmed</p>
+        </div>
+
+        <div id="feedback-section">
+            <h5>Rate Your Experience</h5>
+            <div class="star-rating" id="star-rating">
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+            </div>
+            <button class="btn-custom" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Pass Flask data to JavaScript
+        const orderData = {{ order_json | safe }};
+        const cartItems = {{ cart_items_json | safe }} || [];
+        const agentData = {{ agent_json | safe }};
+
+        // Configurable total delivery time in minutes (change this value to adjust everything)
+        const TOTAL_DELIVERY_TIME_MINUTES = 1; // Set to 10 minutes (or any value you want)
+        const TOTAL_DELIVERY_TIME_SECONDS = TOTAL_DELIVERY_TIME_MINUTES * 60; // Convert to seconds
+        let estimatedSeconds = TOTAL_DELIVERY_TIME_SECONDS; // Dynamic total seconds
+        let timerInterval;
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            const themeButton = document.getElementById("theme-button");
+            const body = document.body;
+            const cartCount = document.getElementById("cart-count");
+            const navToggle = document.getElementById("nav-toggle");
+            const navMenu = document.getElementById("nav-menu");
+
+            // Theme toggle
+            body.classList.add("dark-theme");
+            themeButton.addEventListener("click", () => {
+                body.classList.toggle("dark-theme");
+                themeButton.classList.toggle("bx-moon");
+                themeButton.classList.toggle("bx-sun");
+                localStorage.setItem("dark-mode", body.classList.contains("dark-theme"));
+            });
+
+            const savedTheme = localStorage.getItem("dark-mode");
+            if (savedTheme === "true") {
+                body.classList.add("dark-theme");
+                themeButton.classList.remove("bx-moon");
+                themeButton.classList.add("bx-sun");
+            } else {
+                body.classList.remove("dark-theme");
+                themeButton.classList.remove("bx-sun");
+                themeButton.classList.add("bx-moon");
+            }
+
+            // Update cart count
+            cartCount.innerText = cartItems.length.toString();
+
+            // Populate order details
+            document.getElementById("order-id").innerText = orderData.order_id || "N/A";
+            document.getElementById("tracking-id").innerText = orderData.tracking_id || Math.floor(10000000 + Math.random() * 90000000);
+            document.getElementById("ordered-at").innerText = orderData.ordered_at || new Date().toLocaleString();
+            document.getElementById("payment-mode").innerText = orderData.payment_method === "cod" ? "Cash on Delivery" : "Online Payment";
+            document.getElementById("delivery-address").innerText = `${orderData.delivery_details.street}, ${orderData.delivery_details.city}, ${orderData.delivery_details.state} - ${orderData.delivery_details.pincode}, Coordinates: ${orderData.delivery_details.coordinates}`;
+            document.getElementById("agent-name").innerText = agentData.name || "N/A";
+            document.getElementById("agent-contact").innerText = agentData.contact || "N/A";
+
+            const orderItemsTable = document.getElementById("order-items-table");
+            const billSummary = document.getElementById("bill-summary");
+
+            if (cartItems.length > 0) {
+                orderItemsTable.innerHTML = '<tr><th>Item ID</th><th>Item Name</th><th>Quantity</th><th>Discount</th><th>Amount</th></tr>';
+                let subtotal = 0;
+
+                cartItems.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    const discountAmount = (itemTotal * (item.discount_percentage || 0)) / 100;
+                    const amount = itemTotal - discountAmount;
+                    subtotal += amount;
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${item.menu_item_id || "N/A"}</td>
+                        <td>${item.name || "Unknown Item"}</td>
+                        <td>${item.quantity || 1}</td>
+                        <td>₹${discountAmount.toFixed(2)} (${item.discount_percentage || 0}%)</td>
+                        <td>₹${amount.toFixed(2)}</td>
+                    `;
+                    orderItemsTable.appendChild(row);
+                });
+
+                const tax = orderData.tax || (subtotal * 0.18).toFixed(2);
+                const deliveryCharge = orderData.delivery_charge || 50.00;
+                const total = orderData.total || (subtotal + parseFloat(tax) + deliveryCharge).toFixed(2);
+
+                billSummary.innerHTML = `
+                    <p><span class="summary-label">Subtotal:</span> ₹${subtotal.toFixed(2)}</p>
+                    <p><span class="summary-label">Tax (18%):</span> ₹${tax}</p>
+                    <p><span class="summary-label">Delivery Charge:</span> ₹${deliveryCharge.toFixed(2)}</p>
+                    <p class="total"><span class="summary-label">Total:</span> ₹${total}</p>
+                `;
+            } else {
+                orderItemsTable.innerHTML = '<tr><td colspan="5">No items found for this order.</td></tr>';
+                billSummary.innerHTML = `
+                    <p><span class="summary-label">Subtotal:</span> ₹0.00</p>
+                    <p><span class="summary-label">Tax (18%):</span> ₹0.00</p>
+                    <p><span class="summary-label">Delivery Charge:</span> ₹0.00</p>
+                    <p class="total"><span class="summary-label">Total:</span> ₹0.00</p>
+                `;
+            }
+
+            startEstimatedTime();
+            document.getElementById("order-message").style.display = "block";
+            startDeliveryProcess();
+
+            navToggle.addEventListener("click", () => {
+                navMenu.classList.toggle("show-menu");
+            });
+        });
+    
+        function startEstimatedTime() {
+            const arrivalTimeElement = document.getElementById("arrival-time");
+            const now = new Date(); // Real current time
+            const currentTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+            const estimatedDelivery = new Date(now.getTime() + TOTAL_DELIVERY_TIME_SECONDS * 1000);
+            const deliveryTimeStr = estimatedDelivery.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+            const deliveryDateStr = estimatedDelivery.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+    
+            arrivalTimeElement.innerText = `${Math.floor(TOTAL_DELIVERY_TIME_SECONDS / 60)}min:${(TOTAL_DELIVERY_TIME_SECONDS % 60).toString().padStart(2, '0')}sec | ${deliveryDateStr} [${currentTimeStr} - ${deliveryTimeStr} IST]`;
+    
+            timerInterval = setInterval(() => {
+                estimatedSeconds--;
+                if (estimatedSeconds < 0) {
+                    clearInterval(timerInterval);
+                    arrivalTimeElement.innerText = `0min:00sec | ${deliveryDateStr} [Delivered]`;
+                    return;
+                }
+    
+                const minutesLeft = Math.floor(estimatedSeconds / 60);
+                const secondsLeft = estimatedSeconds % 60;
+                const currentTime = new Date(now.getTime() + (TOTAL_DELIVERY_TIME_SECONDS - estimatedSeconds) * 1000);
+                const currentTimeStr = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+    
+                arrivalTimeElement.innerText = `${minutesLeft}min:${secondsLeft.toString().padStart(2, '0')}sec | ${deliveryDateStr} [${currentTimeStr} - ${deliveryTimeStr} IST]`;
+            }, 1000);
+        }
+    
+        function startDeliveryProcess() {
+    const orderStatusElement = document.getElementById("order-status");
+    const transitionMessageElement = document.getElementById("transition-message");
+    const scooter = document.getElementById("delivery-scooter");
+    const smokeIcon = document.getElementById("smoke-icon");
+    const icons = {
+        confirmed: document.getElementById("icon-confirmed"),
+        shipped: document.getElementById("icon-shipped"),
+        out_for_delivery: document.getElementById("icon-out-for-delivery"),
+        delivered: document.getElementById("icon-delivered")
+    };
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    let currentOrder = JSON.parse(localStorage.getItem("currentOrder")) || {};
+
+    icons.confirmed.classList.add("active");
+    scooter.style.left = "5%"; /* Adjusted to match new starting position */
+
+    let elapsed = 0;
+    const stage1Duration = TOTAL_DELIVERY_TIME_SECONDS / 6;
+    const stage2Duration = (TOTAL_DELIVERY_TIME_SECONDS * 2) / 6;
+    const stage3Duration = (TOTAL_DELIVERY_TIME_SECONDS * 3) / 6;
+    let hasUpdatedStatusStage1 = false;
+    let hasUpdatedStatusStage2 = false;
+    let hasUpdatedStatusStage3 = false;
+
+    const positions = {
+        start: 5,         /* Adjusted from 10 */
+        picked: 35,       /* Unchanged */
+        outForDelivery: 65, /* Unchanged */
+        delivered: 95     /* Adjusted from 90 */
+    };
+
+    const deliveryInterval = setInterval(() => {
+        elapsed += 0.1;
+
+        let newPosition;
+        if (elapsed < stage1Duration) {
+            const progress = elapsed / stage1Duration;
+            newPosition = positions.start + (positions.picked - positions.start) * progress;
+        } else if (elapsed < (stage1Duration + stage2Duration)) {
+            const stageElapsed = elapsed - stage1Duration;
+            const progress = stageElapsed / stage2Duration;
+            newPosition = positions.picked + (positions.outForDelivery - positions.picked) * progress;
+        } else if (elapsed <= TOTAL_DELIVERY_TIME_SECONDS) {
+            const stageElapsed = elapsed - (stage1Duration + stage2Duration);
+            const progress = stageElapsed / stage3Duration;
+            newPosition = positions.outForDelivery + (positions.delivered - positions.outForDelivery) * progress;
+        } else {
+            newPosition = positions.delivered;
+        }
+
+        scooter.style.left = `${newPosition}%`;
+
+        if (elapsed >= stage1Duration && !hasUpdatedStatusStage1) {
+            hasUpdatedStatusStage1 = true;
+            icons.shipped.classList.add("active");
+            orderStatusElement.innerText = "Order Picked";
+            orderStatusElement.className = "badge bg-warning";
+            transitionMessageElement.innerText = "Order Picked";
+            smokeIcon.style.left = "35%"; /* Matches new picked position */
+            smokeIcon.style.display = "block";
+            setTimeout(() => smokeIcon.style.display = "none", 1000);
+        }
+
+        if (elapsed >= (stage1Duration + stage2Duration) && !hasUpdatedStatusStage2) {
+            hasUpdatedStatusStage2 = true;
+            icons.out_for_delivery.classList.add("active");
+            orderStatusElement.innerText = "Out for Delivery";
+            orderStatusElement.className = "badge bg-info";
+            transitionMessageElement.innerText = "Out for Delivery";
+            smokeIcon.style.left = "65%"; /* Matches new outForDelivery position */
+            smokeIcon.style.display = "block";
+            setTimeout(() => smokeIcon.style.display = "none", 1000);
+        }
+
+        if (elapsed >= TOTAL_DELIVERY_TIME_SECONDS && !hasUpdatedStatusStage3) {
+            hasUpdatedStatusStage3 = true;
+            icons.delivered.classList.add("active");
+            orderStatusElement.innerText = "Order Delivered";
+            orderStatusElement.className = "badge bg-success";
+            transitionMessageElement.innerText = "Order Delivered";
+            smokeIcon.style.left = "95%"; /* Matches new delivered position */
+            smokeIcon.style.display = "block";
+            setTimeout(() => smokeIcon.style.display = "none", 1000);
+            document.getElementById("order-message").style.display = "none";
+            document.getElementById("feedback-section").style.display = "block";
+
+            currentOrder.status = "delivered";
+            const existingOrderIndex = orders.findIndex(o => o.orderId === currentOrder.orderId);
+            if (existingOrderIndex === -1) {
+                orders.push(currentOrder);
+            } else {
+                orders[existingOrderIndex] = currentOrder;
+            }
+            localStorage.setItem("orders", JSON.stringify(orders));
+        }
+
+        if (elapsed >= TOTAL_DELIVERY_TIME_SECONDS) {
+            clearInterval(deliveryInterval);
+            scooter.style.left = `${positions.delivered}%`;
+        }
+    }, 100);
+}
+    
+        let selectedRating = 0;
+        const stars = document.querySelectorAll(".star-rating .fas");
+        stars.forEach(star => {
+            star.addEventListener("click", function () {
+                selectedRating = parseInt(this.getAttribute("data-value"));
+                stars.forEach(s => s.classList.remove("active"));
+                for (let i = 0; i < selectedRating; i++) {
+                    stars[i].classList.add("active");
+                }
+            });
+        });
+    
+        /* 
+        function submitFeedback() {
+            if (selectedRating === 0) {
+                alert("Please select a rating before submitting!");
+                return;
+            }
+            const feedback = { 
+                order_id: orderData.order_id, 
+                rating: selectedRating, 
+                timestamp: new Date().toLocaleString() 
+            };
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(feedback)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to submit feedback');
+                alert("Thank you for your feedback!");
+                document.getElementById("feedback-section").style.display = "none";
+            })
+            .catch(error => {
+                console.error("Error submitting feedback:", error);
+                alert("Failed to submit feedback: " + error.message);
+            });
+        }
+        
+        
+        */
+        function submitFeedback() {
+            if (selectedRating === 0) {
+                alert("Please select a rating before submitting!");
+                return;
+            }
+            const feedback = { 
+                orderId: document.getElementById("order-id").innerText, 
+                rating: selectedRating, 
+                timestamp: new Date().toLocaleString() 
+            };
+            const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+            feedbacks.push(feedback);
+            localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+            alert("Thank you for your feedback!");
+            document.getElementById("feedback-section").style.display = "none";
+        }
+    </script>
+</body>
+</html>
