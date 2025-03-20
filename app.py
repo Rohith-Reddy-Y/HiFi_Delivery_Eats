@@ -47,18 +47,18 @@ def create_app():
     def load_user(user_id):
         try:
             user_type, id_str = user_id.split(":")
-            real_id = int(id_str)
         except Exception as e:
             # Return None if the id is not in the expected format
             return None
 
         if user_type == "customer":
-            return Customer.query.get(real_id)
+            return Customer.query.get(id_str)
         elif user_type == "admin":
-            return Admin.query.get(real_id)
+            return Admin.query.get(id_str)
         elif user_type == "delivery":
-            return DeliveryAgent.query.get(real_id)
+            return DeliveryAgent.query.get(id_str)
         return None
+
 
     
     @login_manager.unauthorized_handler

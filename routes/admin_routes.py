@@ -1,65 +1,103 @@
 import base64
+import datetime
 import io
 from flask import flash, jsonify, redirect, render_template, url_for
 from flask_login import current_user, login_required
 from matplotlib import pyplot as plt
 import pandas as pd
-from sqlalchemy import func
+from sqlalchemy import desc, func
 import seaborn as sns
 import matplotlib.dates as mdates
 import plotly.express as px
+from datetime import datetime, timedelta, timezone
 
-from models import DeliveryAgent, Order
+from models import Customer, DeliveryAgent, Order
+from routes.insight_utils import (
+    calculate_average_delivery_time,
+    calculate_delivery_partner_performance,
+    calculate_on_time_order_percentage,
+    calculate_return_refund_statistics,
+    calculate_revenue_per_delivery,
+    generate_agent_rating_chart,
+    generate_customer_feedback_chart,
+    generate_line_chart,
+    generate_monthly_retention_chart,
+    generate_pie_chart,
+    generate_bar_chart
+)
 
 
 def admin_routes(app, db):
     @app.route('/admin')
     def admin():
+        print(current_user)
         if not current_user.is_authenticated:
             return redirect(url_for('employee_login'))
         
-        # Fetch aggregated order data by date using SQLAlchemy ORM.
+        # Aggregated order data by date for sales chart
         orders = db.session.query(
             func.date(Order.created_at).label("order_date"),
             func.sum(Order.total_price).label("total_sales")
         ).group_by(func.date(Order.created_at))\
-        .order_by(func.date(Order.created_at))\
-        .all()
+         .order_by(func.date(Order.created_at))\
+         .all()
+        
+        # Total orders count using proper primary key
+        total_orders = db.session.query(func.count(Order.order_id)).scalar()
+        
+        # Total users count (assuming customers represent users)
+        total_users = db.session.query(func.count(Customer.customer_id)).scalar()
+        
+        # Overall total sales from all orders
+        overall_total_sales = db.session.query(func.coalesce(func.sum(Order.total_price), 0)).scalar()
+        
+        # Total delivery partners count using proper primary key
+        delivery_partners = db.session.query(func.count(DeliveryAgent.delivery_agent_id)).scalar()
+        
+        # Query recent orders (limit to last 10 orders)
+        recent_orders = Order.query.order_by(desc(Order.created_at)).limit(10).all()
 
-        if not orders:
-            return render_template('admin/home.html', chart_html=None, message="No sales data available.")
-
-        # Convert the query result to a Pandas DataFrame.
-        df = pd.DataFrame(orders, columns=['order_date', 'total_sales'])
-        df['order_date'] = pd.to_datetime(df['order_date'])
-
-        # Create an interactive Plotly line chart with markers.
-        fig = px.line(df, x='order_date', y='total_sales', markers=True,
-                    title="📊 Order Trend Over Time",
-                    labels={'order_date': 'Date', 'total_sales': 'Total Order (₹)'})
-
-        # Enhance interactivity: add a range slider and selection buttons.
-        fig.update_layout(
-            hovermode="x unified",
-            template="plotly_white",
-            xaxis=dict(
-                rangeselector=dict(
-                    buttons=[
-                        dict(count=7, label="1w", step="day", stepmode="backward"),
-                        dict(count=1, label="1m", step="month", stepmode="backward"),
-                        dict(count=6, label="6m", step="month", stepmode="backward"),
-                        dict(step="all")
-                    ]
-                ),
-                rangeslider=dict(visible=True),
-                type="date"
+        # Prepare sales chart
+        if orders:
+            # Convert query result to DataFrame
+            df = pd.DataFrame(orders, columns=['order_date', 'total_sales'])
+            df['order_date'] = pd.to_datetime(df['order_date'])
+            
+            # Create Plotly line chart with markers
+            fig = px.line(df, x='order_date', y='total_sales', markers=True,
+                          title="📊 Order Trend Over Time",
+                          labels={'order_date': 'Date', 'total_sales': 'Total Sales (₹)'})
+            fig.update_layout(
+                hovermode="x unified",
+                template="plotly_white",
+                height=400,
+                xaxis=dict(
+                    rangeselector=dict(
+                        buttons=[
+                            dict(count=7, label="1w", step="day", stepmode="backward"),
+                            dict(count=1, label="1m", step="month", stepmode="backward"),
+                            dict(count=6, label="6m", step="month", stepmode="backward"),
+                            dict(step="all")
+                        ]
+                    ),
+                    rangeslider=dict(visible=True),
+                    type="date"
+                )
             )
-        )
+            chart_html = fig.to_html(full_html=False)
+            message = ""
+        else:
+            chart_html = None
+            message = "No sales data available."
 
-        # Convert the Plotly figure to HTML (without full HTML headers) to embed in the template.
-        chart_html = fig.to_html(full_html=False)
-
-        return render_template('admin/home.html', chart_html=chart_html)
+        return render_template('admin/home.html',
+                               chart_html=chart_html,
+                               message=message,
+                               total_orders=total_orders,
+                               total_users=total_users,
+                               overall_total_sales=overall_total_sales,
+                               delivery_partners=delivery_partners,
+                               recent_orders=recent_orders)
 
     
     @app.route('/admin/delivery_partner')
@@ -73,7 +111,7 @@ def admin_routes(app, db):
             accepted_agents=accepted_agents
         )
     
-    @app.route('/admin/accept/<int:id>', methods=['POST'])
+    @app.route('/admin/accept/<string:id>', methods=['POST'])
     def accept_agent(id):
         agent = DeliveryAgent.query.get(id)
         if not agent:
@@ -86,7 +124,7 @@ def admin_routes(app, db):
         return jsonify({"message": f"Agent {agent.username} accepted!"})
     
 
-    @app.route('/admin/reject/<int:id>', methods=['POST'])
+    @app.route('/admin/reject/<string:id>', methods=['POST'])
     def reject_agent(id):
         agent = DeliveryAgent.query.get(id)
         if not agent:
@@ -98,10 +136,9 @@ def admin_routes(app, db):
         db.session.commit()
         
         flash(f"Agent {agent.username} has been rejected and removed from the database!")
-
         return jsonify({"message": f"Agent {agent.username} has been rejected and removed from the database!"})
     
-    @app.route('/admin/deactivate/<int:id>', methods=['POST'])
+    @app.route('/admin/deactivate/<string:id>', methods=['POST'])
     def deactivate_agent(id):
         agent = DeliveryAgent.query.get(id)
         if not agent:
@@ -112,7 +149,7 @@ def admin_routes(app, db):
         flash(f"Agent {agent.username} has been deactivated.")
         return jsonify({"message": f"Agent {agent.username} has been deactivated."})
 
-    @app.route('/admin/activate/<int:id>', methods=['POST'])
+    @app.route('/admin/activate/<string:id>', methods=['POST'])
     def activate_agent(id):
         agent = DeliveryAgent.query.get(id)
         if not agent:
@@ -125,58 +162,39 @@ def admin_routes(app, db):
     
     @app.route('/admin/insights')
     @login_required
-    def sales_plot_insights():
-        # Fetch aggregated order data by date using SQLAlchemy ORM.
-        orders = db.session.query(
-            func.date(Order.created_at).label("order_date"),
-            func.sum(Order.total_price).label("total_sales")
-        ).group_by(func.date(Order.created_at))\
-        .order_by(func.date(Order.created_at))\
-        .all()
-
-        if not orders:
-            return render_template('admin/home.html', image_url=None, message="No sales data available.")
-
-        # Convert query result to a DataFrame
-        df = pd.DataFrame(orders, columns=['order_date', 'total_sales'])
+    def insights():
+        if not current_user.is_authenticated:
+            return redirect(url_for('employee_login'))
         
-        # Convert order_date to datetime
-        df['order_date'] = pd.to_datetime(df['order_date'])
+        # Fetching charts (demo and database reflected)
+        charts = []
+        chart_html = generate_pie_chart()           # Demo data chart
+        bar_chart = generate_bar_chart()              # Demo data chart
+        line_chart_html = generate_line_chart()       # Data from the database
+        delivery_rating_bar = generate_agent_rating_chart()
+        monthly_retention_chart = generate_monthly_retention_chart()
+        customer_feedback_chart = generate_customer_feedback_chart()
 
-        # Set plot style and create the figure
-        sns.set_style("whitegrid")
-        plt.figure(figsize=(14, 6))
+        charts.append(customer_feedback_chart)
+        charts.append(line_chart_html)
+        charts.append(delivery_rating_bar)
+        charts.append(monthly_retention_chart)
+        charts.append(chart_html)
+        charts.append(bar_chart)
 
-        # Create the line plot
-        sns.lineplot(x=df['order_date'], y=df['total_sales'], marker='o', color='b',
-                    linewidth=2.5, label="Total Order")
-
-        # Format the x-axis for dates
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=max(1, len(df) // 10)))
-        plt.xticks(rotation=45, ha="right")
-
-        # Add data labels at intervals
-        for i in range(0, len(df), max(1, len(df) // 8)):
-            plt.text(df['order_date'][i], df['total_sales'][i] + 5,
-                    f"{int(df['total_sales'][i])}",
-                    fontsize=10, ha='center', color='black', fontweight='bold')
-
-        # Set labels and title
-        plt.xlabel("Date", fontsize=12)
-        plt.ylabel("Total Order (₹)", fontsize=12)
-        plt.title("📊 Order Trend Over Time", fontsize=14, fontweight="bold")
-        plt.legend()
-        plt.grid(True, linestyle="--", alpha=0.6)
-
-        # Save the plot to an in-memory buffer
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png')
-        plt.close()
-        buffer.seek(0)
-
-        # Encode the image as base64 and create a data URL
-        image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        image_url = f"data:image/png;base64,{image_base64}"
-
-        return render_template('admin/home.html', image_url=image_url)
+        # Compute analysis statistics with optimized queries:
+        avg_delivery_time = calculate_average_delivery_time() 
+        delivery_partner_performance = calculate_delivery_partner_performance()
+        return_refund_percentage = calculate_return_refund_statistics()
+        on_time_order_percentage = calculate_on_time_order_percentage()
+        revenue_per_delivery = calculate_revenue_per_delivery()
+        
+        return render_template(
+            'admin/insights.html',
+            charts=charts,
+            avg_delivery_time=avg_delivery_time,
+            delivery_partner_performance=delivery_partner_performance,
+            return_refund_percentage=return_refund_percentage,
+            on_time_order_percentage=on_time_order_percentage,
+            revenue_per_delivery=revenue_per_delivery
+        )

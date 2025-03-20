@@ -232,6 +232,7 @@ class Order(BaseModel):
     delivery_location = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     delivered_at = db.Column(db.DateTime, nullable=True)
+    order_feedback = db.Column(db.Integer, nullable=True)
 
     customer = db.relationship("Customer", back_populates="orders", foreign_keys=[customer_id])
     delivery_agent = db.relationship("DeliveryAgent", back_populates="deliveries")
