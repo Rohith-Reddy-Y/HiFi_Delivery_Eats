@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine, func, asc, desc
 from sqlalchemy.orm import sessionmaker
-from database.create_database import Base, MenuItem, Category, Subcategory, Cart, User, Order, OrderItem
+from database.create_database import Base, MenuItem, Category, Subcategory, Cart, User, Order, OrderItem, DeliveryAgent
 from database.services import MenuService, generate_next_id
 import os
 import logging
@@ -20,8 +20,8 @@ session = Session()
 menu_service = MenuService(session)
 
 app = Flask(__name__)
-app.secret_key = 'ksfiwqy239478i32hkbqwmehrkasdf'  # Replace with a secure key
-
+# app.secret_key = 'ksfiwqy239478i32hkbqwmehrkasdf'  # Replace with a secure key
+app.secret_key = 'sdfasdrwersdasdfas345ads'  
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -66,6 +66,15 @@ def test():
 def index():
     """Render the Home page."""
     return render_template('index.html')
+
+# http://127.0.0.1:5000/admin.html
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 @app.route('/menu')
 def menu():
@@ -403,6 +412,83 @@ def manage_cart():
         session.commit()
         return jsonify({'data': items, 'message': 'Cart updated successfully'})
 
+# New Endpoint: Fetch User 1's Order History
+# Updated /api/user_order_history endpoint
+@app.route('/api/user_order_history', methods=['GET'])
+@login_required
+def get_user_order_history():
+    try:
+        user_id = current_user.id 
+        orders = session.query(Order).filter(Order.user_id == user_id).all()
+            
+        if not orders:  # If no orders exist, mark as new user
+            return jsonify({'data': [], 'is_new_user': True, 'ok': True})
+        order_items = session.query(OrderItem).join(Order).filter(Order.user_id == user_id).all()
+        
+        order_history = []
+        for item in order_items:
+            menu_item = session.query(MenuItem).filter(MenuItem.menu_item_id == item.menu_item_id).first()
+            order_history.append({
+                'order_id': item.order_id,
+                'menu_item_id': item.menu_item_id,
+                'name': menu_item.name,
+                'subcategory_name': menu_item.subcategory.name if menu_item.subcategory else None,
+                'category_name': menu_item.category.name if menu_item.category else None,
+                'quantity': item.quantity,
+                'price': float(item.price),
+                'ordered_at': item.order.created_at.isoformat()
+            })
+        
+        return jsonify({'data': order_history, 'is_new_user': False, 'ok': True})
+    except Exception as e:
+        logger.error(f"Error fetching user order history: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+        
+        
+# New /api/recommendations endpoint
+@app.route('/api/recommendations', methods=['GET'])
+@login_required
+def get_recommendations():
+    try:
+        user_id = current_user.id
+        orders = session.query(Order).filter(Order.user_id == user_id).all()
+        
+        if not orders:  # New user, no recommendations
+            return jsonify({'data': [], 'is_new_user': True, 'ok': True})
+        # Get ordered items and their subcategories
+        order_items = session.query(OrderItem).join(Order).filter(Order.user_id == user_id).all()
+        ordered_item_ids = {item.menu_item_id for item in order_items}
+        ordered_subcategories = {
+            session.query(MenuItem).filter(MenuItem.menu_item_id == item.menu_item_id).first().subcategory.name
+            for item in order_items
+        }
+        # Fetch all menu items and filter recommendations
+        all_menu_items = session.query(MenuItem).all()
+        recommendations = [
+            {
+                'menu_item_id': item.menu_item_id,
+                'name': item.name,
+                'price': float(item.price),
+                'subcategory_name': item.subcategory.name if item.subcategory else None,
+                'category_name': item.category.name if item.category else None,
+                'description': item.description,
+                'image_url': item.image_url,
+                'is_out_of_stock': item.is_out_of_stock,
+                'stock_available': item.stock_available
+            }
+            for item in all_menu_items
+            if (item.subcategory.name in ordered_subcategories and 
+                item.menu_item_id not in ordered_item_ids and 
+                not item.is_out_of_stock)
+        ]
+        # Limit to 5 recommendations (adjust as needed)
+        recommendations = recommendations[:5]
+        
+        return jsonify({'data': recommendations, 'is_new_user': False, 'ok': True})
+    except Exception as e:
+        logger.error(f"Error fetching recommendations: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+        
 
 # ORDER MANAGEMENT ENDPOINTS
 
@@ -550,7 +636,7 @@ def place_customer_order():
         logger.error(f"Error placing order: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
-
+# http://127.0.0.1:5000/order_confirmation?order_id=O001
 @app.route('/order_confirmation')
 @login_required
 def order_confirmation():
@@ -619,6 +705,225 @@ def order_confirmation():
                           order_json=order_data,
                           cart_items_json=cart_data,
                           agent_json=agent_data)
+
+
+
+@app.route('/api/admin/pending_orders', methods=['GET'])
+@login_required
+def get_pending_orders():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+
+    try:
+        # Fetch pending orders with user and order items
+        orders = (
+            session.query(Order, User)
+            .join(User, Order.user_id == User.user_id)
+            .filter(Order.status == "Pending")
+            .all()
+        )
+
+        orders_list = []
+        for order, user in orders:
+            # Fetch order items
+            order_items = (
+                session.query(OrderItem, MenuItem)
+                .join(MenuItem, OrderItem.menu_item_id == MenuItem.menu_item_id)
+                .filter(OrderItem.order_id == order.order_id)
+                .all()
+            )
+            items = [{
+                'itemId': item.OrderItem.menu_item_id,
+                'itemName': item.MenuItem.name,
+                'quantity': item.OrderItem.quantity,
+                'price': float(item.OrderItem.price),
+                'image': item.MenuItem.image_url
+            } for item in order_items]
+
+            delivery_parts = order.delivery_location.split(', ') if order.delivery_location else ['', '', '']
+            state_pin = delivery_parts[2].split(' ') if len(delivery_parts) > 2 else ['', '']
+
+            orders_list.append({
+                'orderId': order.order_id,
+                'date': order.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'items': items,
+                'total': float(order.total_price),
+                'name': user.full_name,
+                'phone': user.phone,
+                'street': delivery_parts[0],
+                'city': delivery_parts[1] if len(delivery_parts) > 1 else '',
+                'state': state_pin[0] if state_pin else '',
+                'pincode': state_pin[1] if len(state_pin) > 1 else '',
+                'status': order.status
+            })
+
+        return jsonify({'data': orders_list, 'ok': True})
+    except Exception as e:
+        logger.error(f"Error fetching pending orders: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/delivery_agents', methods=['GET'])
+@login_required
+def get_delivery_agents():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+
+    try:
+        agents = session.query(DeliveryAgent).all()
+        agents_list = [{
+            'name': agent.name,
+            'status': agent.availability_status.lower(),
+            'delivery_agent_id': agent.delivery_agent_id  # Include for assignment later
+        } for agent in agents]
+        return jsonify({'data': agents_list, 'ok': True})
+    except Exception as e:
+        logger.error(f"Error fetching delivery agents: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/admin/assign_order', methods=['POST'])
+@login_required
+def assign_order():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+
+    data = request.get_json()
+    order_id = data.get('order_id')
+    delivery_agent_id = data.get('delivery_agent_id')
+
+    try:
+        order = session.query(Order).filter_by(order_id=order_id).first()
+        if not order or order.status != "Pending":
+            return jsonify({"error": "Order not found or not pending"}), 404
+
+        agent = session.query(DeliveryAgent).filter_by(delivery_agent_id=delivery_agent_id).first()
+        if not agent:
+            return jsonify({"error": "Delivery agent not found"}), 404
+        if agent.availability_status != "Available":
+            return jsonify({"error": "Agent not available"}), 400
+
+        order.delivery_agent_id = delivery_agent_id
+        order.status = "Preparing"
+        agent.availability_status = "Busy"
+
+        session.commit()
+        return jsonify({"message": f"Order {order_id} assigned to {agent.name}", "ok": True}), 200
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error assigning order: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/reject_order', methods=['POST'])
+@login_required
+def reject_order():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+
+    data = request.get_json()
+    order_id = data.get('order_id')
+
+    try:
+        order = session.query(Order).filter_by(order_id=order_id).first()
+        if not order or order.status != "Pending":
+            return jsonify({"error": "Order not found or not pending"}), 404
+
+        order.status = "Cancelled"
+        session.commit()
+        return jsonify({"message": f"Order {order_id} rejected", "ok": True}), 200
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error rejecting order: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+    
+
+
+# New Endpoint: Summary Statistics
+@app.route('/api/admin/summary', methods=['GET'])
+@login_required
+def get_summary():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+    try:
+        total_orders = session.query(func.count(Order.order_id)).scalar()
+        total_revenue = session.query(func.sum(Order.total_price)).scalar() or 0.0
+        cancelled_orders = session.query(func.count(Order.order_id)).filter(Order.status == "Cancelled").scalar()
+        delivered_orders = session.query(func.count(Order.order_id)).filter(Order.status == "Delivered").scalar()
+        summary = {
+            "total_orders": total_orders,
+            "total_revenue": float(total_revenue),  # Convert Decimal to float for JSON
+            "cancelled_orders": cancelled_orders,
+            "delivered_orders": delivered_orders
+        }
+        return jsonify({"data": summary, "ok": True})
+    except Exception as e:
+        logger.error(f"Error fetching summary: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+# New Endpoint: Order Status Chart Data
+@app.route('/api/admin/order_status_chart', methods=['GET'])
+@login_required
+def get_order_status_chart():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+    try:
+        status_counts = session.query(Order.status, func.count(Order.order_id)).group_by(Order.status).all()
+        chart_data = {status: count for status, count in status_counts}
+        # Ensure all statuses are included, even if count is 0
+        all_statuses = ["Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled"]
+        for status in all_statuses:
+            if status not in chart_data:
+                chart_data[status] = 0
+        return jsonify({"data": chart_data, "ok": True})
+    except Exception as e:
+        logger.error(f"Error fetching chart data: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+
+# New Endpoint: Fetch All Orders with Pagination and Sorting
+@app.route('/api/admin/all_orders', methods=['GET'])
+@login_required
+def get_all_orders():
+    # if current_user.role != 'admin':
+    #     return jsonify({"error": "Unauthorized access"}), 403
+    try:
+        # Pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        offset = (page - 1) * per_page
+        # Sorting parameters
+        sort_by = request.args.get('sort_by', 'order_id')  # Default sort by order_id
+        sort_dir = request.args.get('sort_dir', 'asc')  # Default ascending
+        sort_func = asc if sort_dir.lower() == 'asc' else desc
+        # Valid sortable columns
+        valid_columns = {'order_id': Order.order_id, 'status': Order.status, 'created_at': Order.created_at, 'total_price': Order.total_price}
+        sort_column = valid_columns.get(sort_by, Order.order_id)  # Fallback to order_id
+        # Query orders with sorting and pagination
+        total_orders = session.query(func.count(Order.order_id)).scalar()
+        orders_query = session.query(Order).join(User, Order.user_id == User.user_id).order_by(sort_func(sort_column)).limit(per_page).offset(offset)
+        orders = orders_query.all()
+        orders_list = [{
+            'order_id': order.order_id,
+            'customer_name': order.user.full_name,
+            'status': order.status,
+            'total_price': float(order.total_price),
+            'created_at': order.created_at.isoformat(),
+            'delivery_agent_id': order.delivery_agent_id or 'Not Assigned'
+        } for order in orders]
+        return jsonify({
+            'data': orders_list,
+            'total': total_orders,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': (total_orders + per_page - 1) // per_page,
+            'ok': True
+        })
+    except Exception as e:
+        logger.error(f"Error fetching all orders: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 if __name__ == '__main__':

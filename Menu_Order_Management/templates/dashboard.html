@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - HIFI Delivery Eats</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+    <style>
+        /* Placeholder Scroller Styles (unchanged) */
+        .search-placeholder-wrapper {
+            height: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 100%;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .search-placeholder-static {
+            white-space: nowrap;
+        }
+
+        .search-placeholder-scroller {
+            display: block;
+            animation: scroll-up-placeholder 27s linear infinite;
+            margin-left: 5px;
+            will-change: transform;
+        }
+
+        .search-placeholder-scroller span {
+            display: block;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            text-align: left;
+        }
+
+        @keyframes scroll-up-placeholder {
+            0% {
+                transform: translateY(0.75rem);
+            }
+
+            11.11% {
+                transform: translateY(0.75rem);
+            }
+
+            12.11% {
+                transform: translateY(-0.75rem);
+            }
+
+            22.22% {
+                transform: translateY(-0.75rem);
+            }
+
+            23.22% {
+                transform: translateY(-2.25rem);
+            }
+
+            33.33% {
+                transform: translateY(-2.25rem);
+            }
+
+            34.33% {
+                transform: translateY(-3.75rem);
+            }
+
+            44.44% {
+                transform: translateY(-3.75rem);
+            }
+
+            45.44% {
+                transform: translateY(-5.25rem);
+            }
+
+            55.55% {
+                transform: translateY(-5.25rem);
+            }
+
+            56.55% {
+                transform: translateY(-6.75rem);
+            }
+
+            66.66% {
+                transform: translateY(-6.75rem);
+            }
+
+            67.66% {
+                transform: translateY(-8.25rem);
+            }
+
+            77.77% {
+                transform: translateY(-8.25rem);
+            }
+
+            78.77% {
+                transform: translateY(-9.75rem);
+            }
+
+            88.88% {
+                transform: translateY(-9.75rem);
+            }
+
+            89.88% {
+                transform: translateY(-11.25rem);
+            }
+
+            100% {
+                transform: translateY(-11.25rem);
+            }
+        }
+
+        .search-input::placeholder {
+            color: transparent;
+        }
+
+        .search-form {
+            position: relative;
+        }
+
+        .search-placeholder-wrapper {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .search-input:focus+.search-placeholder-wrapper,
+        .search-input:not(:placeholder-shown)+.search-placeholder-wrapper {
+            display: none;
+        }
+
+        /* Updated Popup and Order List Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+
+        .popup h3 {
+            font-size: 1.25rem;
+            color: var(--title-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .agent-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .agent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .agent-item:hover {
+            background: #f5f5f5;
+        }
+
+        .agent-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-name {
+            font-weight: 500;
+            color: var(--title-color);
+        }
+
+        .agent-status {
+            font-size: 0.85rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 4px;
+        }
+
+        .agent-status-available {
+            background: #ffca28;
+            color: #333;
+        }
+
+        .agent-status-active {
+            background: var(--first-color);
+            color: #fff;
+        }
+
+        .agent-status-offline {
+            background: #ff5a5f;
+            color: #fff;
+        }
+
+        .assign-btn {
+            background: var(--first-color);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .assign-btn:hover {
+            background: var(--first-color-alt);
+        }
+
+        .popup-close {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .popup-close:hover {
+            background: #d0d0d0;
+        }
+
+        .confirm-reject-btn {
+            background: #ff5a5f;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .confirm-reject-btn:hover {
+            background: #e04e53;
+        }
+
+        .order-card .customer-info {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+
+<body>
+    <!-- Header remains unchanged -->
+    <header class="l-header" id="header">
+        <nav class="nav bd-container">
+            <a href="#" class="nav__logo">HIFI Delivery Eats</a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <form class="search-form">
+                            <input type="text" class="search-input" placeholder=" " aria-label="Search" />
+                            <div class="search-placeholder-wrapper">
+                                <span class="search-placeholder-static">Search for</span>
+                                <div class="search-placeholder-scroller" id="placeholder-scroller"></div>
+                            </div>
+                            <button type="submit" class="search-button">
+                                <i class="bx bx-search"></i>
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav__item">
+                        <a href="{{ url_for('admin') }}" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item nav__dropdown">
+                        <a href="#" class="nav__link nav__menu-link">Menu <i class="bx bx-chevron-down"></i></a>
+                        <div class="nav__dropdown-content">
+                            <a href="{{ url_for('menu') }}">Add Menu</a>
+                            <a href="{{ url_for('show_menu') }}">Show Menu</a>
+                        </div>
+                    </li>
+                    <li class="nav__item">
+                        <a href="{{ url_for('dashboard') }}" class="nav__link active-link">Dashboard</a>
+                    </li>
+                    <li class="nav__item"> <!-- ../home/home.html#about -->
+                        <a href="#about" class="nav__link">About Us</a>
+                    </li>
+                    <li class="nav__item"> <!-- ../home/home.html#contact -->
+                        <a href="#contact" class="nav__link">Contact Us</a>
+                    </li>
+                    <li class="nav__item"> <!-- ../home/home.html#contact -->
+                        <a href="#contact" class="nav__link">Sign</a>
+                    </li>
+                    <li class="nav__item">
+                        <i class="bx bx-moon change-theme" id="theme-button"></i>
+                    </li>
+                    <!-- <li class="nav__item nav__dropdown user-dropdown">
+              <a href="#" class="nav__link nav__user-link"
+                ><span class="nav__user-icon"></span
+              ></a>
+              <div class="nav__dropdown-content user-dropdown-content">
+                <a href="../order/order_track_COD.html">My Orders</a>
+                <a href="../favorites/favorites.html">Favorites</a>
+              </div>
+            </li> -->
+                </ul>
+            </div>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class="bx bx-menu"></i>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-header bd-container">
+            <h1 class="home__title">Dashboard</h1>
+            <p>Hi, Welcome back to ADMIN!</p>
+        </div>
+
+        <div class="insights bd-container">
+            <!-- Insights section unchanged -->
+            <div class="summary-card" data-section="business-insights">
+                <span class="icon"><i class="bx bx-trending-up"></i></span>
+                <h3>Business Performance Insights</h3>
+                <div class="stock-animation">
+                    <svg class="stock-line" width="60" height="40">
+                        <polyline points="0,40 15,30 30,35 45,20 60,25" fill="none" stroke="#069c54" stroke-width="2" />
+                    </svg>
+                </div>
+                <p>Track your business growth trends</p>
+            </div>
+            <div class="summary-card" data-section="order-assignment">
+                <span class="icon"><i class="bx bx-transfer"></i></span>
+                <h3>Order Assignment</h3>
+                <div class="order-assignment-animation">
+                    <img src="{{ url_for('static', filename='images/box.gif') }}" alt="Order Assignment Animation"
+                        class="animation-image" />
+                </div>
+                <p>Assign orders to delivery agents</p>
+            </div>
+            <div class="summary-card" data-section="delivery-agents">
+                <span class="icon"><i class="bx bx-cycling"></i></span>
+                <h3>Delivery Agents</h3>
+                <div class="delivery-agent-animation">
+                    <img src="{{ url_for('static', filename='images/delivery.png') }}" alt="Delivery Agent"
+                        class="animation-image" />
+                </div>
+                <p>Monitor agent availability</p>
+            </div>
+            <div class="summary-card" data-section="history">
+                <span class="icon"><i class="bx bx-history"></i></span>
+                <h3>
+                    Order <br />
+                    History
+                </h3>
+                <div class="history-animation">
+                    <img src="{{ url_for('static', filename='images/clipboard.gif') }}" alt="History Animation"
+                        class="animation-image" />
+                </div>
+                <p>View past order activities</p>
+            </div>
+        </div>
+
+        <!-- Business Insights Section unchanged -->
+        <div class="section-content business-insights bd-container" style="display: none">
+            <div class="charts">
+                <div class="charts-header">
+                    <h2 class="section-title">Analytics Overview</h2>
+                    <div class="chart-time-selector">
+                        <label for="time-period-select">Period:</label>
+                        <select id="time-period-select" class="time-period-select">
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart pie-charts">
+                    <h2 class="section-title">Pie Chart</h2>
+                    <div class="chart-controls">
+                        <label><input type="checkbox" id="toggle-chart" checked />
+                            Chart</label>
+                        <label><input type="checkbox" id="toggle-values" checked /> Show
+                            Value</label>
+                    </div>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart total-order">
+                            <span class="pie-value" id="pie-total-order"></span>
+                            <p>Total Order</p>
+                        </div>
+                        <div class="pie-chart customer-growth">
+                            <span class="pie-value" id="pie-customer-growth"></span>
+                            <p>Customer Growth</p>
+                        </div>
+                        <div class="pie-chart total-revenue">
+                            <span class="pie-value" id="pie-total-revenue"></span>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                    <canvas id="pie-chart"></canvas>
+                </div>
+                <div class="chart revenue-chart">
+                    <h2 class="section-title">Total Revenue</h2>
+                    <div class="chart-legend">
+                        <span class="legend-item">2023</span>
+                        <span class="legend-item">2024</span>
+                    </div>
+                    <canvas id="revenue-chart"></canvas>
+                </div>
+                <div class="chart order-chart">
+                    <h2 class="section-title">Chart Order</h2>
+                    <button class="save-report">Save Report</button>
+                    <canvas id="order-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="summary">
+                <div class="summary-card">
+                    <span class="icon"><i class="bx bx-list-ul"></i></span>
+                    <h3 id="total-orders"></h3>
+                    <p>
+                        Total Orders <span class="trend" id="total-orders-trend"></span>
+                    </p>
+                </div>
+                <div class="summary-card">
+                    <span class="icon"><i class="bx bx-package"></i></span>
+                    <h3 id="delivered-orders"></h3>
+                    <p>
+                        Total Delivered
+                        <span class="trend" id="delivered-orders-trend"></span>
+                    </p>
+                </div>
+                <div class="summary-card">
+                    <span class="icon"><i class="bx bx-rupee"></i></span>
+                    <h3 id="total-revenue"></h3>
+                    <p>
+                        Total Revenue <span class="trend" id="total-revenue-trend"></span>
+                    </p>
+                </div>
+                <div class="summary-card">
+                    <span class="icon cancelled"><i class="bx bx-x"></i></span>
+                    <h3 id="cancelled-orders"></h3>
+                    <p>
+                        Total Cancelled
+                        <span class="trend" id="total-cancelled-trend"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Assignment Section with updated buttons -->
+        <div class="section-content order-assignment bd-container" style="display: none">
+            <div class="order-list">
+                <h2 class="section-title">Order List</h2>
+                <div class="order-tabs" id="order-tabs"></div>
+                <div class="order-items" id="order-items"></div>
+            </div>
+            <div class="popup-overlay" id="agent-assignment-popup" style="display: none">
+                <div class="popup">
+                    <h3 id="agent-popup-title">Assign Delivery Agent</h3>
+                    <div id="agent-list" class="agent-list"></div>
+                    <button id="agent-popup-close" class="popup-close">Close</button>
+                </div>
+            </div>
+            <!-- New Table Section -->
+            <div class="all-orders-section">
+                <h2>All Orders</h2>
+                <table id="all-orders-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="order_id">Order ID</th>
+                            <th data-sort="customer_name">Customer</th>
+                            <th data-sort="status">Status</th>
+                            <th data-sort="total_price">Total</th>
+                            <th data-sort="created_at">Date</th>
+                            <th>Delivery Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Delivery Agents and History Sections unchanged -->
+        <div class="section-content delivery-agents bd-container" style="display: none">
+            <div class="delivery-agents">
+                <h2 class="section-title">Delivery Agent Status</h2>
+                <div class="agent-list" id="agent-list-ui"></div>
+            </div>
+        </div>
+
+        <div class="section-content history bd-container" style="display: none">
+            <div class="recent-activity-section">
+                <h2 class="section-title">Recent Activity</h2>
+                <div class="recent-activity"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-popup" class="custom-popup">
+        <span id="popup-message"></span>
+        <button id="popup-close">OK</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+</body>
+
+</html>

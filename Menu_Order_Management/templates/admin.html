@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- <script src="https://unpkg.com/scrollreveal"></script> -->
+    <style>
+        /* Placeholder Scroller Styles */
+        .search-placeholder-wrapper {
+          height: 1.5rem; /* Match the height of the input text for one line */
+          overflow: hidden;
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          width: 100%; /* Match the input width */
+          color: var(--text-color); /* Match search input text color */
+          font-size: 14px; /* Match search input font size */
+        }
+  
+        .search-placeholder-static {
+          white-space: nowrap;
+        }
+  
+        .search-placeholder-scroller {
+          display: block;
+          animation: scroll-up-placeholder 27s linear infinite; /* 9 items, 3s each */
+          margin-left: 5px; /* Small gap between "Search for" and subcategory */
+          will-change: transform; /* Optimize animation performance */
+        }
+  
+        .search-placeholder-scroller span {
+          display: block;
+          height: 1.5rem; /* Match wrapper height */
+          line-height: 1.5rem; /* Center vertically */
+          text-align: left; /* Align with input text */
+        }
+  
+        @keyframes scroll-up-placeholder {
+          /* Adjusted for seamless looping: 9 items, each visible for 3s, total 27s cycle */
+          0% { transform: translateY(0.75rem); } /* Start with Starter */
+          11.11% { transform: translateY(0.75rem); } /* 3s pause for Starter */
+          12.11% { transform: translateY(-0.75rem); } /* Move to Biryani */
+          22.22% { transform: translateY(-0.75rem); } /* 3s pause for Biryani */
+          23.22% { transform: translateY(-2.25rem); } /* Move to Soups */
+          33.33% { transform: translateY(-2.25rem); } /* 3s pause for Soups */
+          34.33% { transform: translateY(-3.75rem); } /* Move to Salads */
+          44.44% { transform: translateY(-3.75rem); } /* 3s pause for Salads */
+          45.44% { transform: translateY(-5.25rem); } /* Move to Breads */
+          55.55% { transform: translateY(-5.25rem); } /* 3s pause for Breads */
+          56.55% { transform: translateY(-6.75rem); } /* Move to Main Course */
+          66.66% { transform: translateY(-6.75rem); } /* 3s pause for Main Course */
+          67.66% { transform: translateY(-8.25rem); } /* Move to Beverages */
+          77.77% { transform: translateY(-8.25rem); } /* 3s pause for Beverages */
+          78.77% { transform: translateY(-9.75rem); } /* Move to Icecreams */
+          88.88% { transform: translateY(-9.75rem); } /* 3s pause for Icecreams */
+          89.88% { transform: translateY(-11.25rem); } /* Move to Breakfast */
+          100% { transform: translateY(-11.25rem); } /* Move past Breakfast to loop seamlessly to Starter */
+        }
+  
+        /* Hide default placeholder */
+        .search-input::placeholder {
+          color: transparent; /* Hide the default placeholder */
+        }
+  
+        /* Ensure the placeholder wrapper aligns with the input */
+        .search-form {
+          position: relative;
+        }
+  
+        .search-placeholder-wrapper {
+          position: absolute;
+          left: 15px; /* Match padding of input */
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none; /* Allow clicking through to the input */
+        }
+  
+        /* Clear placeholder when input is focused or has value */
+        .search-input:focus + .search-placeholder-wrapper,
+        .search-input:not(:placeholder-shown) + .search-placeholder-wrapper {
+          display: none;
+        }
+    </style>
+    <title>HIFI Delivery Eats</title>
+  </head>
+  <body>
+    <a href="#" class="scrolltop" id="scroll-top">
+      <i class="bx bx-chevron-up scrolltop__icon"></i>
+    </a>
+
+    <header class="l-header" id="header">
+      <nav class="nav bd-container">
+        <a href="#" class="nav__logo">HIFI Delivery Eats</a>
+        <div class="nav__menu" id="nav-menu">
+          <ul class="nav__list">
+            <li class="nav__item">
+                <form class="search-form">
+                    <input
+                      type="text"
+                      class="search-input"
+                      placeholder=" "
+                      aria-label="Search"
+                    />
+                    <div class="search-placeholder-wrapper">
+                      <span class="search-placeholder-static">Search for</span>
+                      <div class="search-placeholder-scroller" id="placeholder-scroller">
+                        <!-- Items will be dynamically added via JavaScript -->
+                      </div>
+                    </div>
+                    <button type="submit" class="search-button">
+                      <i class="bx bx-search"></i>
+                    </button>
+                </form>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('admin') }}" class="nav__link active-link">Home</a>
+            </li>
+            <li class="nav__item nav__dropdown">
+              <a href="#" class="nav__link nav__menu-link"
+                >Menu <i class="bx bx-chevron-down"></i
+              ></a>
+              <div class="nav__dropdown-content">
+                <a href="{{ url_for('menu') }}">Add Menu</a>
+                <a href="{{ url_for('show_menu') }}">Show Menu</a>
+              </div>
+            </li>
+            <li class="nav__item">
+              <a href="{{ url_for('dashboard') }}" class="nav__link">Dashboard</a>
+            </li>
+            <li class="nav__item">
+              <a href="#about" class="nav__link">About</a>
+            </li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Contact Us</a>
+            </li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Sign</a>
+            </li>
+            <li class="nav__item">
+              <i class="bx bx-moon change-theme" id="theme-button"></i>
+            </li>
+          </ul>
+        </div>
+        <div class="nav__toggle" id="nav-toggle">
+          <i class="bx bx-menu"></i>
+        </div>
+      </nav>
+    </header>
+    <main class="l-main">
+      <section class="home" id="home">
+        <div class="home__container bd-container bd-grid">
+            <div class="home__data">
+              <h1 class="home__title">HIFI Delivery Eats</h1>
+              <div class="subtitle-wrapper">
+                <div class="subtitle-scroller">
+                  <h3 class="home__subtitle">Savor the Finest Dishes</h3>
+                  <!-- <h3 class="home__subtitle">🍗 Delivered to Your <span style="color: green;">Door!</span></h3>
+                  <h3 class="home__subtitle">Order Fresh Meals ⏰ <span style="color: green;">Today!</span></h3>
+                  <h3 class="home__subtitle">Fast Delivery 🚚 at Your <span style="color: green;">Doorstep!</span></h3>
+                  <h3 class="home__subtitle">Savor the Finest Dishes</h3>
+                  <h3 class="home__subtitle">🍗 Delivered to Your <span style="color: green;">Door!</span></h3>
+                  <h3 class="home__subtitle">Order Fresh Meals ⏰ <span style="color: green;">Today!</span></h3>
+                  <h3 class="home__subtitle">Fast Delivery 🚚 at Your <span style="color: green;">Doorstep!</span></h3><br/> -->
+                </div>
+              </div>
+              <a href="{{ url_for('show_menu') }}" class="button">Explore Our Menu</a>
+              <div class="delivered-meals">
+                <p class="delivered-text" id="dynamic-text">
+                  <span>1,000+</span> meals delivered last week!
+                </p>
+              </div>
+            </div>
+          <img
+            src="{{ url_for('static', filename='images/home.png') }}"
+            alt="Home Image"
+            class="home__img"
+            onerror="this.src='https://via.placeholder.com/150?text=Home+Image+Not+Found';"
+          />
+        </div>
+      </section>
+
+      <section class="menu section bd-container" id="menu">
+        <span class="section-subtitle">Our Specialties</span>
+        <h2 class="section-title">Featured Dishes</h2>
+        <div class="menu__container bd-grid">
+          <!-- Salads Category -->
+          <div class="menu__content" data-category="salads">
+            <img
+              src="{{ url_for('static', filename='/images/Barbecue Salad.jpg') }}"
+              alt="Barbecue Salad"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Barbecue Salad</h3>
+            <span class="menu__category">Salads</span>
+          </div>
+          <!-- Seafood Category -->
+          <div class="menu__content" data-category="seafood">
+            <img
+              src="{{ url_for('static', filename='images/Fish Fillet.jpg') }}"
+              alt="Fish Fillet"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Fish Fillet</h3>
+            <span class="menu__category">Seafood</span>
+          </div>
+          <!-- Meats Category -->
+          <div class="menu__content" data-category="meats">
+            <img
+              src="{{ url_for('static', filename='images/Grilled Steak.jpg') }}"
+              alt="Grilled Steak"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Grilled Steak</h3>
+            <span class="menu__category">Meats</span>
+          </div>
+          <!-- Indian Category -->
+          <div class="menu__content" data-category="indian">
+            <img
+              src="{{ url_for('static', filename='images/Hyderabadi Biryani.jpg') }}"
+              alt="Hyderabadi Biryani"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Hyderabadi Biryani</h3>
+            <span class="menu__category">Indian</span>
+          </div>
+          <!-- Fast Food Category -->
+          <div class="menu__content" data-category="fast-food">
+            <img
+              src="{{ url_for('static', filename='images/Burger.jpg') }}"
+              alt="Burger"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Burger</h3>
+            <span class="menu__category">Fast Food</span>
+          </div>
+          <!-- Breakfast Category -->
+          <div class="menu__content" data-category="breakfast">
+            <img
+              src="{{ url_for('static', filename='images/Breakfast Platter.jpg') }}"
+              alt="Breakfast Platter"
+              class="menu__img"
+              onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+            />
+            <h3 class="menu__name">Breakfast Platter</h3>
+            <span class="menu__category">Breakfast</span>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px">
+          <div class="show1">
+            <a
+              href="{{ url_for('show_menu') }}"
+              class="button"
+              style="background-color: green"
+              >Discover Full Menu</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="about section bd-container" id="about">
+        <div class="about__container bd-grid">
+          <div class="about__data">
+            <div class="about_info">
+              <span class="section-subtitle_about__initial">About us</span>
+            </div>
+            <h2 class="section-title about__initial">
+              Crafting Culinary Excellence
+            </h2>
+            <p class="about__description">
+              Indulge in the finest cuisine with top-notch service at HIFI
+              Delivery Eats. Visit us for an unforgettable dining experience.
+            </p>
+            <div class="about_1"><a href="#" class="button">Our Story</a></div>
+          </div>
+          <img src="{{ url_for('static', filename='imgs/about.jpg') }}" alt="About Image" class="about__img" />
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer section bd-container">
+      <div class="footer__container bd-grid">
+        <div class="footer__content">
+          <a href="#" class="footer__logo">HIFI Delivery</a>
+          <span class="footer__description">Restaurant</span>
+          <div>
+            <a href="#" class="footer__social"
+              ><i class="bx bxl-facebook"></i
+            ></a>
+            <a href="#" class="footer__social"
+              ><i class="bx bxl-instagram"></i
+            ></a>
+            <a href="#" class="footer__social"
+              ><i class="bx bxl-twitter"></i
+            ></a>
+          </div>
+        </div>
+        <div class="footer__content">
+          <h3 class="footer__title">Services</h3>
+          <ul>
+            <li><a href="#" class="footer__link">Delivery</a></li>
+            <li><a href="#" class="footer__link">Pricing</a></li>
+            <li><a href="#" class="footer__link">Fast Food</a></li>
+            <li><a href="#" class="footer__link">Reserve Your Spot</a></li>
+          </ul>
+        </div>
+        <div class="footer__content">
+          <h3 class="footer__title">Information</h3>
+          <ul>
+            <li><a href="#" class="footer__link">Event</a></li>
+            <li><a href="#" class="footer__link">Contact Us</a></li>
+            <li><a href="#" class="footer__link">Privacy Policy</a></li>
+            <li><a href="#" class="footer__link">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer__content">
+          <h3 class="footer__title">Address</h3>
+          <ul>
+            <li>Hyderabad</li>
+            <li>Infosys</li>
+            <li>999 - 888 - 777</li>
+            <li>HIFI-delivery@email.com</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer__copy">
+        © 2025 Infosys Springboard Internship. All rights reserved
+      </p>
+    </footer>
+
+    <!-- JavaScript to dynamically populate the placeholder scroller -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const scroller = document.getElementById("placeholder-scroller");
+          if (scroller) {
+            const subcategories = [
+              "Starter",
+              "Biryani",
+              "Soups",
+              "Salads",
+              "Breads",
+              "Main Course",
+              "Beverages",
+              "Icecreams",
+              "Breakfast",
+            ];
+            const items = [...subcategories, ...subcategories]; // Duplicate for smooth looping
+            items.forEach((subcategory) => {
+              const span = document.createElement("span");
+              span.textContent = subcategory;
+              scroller.appendChild(span);
+            });
+          }
+        });
+    </script>
+
+    <script src="https://unpkg.com/scrollreveal" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  FOR EXAMPLE THIS CODE PART 
+        <div class="menu-category" data-category="Starter">
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries 
+            </div>
+        </div>
+        
+        <div class="menu-category" data-category="Icecream">
+            <div class="menu__container bd-grid">
+              <!-- Dynamically add new entries 
+            </div>
+        </div>
+
+        <div class="menu-category" data-category="Starter">
+            <div class="menu__container bd-grid">
+              Dynamically add new entries 
+            </div>
+        </div>
+
+
+        ISC001	Pizza
+ISC002	Biryani
+ISC003	Salad
+ISC004	Dessert
+ISC005	Starter
+ISC006	Soup
+ISC007	Bread
+ISC008	Main Course
+ISC009	Beverage
+ISC010	Breakfast
+ISC011	Icecream
+ISC012	Starter
+ISC013	Biryani
+ISC014	Salad
+ISC015	Soup
+
+        <option value="">SUB-CATEGORY</option>
+          <option value="Starter">Starter</option>
+          <option value="Soup">Soups</option>
+          <option value="Salad">Salads</option>
+          <option value="Bread">Breads</option>
+          <option value="Main Course">Main Course</option>
+          <option value="Beverage">Beverages</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Biryani">Biryani</option>
+          <option value="Icecream">Icecreams</option></select
+        
+        <div class="menu__container bd-grid">
+            <!-- Starter Category --
+            <div class="menu__content" data-category="Starter">
+              <img
+              
+                src="{{ url_for('static', filename='images/Paneer_Tikka.jpg') }}"
+                alt="Paneer Tikka"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Paneer Tikka</h3>
+              <span class="menu__category">Starters</span>
+            </div>
+            <!-- Soups Category --
+            <div class="menu__content" data-category="Soup">
+              <img
+                src="{{ url_for('static', filename='images/tomato_Soup.jpg') }}"
+                alt="Tomato Soup"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Tomato Soup</h3>
+              <span class="menu__category">Soups</span>
+            </div>
+            <!-- Salads Category --
+            <div class="menu__content" data-category="Salad">
+              <img
+                src="{{ url_for('static', filename='images/Greek_Salad.jpg') }}"
+                alt="Greek Salad"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Greek Salad</h3>
+              <span class="menu__category">Salads</span>
+            </div>
+            <!-- Indian Category --
+            <div class="menu__content" data-category="indian">
+              <img
+                src="{{ url_for('static', filename='images/Hyderabadi Biryani.jpg') }}"
+                alt="Hyderabadi Biryani"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Hyderabadi Biryani</h3>
+              <span class="menu__category">Indian</span>
+            </div>
+            <!-- Fast Food Category --
+            <div class="menu__content" data-category="fast-food">
+              <img
+              
+                src="{{ url_for('static', filename='images/Burger.jpg') }}"
+                alt="Burger"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Burger</h3>
+              <span class="menu__category">Fast Food</span>
+            </div>
+            <!-- Breakfast Category --
+            <div class="menu__content" data-category="breakfast">
+              <img
+              
+                src="{{ url_for('static', filename='images/Breakfast Platter.jpg') }}"
+                alt="Breakfast Platter"
+                class="menu__img"
+                onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found';"
+              />
+              <h3 class="menu__name">Breakfast Platter</h3>
+              <span class="menu__category">Breakfast</span>
+            </div>
+          </div>
+        -->

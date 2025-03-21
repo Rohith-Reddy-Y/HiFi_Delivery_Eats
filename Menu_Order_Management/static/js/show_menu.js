@@ -85,6 +85,85 @@ async function fetchMenuItems() {
   }
 }
 
+// New Function: Fetch Recommendations
+async function fetchRecommendations() {
+    try {
+        const response = await fetch('/api/recommendations', {
+            method: 'GET',
+            credentials: 'include', // Include cookies for session
+        });
+        if (!response.ok) throw new Error('Failed to fetch recommendations');
+        const result = await response.json();
+        console.log("Recommendations:", result);
+        populateRecommendations(result.data, result.is_new_user);
+    } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        document.getElementById("recommendation-container").innerHTML = "<p>Error loading recommendations.</p>";
+    }
+}
+
+// New Function: Populate Recommendations
+function populateRecommendations(recommendations, isNewUser) {
+    const recommendationSection = document.getElementById("recommendation-section");
+    const recommendationContainer = document.getElementById("recommendation-container");
+
+    if (isNewUser || recommendations.length === 0) {
+        recommendationSection.style.display = "none"; // Hide for new users or no recommendations
+        return;
+    }
+
+    recommendationSection.style.display = "block"; // Show for returning users with recommendations
+    recommendationContainer.innerHTML = ""; // Clear existing content
+
+    recommendations.forEach(item => {
+        const menuItem = document.createElement("div");
+        const baseUrl = "https://HiFiDeliveryEats.com/";
+        const staticImagePath = "/static/images/";
+        
+        menuItem.classList.add("menu__content", "dynamic");
+        menuItem.setAttribute("data-name", item.name);
+        menuItem.setAttribute("data-price", item.price);
+        menuItem.setAttribute("data-type", item.category_name?.toLowerCase() || "");
+        menuItem.setAttribute("data-item-id", item.menu_item_id || "");
+
+        const cartItem = cart.find(ci => ci.menu_item_id === item.menu_item_id);
+        const quantity = cartItem ? cartItem.quantity : 0;
+        const stockAvailable = item.stock_available;
+
+        const cartControlHtml = stockAvailable === 0
+            ? `<div class="cart-control"><span class="out-of-stock">Out of Stock</span></div>`
+            : quantity > 0
+                ? `
+          <div class="cart-control">
+            <span class="cart-icon-wrapper"><i class="bx bx-cart-alt cart-icon"></i></span>
+            <div class="quantity-control">
+              <button class="decrement">-</button>
+              <span class="item-count">${quantity}</span>
+              <button class="increment">+</button>
+            </div>
+          </div>
+        `
+                : `
+          <div class="cart-control">
+            <span class="cart-icon-wrapper menu__button"><i class="bx bx-cart-alt cart-icon"></i></span>
+          </div>
+        `;
+
+        menuItem.innerHTML = `
+        <img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" class="menu__img" />
+        <h3 class="menu__name">${item.name}</h3>
+        <span class="menu__detail">${item.description || "No description available"}</span>
+        <div class="menu__price-row">
+          <span class="menu__preci">₹ ${parseFloat(item.price).toFixed(2)}</span>
+          ${cartControlHtml}
+        </div>
+      `;
+
+        recommendationContainer.appendChild(menuItem);
+        setupCartControls(menuItem, item); // Reuse existing function
+    });
+}
+
 // Function to append dynamic items to the menu
 function appendDynamicItems(menuItems) {
     if (!menuItems || menuItems.length === 0) {
@@ -347,6 +426,7 @@ document.addEventListener("DOMContentLoaded",async function () {
     // DOM Elements
     await fetchCart();
     await fetchMenuItems();
+    await fetchRecommendations();
     updateCartCount();
     
     const themeButton = document.getElementById("theme-button");
