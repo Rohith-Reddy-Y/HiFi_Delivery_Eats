@@ -788,3 +788,12 @@ img {
   .dark-theme .out-of-stock {
     color: #ff6655; /* Lighter red for dark mode visibility */
   }
+
+/* New styles for recommendation section */
+#recommendation-section {
+  margin-top: 20px;
+}
+
+#recommendation-section .category-title {
+  color: #4CAF50; /* Highlight recommendations */
+}
