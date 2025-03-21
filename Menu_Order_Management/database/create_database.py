@@ -44,7 +44,6 @@ class User(Base):
     
     # Explicitly define foreign_keys
     orders = relationship("Order", back_populates="user", foreign_keys="Order.user_id")  # Orders placed by user
-    deliveries = relationship("Order", back_populates="delivery_agent", foreign_keys="Order.delivery_agent_id")  # Orders assigned to delivery agent
     cart_items = relationship("Cart", back_populates="user")
 
 
@@ -95,7 +94,7 @@ class Order(Base):
     __tablename__ = "orders"
     order_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
-    delivery_agent_id: Mapped[str] = mapped_column(ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True)
+    delivery_agent_id: Mapped[str] = mapped_column(ForeignKey("delivery_agents.delivery_agent_id", ondelete="SET NULL"), nullable=True)  # Updated to reference delivery_agents
     status: Mapped[str] = mapped_column(Enum("Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled", name="order_status"), nullable=False, default="Pending")
     total_price: Mapped[float] = mapped_column(DECIMAL(10,2), nullable=False)
     delivery_location: Mapped[str] = mapped_column(Text, nullable=False)
@@ -104,7 +103,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     # Explicitly specify foreign_keys for clarity
     user = relationship("User", back_populates="orders", foreign_keys=[user_id])  # Customer
-    delivery_agent = relationship("User", back_populates="deliveries", foreign_keys=[delivery_agent_id])  # Delivery agent
+    delivery_agent = relationship("DeliveryAgent", back_populates="orders")  # Delivery agent
 
     order_items = relationship("OrderItem", back_populates="order")
 
@@ -125,8 +124,10 @@ class DeliveryAgent(Base):
     __table_args__ = {'extend_existing': True}
     __tablename__ = "delivery_agents"
     delivery_agent_id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"), nullable=True, unique=True)
     availability_status: Mapped[str] = mapped_column(Enum("Available", "Busy", "Inactive", name="agent_status"), nullable=False, default="Available")
+    orders = relationship("Order", back_populates="delivery_agent")  # Added relationship
 
 # Cart Table
 class Cart(Base):
