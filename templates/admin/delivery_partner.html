@@ -36,18 +36,18 @@
     </thead>
     <tbody id="userList">
       {% for agent in pending_agents %}
-      <tr id="user-{{ agent.id }}">
+      <tr id="user-{{ agent.delivery_agent_id }}">
         <td>{{ agent.username }}</td>
-        <td>DA{{ agent.id }}</td>
+        <td>{{ agent.delivery_agent_id }}</td>
         <td>{{ agent.email }}</td>
         <td>{{ agent.phone }}</td>
         <td>{{ agent.delivery_area }}</td>
         <td>{{ agent.id_proof }}</td>
         <td>
-          <button class="accept" onclick="handleAccept({{ agent.id }})">
+          <button class="accept" onclick="handleAccept('{{ agent.delivery_agent_id }}')">
             Accept
           </button>
-          <button class="reject" onclick="handleReject({{ agent.id }})">
+          <button class="reject" onclick="handleReject('{{ agent.delivery_agent_id }}')">
             Reject
           </button>
         </td>
@@ -77,11 +77,11 @@
     </thead>
     <tbody id="acceptedAgentsList">
       {% for agent in accepted_agents %}
-      <tr id="user-{{ agent.id }}">
+      <tr id="user-{{ agent.delivery_agent_id }}">
         <td style="color: {% if not agent.is_active %}red{% else %}green{% endif %};">
           {{ agent.username }}
         </td>
-        <td>DA{{ agent.id }}</td>
+        <td>{{ agent.delivery_agent_id }}</td>
         <td>{{ agent.email }}</td>
         <td>{{ agent.phone }}</td>
         <td>{{ agent.delivery_area }}</td>
@@ -91,7 +91,7 @@
           <label class="switch">
             <input
               type="checkbox"
-              onchange="confirmToggleAgent({{ agent.id }}, this)"
+              onchange="confirmToggleAgent('{{ agent.delivery_agent_id }}', this)"
               {{ 'checked' if agent.is_active else '' }}
             />
             <span class="slider"></span>

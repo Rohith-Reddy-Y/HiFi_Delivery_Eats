@@ -33,7 +33,7 @@
                     {% if address.is_preferred %}
                     <span class="preferred-badge"><i class="fas fa-star"></i> Default Address</span>
                     {% else %}
-                    <button class="btn-make-preferred" data-address-id="{{ address.id }}">
+                    <button class="btn-make-preferred" data-address-id="{{ address.address_id }}">
                         <i class="fas fa-star-o"></i> Set as Default
                     </button>
                     {% endif %}
@@ -42,7 +42,7 @@
                         <i class="fas fa-edit"></i>Edit
                     </button> 
                     -->
-                    <button class="btn-delete-address" data-address-id="{{ address.id }}">
+                    <button class="btn-delete-address" data-address-id="{{ address.address_id }}">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
