@@ -3,7 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,flask,python
 
 ### Flask ###
-instance/*
+# instance/*
 !instance/.gitignore
 .webassets-cache
 # .enva
@@ -73,7 +73,7 @@ db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
-instance/
+# instance/
 
 # Scrapy stuff:
 .scrapy
