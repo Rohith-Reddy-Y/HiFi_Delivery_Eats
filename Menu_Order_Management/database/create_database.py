@@ -82,6 +82,7 @@ class MenuItem(Base):
     discount_percentage: Mapped[float] = mapped_column(DECIMAL(5,2), nullable=True)
     stock_available: Mapped[int] = mapped_column(Integer, default=100)  # Added stock field
     scheduled_update_time: Mapped[datetime] = mapped_column(DATETIME, nullable=True, default= datetime.utcnow)
+    pending_update: Mapped[str] = mapped_column(Text, nullable=True)  # JSON string for pending changes
     category = relationship("Category", back_populates="menu_items")
     subcategory = relationship("Subcategory", back_populates="menu_items")  # New relationship
     orders = relationship("OrderItem", back_populates="menu_item")
@@ -145,8 +146,12 @@ class Cart(Base):
 # print("Creating tables...")
 # Base.metadata.create_all(bind=engine)  # only create tables to the database if not exist else do nothing. 
 
-
 '''
+with engine.connect() as connection:
+    connection.execute(text("ALTER TABLE menu_items ADD COLUMN pending_update TEXT DEFAULT NULL;"))
+    connection.commit()
+    print("Added pending_update column")
+
 # For adding new attributes to the existing table
 with engine.connect() as connection:
     connection.execute(text("ALTER TABLE menu_items ADD COLUMN stock_available INTEGER DEFAULT 100;"))

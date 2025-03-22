@@ -4,10 +4,13 @@ from sqlalchemy import create_engine, func, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database.create_database import Base, MenuItem, Category, Subcategory, Cart, User, Order, OrderItem, DeliveryAgent
 from database.services import MenuService, generate_next_id
+from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
+import pytz
+import datetime as dt
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +30,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-        
+# Initialize scheduler
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+
 UPLOAD_FOLDER = "static/images"  # Folder to store images
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -108,10 +115,78 @@ def order_track():
 
 # MENU MANAGEMENT FUNCTIONS : Add_menu webpage
 
+# Function to apply scheduled updates
+def apply_scheduled_updates():
+    with app.app_context():
+        try:
+            now = datetime.now(dt.UTC)
+            logger.info(f"Checking updates at {now} UTC")
+            pending_items = session.query(MenuItem).filter(
+                MenuItem.scheduled_update_time <= now,
+                MenuItem.pending_update.isnot(None)
+            ).all()
+            logger.info(f"Found {len(pending_items)} items to update")
+            if pending_items:
+                for item in pending_items:
+                    logger.info(f"Item {item.menu_item_id}: scheduled_update_time={item.scheduled_update_time}, pending_update={item.pending_update}")
+            else:
+                # Log all items with pending updates to diagnose
+                all_pending = session.query(MenuItem).filter(MenuItem.pending_update.isnot(None)).all()
+                logger.info(f"All items with pending updates: {len(all_pending)}")
+                for item in all_pending:
+                    logger.info(f"Excluded item {item.menu_item_id}: scheduled_update_time={item.scheduled_update_time}")
+            for item in pending_items:
+                updates = json.loads(item.pending_update)
+                logger.info(f"Updating item {item.menu_item_id} with {updates}")
+                for key, value in updates.items():
+                    if key == "price":
+                        item.price = float(value)
+                    elif key == "stock_available":
+                        item.stock_available = int(value)
+                        item.is_out_of_stock = int(value) == 0
+                    elif key == "discount_percentage":
+                        item.discount_percentage = float(value)
+                    elif key == "is_best_seller":
+                        item.is_best_seller = bool(value)
+                    elif key == "name":
+                        item.name = value
+                    elif key == "description":
+                        item.description = value
+                    elif key == "category_name":
+                        category = session.query(Category).filter(func.lower(Category.name) == value.lower()).first()
+                        if category:
+                            item.category_id = category.category_id
+                    elif key == "subcategory_name":
+                        subcategory = session.query(Subcategory).filter(func.lower(Subcategory.name) == value.lower()).first()
+                        if subcategory:
+                            item.subcategory_id = subcategory.subcategory_id
+                item.pending_update = None
+                item.scheduled_update_time = None
+            session.commit()
+            logger.info(f"Applied scheduled updates to {len(pending_items)} items")
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error applying scheduled updates: {e}", exc_info=True)
+        finally:
+            session.close()
+# Schedule the task to run every minute
+scheduler.add_job(apply_scheduled_updates, 'interval', minutes=1)
+
 @app.route('/add_item', methods=["POST"])
 def add_item():
     try:
         data = request.form
+        scheduled_time = data.get("scheduled_update_time")
+        if scheduled_time and scheduled_time.strip():
+            # Assume input is IST, convert to UTC
+            ist_tz = pytz.timezone('Asia/Kolkata')
+            scheduled_dt = datetime.fromisoformat(scheduled_time)
+            scheduled_ist = ist_tz.localize(scheduled_dt)
+            scheduled_update_time = scheduled_ist.astimezone(timezone.utc)
+            logger.info(f"Converted {scheduled_time} IST to {scheduled_update_time} UTC")
+        else:
+            scheduled_update_time = None
+            
         item_name = data["item_name"]
         description = data["description"]
         price = float(data["price"])
@@ -133,20 +208,53 @@ def add_item():
                 # Generate a dummy image URL
                 image_url = f"{BASE_URL}{image.filename}"
         
-        new_item = menu_service.add_menu_item(
-            name=item_name,
-            description=description,
-            price=price,
-            image_url=image_url,
-            category_name=category_name,
-            subcategory_name=subcategory_name,
-            nutrient_value="N/A",
-            calorie_count=0,
-            is_best_seller=best_seller,
-            is_out_of_stock=is_out_of_stock,
-            discount_percentage=discount,
-            stock_available=stock_available
-        )
+        # If scheduled, store as pending update
+        if scheduled_update_time:
+            pending_update = {
+                "name": item_name,
+                "description": description,
+                "price": price,
+                "category_name": category_name,
+                "subcategory_name": subcategory_name,
+                "discount_percentage": discount,
+                "is_best_seller": best_seller,
+                "stock_available": stock_available
+            }
+            new_item = MenuItem(
+                menu_item_id=generate_next_id(menu_service.get_latest_id(MenuItem.menu_item_id), "MI"),
+                name="Pending Item",  # Placeholder until scheduled
+                description="Pending",
+                price=0.0,
+                image_url=image_url,
+                category_id=session.query(Category).filter_by(name=category_name).first().category_id,
+                subcategory_id=session.query(Subcategory).filter_by(name=subcategory_name).first().subcategory_id,
+                nutrient_value="N/A",
+                calorie_count=0,
+                is_best_seller=False,
+                is_out_of_stock=True,
+                discount_percentage=0.0,
+                stock_available=0,
+                scheduled_update_time=scheduled_update_time,
+                pending_update=json.dumps(pending_update)
+            )
+        else:
+            new_item = menu_service.add_menu_item(
+                name=item_name,
+                description=description,
+                price=price,
+                image_url=image_url,
+                category_name=category_name,
+                subcategory_name=subcategory_name,
+                nutrient_value="N/A",
+                calorie_count=0,
+                is_best_seller=best_seller,
+                is_out_of_stock=is_out_of_stock,
+                discount_percentage=discount,
+                stock_available=stock_available
+            )
+
+        session.add(new_item)
+        session.commit()
         
         return jsonify({"success": True, "message": "Item added successfully", "menu_item_id": new_item.menu_item_id,"image_url":new_item.image_url})
     except Exception as e:
@@ -160,6 +268,7 @@ def add_item():
 def get_items():
     items = (session.query(MenuItem, Category, Subcategory).join(Category, MenuItem.category_id == Category.category_id)
         .join(Subcategory, MenuItem.subcategory_id == Subcategory.subcategory_id).all())
+    
     items_list = [
         {
             "menu_item_id": item.MenuItem.menu_item_id,
@@ -174,7 +283,11 @@ def get_items():
             "image_url": item.MenuItem.image_url,
             "is_best_seller": item.MenuItem.is_best_seller,
             "is_out_of_stock": item.MenuItem.is_out_of_stock,
-            "stock_available": item.MenuItem.stock_available
+            "stock_available": item.MenuItem.stock_available,
+            "scheduled_update_time": (
+                    item.MenuItem.scheduled_update_time.isoformat()
+                    if item.MenuItem.scheduled_update_time else None),  # Handle None explicitly
+            "pending_update": item.MenuItem.pending_update  # Include pending_update if added
         }
         for item in items
     ]
@@ -242,44 +355,48 @@ def update_item():
         if not menu_item_id:
             return jsonify({"error": "Menu item ID not provided"}), 400
         
+        scheduled_time = data.get("scheduled_update_time")
+        scheduled_update_time = datetime.fromisoformat(scheduled_time) if scheduled_time else None
+        
         # Fetch the menu item from the database
         menu_item = session.query(MenuItem).filter_by(menu_item_id=menu_item_id).first()
         if not menu_item:
             return jsonify({"error": "Menu item not found"}), 404
 
         
-        # Update only provided fields, keep others unchanged
-        menu_item.name = data.get("name", menu_item.name)
-        menu_item.description = data.get("description", menu_item.description)
-        menu_item.price = data.get("price", menu_item.price)
-        menu_item.discount_percentage = data.get("discount_percentage", menu_item.discount_percentage)
-        menu_item.is_best_seller = data.get("is_best_seller", menu_item.is_best_seller)
-        menu_item.stock_available = data.get("stock_available", menu_item.stock_available)
+        # If scheduled, store changes in pending_update
+        if scheduled_update_time:
+            pending_update = {
+                "name": data.get("name", menu_item.name),
+                "description": data.get("description", menu_item.description),
+                "price": float(data.get("price", menu_item.price)),
+                "category_name": data.get("category_name", menu_item.category.name),
+                "subcategory_name": data.get("subcategory_name", menu_item.subcategory.name),
+                "discount_percentage": float(data.get("discount_percentage", menu_item.discount_percentage or 0)),
+                "is_best_seller": data.get("is_best_seller", menu_item.is_best_seller),
+                "stock_available": int(data.get("stock_available", menu_item.stock_available))
+            }
+            menu_item.scheduled_update_time = scheduled_update_time
+            menu_item.pending_update = json.dumps(pending_update)
+        else:
+            # Apply changes immediately
+            menu_item.name = data.get("name", menu_item.name)
+            menu_item.description = data.get("description", menu_item.description)
+            menu_item.price = data.get("price", menu_item.price)
+            menu_item.discount_percentage = data.get("discount_percentage", menu_item.discount_percentage)
+            menu_item.is_best_seller = data.get("is_best_seller", menu_item.is_best_seller)
+            menu_item.stock_available = data.get("stock_available", menu_item.stock_available)
+            menu_item.is_out_of_stock = int(data.get("stock_available", menu_item.stock_available)) == 0
 
-        # 🔹 Fetch category_id case-insensitively if category_name is provided
-        if "category_name" in data:
-            category_name = data["category_name"].strip()
-            category = session.query(Category).filter(func.lower(Category.name) == category_name.lower()).first()
-            
-            if category:
-                menu_item.category_id = category.category_id
-                logger.info(f"\n\n\nUpdated category_id to: {menu_item.category_id}")
-            else:
-                logger.error(f"Invalid category name: {category_name}")
-                return jsonify({"error": "Invalid category name"}), 400
-        
-        # 🔹 Fetch subcategory_id case-insensitively if subcategory_name is provided
-        if "subcategory_name" in data:
-            subcategory_name = data["subcategory_name"].strip()
-            subcategory = session.query(Subcategory).filter(func.lower(Subcategory.name) == subcategory_name.lower()).first()
-            
-            if subcategory:
-                menu_item.subcategory_id = subcategory.subcategory_id
-                logger.info(f"\n\n\nUpdated subcategory_id to: {menu_item.subcategory_id}")
-            else:
-                logger.error(f"Invalid subcategory name: {subcategory_name}")
-                return jsonify({"error": "Invalid subcategory name"}), 400
-        
+            if "category_name" in data:
+                category = session.query(Category).filter(func.lower(Category.name) == data["category_name"].lower()).first()
+                if category:
+                    menu_item.category_id = category.category_id
+            if "subcategory_name" in data:
+                subcategory = session.query(Subcategory).filter(func.lower(Subcategory.name) == data["subcategory_name"].lower()).first()
+                if subcategory:
+                    menu_item.subcategory_id = subcategory.subcategory_id
+
         # Commit changes
         session.commit()
         session.close()

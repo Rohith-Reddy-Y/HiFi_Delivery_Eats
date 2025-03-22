@@ -117,7 +117,7 @@ function renderMenuItems() {
                     <td><img src="${staticImagePath}${item.image_url.replace(baseUrl, '')}" alt="${item.name}" width="50"></td>
                     <td>${item.is_best_seller}</td>
                     <td>${item.stock_available}</td>
-                    <td>${formatTimestamp(new Date())}</td>
+                    <td>${item.scheduled_update_time || formatTimestamp(new Date())}</td> <!-- Display scheduled time -->
 
                     <td>
                         <div class="action-buttons">
@@ -290,6 +290,8 @@ function showEditPopup(index, deleteButton, editButton) {
             <input type="radio" id="edit-best-seller-no" name="edit-best-seller" value="no" ${!item.is_best_seller ? "checked" : ""}> No<br>
             <label>Stock Available:</label>
             <input type="number" id="edit-stock-available" min="0" value="${item.stock_available}" required><br>
+            <label>Schedule Update (optional):</label>
+            <input type="datetime-local" id="edit-schedule-time" value="${item.scheduled_update_time}"><br>
             <div class="button-group">
                 <button id="save-edit">Save</button>
                 <button id="cancel-edit">Cancel</button>
@@ -306,6 +308,7 @@ function showEditPopup(index, deleteButton, editButton) {
                 // Validate discount input
                 let discountValue = document.getElementById("edit-discount").value.trim();
                 discountValue = (discountValue === "" || isNaN(parseInt(discountValue)) || parseInt(discountValue) < 0 || parseInt(discountValue) > 100) ? "0" : discountValue;
+                const scheduleTime = document.getElementById("edit-schedule-time").value;
 
                 const updatedItem = {
                     menu_item_id: index,
@@ -317,7 +320,7 @@ function showEditPopup(index, deleteButton, editButton) {
                     discount_percentage: discountValue,
                     is_best_seller: document.querySelector('input[name="edit-best-seller"]:checked').value === "yes",
                     stock_available: stockValue,
-                    scheduled_update_time: formatTimestamp(new Date()),
+                    scheduled_update_time: scheduleTime ? new Date(scheduleTime).toISOString() : null
                 };
 
                 fetch('/update_item', {
@@ -637,6 +640,7 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("image", imageFile);
         formData.append("best_seller", bestSeller);
         formData.append("stock_available", stockAvailable);
+        formData.append("scheduled_update_time", document.getElementById("schedule-time").value || "");
 
         // Send data to the backend
         fetch("/add_item", { method: "POST", body: formData, })
@@ -653,4 +657,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 showSuccessPopup("⚠️ An unexpected error occurred.");
             });
     });
+    renderMenuItems();
 });
