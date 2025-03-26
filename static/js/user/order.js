@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Initial fetches
     await fetchMenuItems();
-    await fetchCart();
+    // await fetchCart();
     console.log("Cart after initial fetch:", cart);
     updateCartCount();
 
@@ -263,6 +263,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const itemPrice = parseFloat(item.price) || 0;
             const itemTotal = itemPrice * quantity;
             const discountPercentage = parseFloat(item.discount_percentage) || 0;
+            console.log(discountPercentage);
             const itemDiscount = (itemTotal * discountPercentage) / 100;
             const actualPrice = itemTotal - itemDiscount;
 
