@@ -209,6 +209,7 @@ class MenuItem(BaseModel):
     discount_percentage = db.Column(db.DECIMAL(5, 2), nullable=True)
     stock_available = db.Column(db.Integer, default=100)
     scheduled_update_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    pending_update = db.Column(db.Text, nullable=True)  # JSON string for pending changes
 
     category = db.relationship("Category", back_populates="menu_items")
     subcategory = db.relationship("Subcategory", back_populates="menu_items")
