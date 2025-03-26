@@ -1,7 +1,8 @@
-from flask import jsonify, render_template, request
+from flask import jsonify, render_template, request, redirect, url_for
 from flask_login import current_user, login_required
 from models import Address, MenuItem, Category, Subcategory, Cart, Order, OrderItem
 from sqlalchemy import text
+import json
 
 def customer_routes(app, db):
     @app.route('/user/profile')
@@ -10,9 +11,72 @@ def customer_routes(app, db):
         return render_template('user/profile.html', user=current_user)
     
     @app.route('/show_menu')
+    @login_required
     def show_menu():
         return render_template('user/show_menu.html', user=current_user)
 
+    # ORDER MANAGEMENT ENDPOINTS: Order page route
+    @app.route('/order', methods=['GET', 'POST'])
+    @login_required
+    def order():
+        if request.method == 'GET':
+            try:
+                cart_items = (
+                    Cart.query
+                    .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
+                    .filter(Cart.customer_id == current_user.customer_id)
+                    .with_entities(
+                        Cart.cart_id,
+                        Cart.menu_item_id,
+                        Cart.quantity,
+                        MenuItem.name.label("menu_item_name"),
+                        MenuItem.price,
+                        MenuItem.discount_percentage
+                    )
+                    .all()
+                )
+
+                cart_data = [
+                    {
+                        'cart_id': item.cart_id,
+                        'menu_item_id': item.menu_item_id,
+                        'name': item.menu_item_name,
+                        'price': float(item.price),
+                        'quantity': item.quantity,
+                        'discount_percentage': float(item.discount_percentage) if item.discount_percentage else 0
+                    }
+                    for item in cart_items
+                ]
+
+                # Calculate totals
+                subtotal = 0
+                total_discount = 0
+                for item in cart_data:
+                    item_total = item['price'] * item['quantity']
+                    item_discount = (item_total * item['discount_percentage']) / 100
+                    subtotal += item_total
+                    total_discount += item_discount
+                tax = (subtotal - total_discount) * 0.18  # 18% tax
+                delivery_charge = 50.0
+                total = subtotal - total_discount + tax + delivery_charge
+
+                return render_template(
+                    'user/order.html',
+                    cart_json=json.dumps(cart_data),
+                    total=total,
+                    subtotal=subtotal - total_discount,
+                    tax=tax,
+                    delivery_charge=delivery_charge,
+                    user=current_user
+                )
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"error": str(e)}), 500
+
+        elif request.method == 'POST':
+            # Redirect to delivery_details when "Place Order" is clicked
+            return redirect(url_for('customer.delivery_details'))
+    
     @app.route("/address/new", methods=["POST"])
     @login_required
     def add_address():

@@ -14,6 +14,7 @@
 </head>
 
 <body>
+    {%block nav_bar%}
     <!--========== SCROLL TOP ==========-->
     <a href="#" class="scrolltop" id="scroll-top">
         <i class="bx bx-chevron-up scrolltop__icon"></i>
@@ -42,8 +43,8 @@
                     </li>
 
                     <li class="nav__item">
-                        <a href="#" class="nav__link">
-                            Cart(<span class="nav__cart-count"></span>)
+                        <a href="{{ url_for('order') }}" class="nav__link">
+                            Cart(<span class="nav__cart-count">0</span>)
                         </a>
                     </li>
                     <!--
@@ -80,6 +81,7 @@
             </div>
         </nav>
     </header>
+    {% endblock nav_bar %}
 
     <!-- Flash Messages (positioned right below the header) -->
     {% with messages = get_flashed_messages() %} {% if messages %}
@@ -93,49 +95,12 @@
     <main class="l-main">{% block content %}{% endblock content %}</main>
 
     <footer class="footer section bd-container">
-        <div class="footer__container bd-grid">
-            <div class="footer__content">
-                <a href="#" class="footer__logo">HIFI Delivery</a>
-                <span class="footer__description">Restaurant</span>
-                <div>
-                    <a href="#" class="footer__social"><i class="bx bxl-facebook"></i></a>
-                    <a href="#" class="footer__social"><i class="bx bxl-instagram"></i></a>
-                    <a href="#" class="footer__social"><i class="bx bxl-twitter"></i></a>
-                </div>
-            </div>
-            <div class="footer__content">
-                <h3 class="footer__title">Services</h3>
-                <ul>
-                    <li><a href="#" class="footer__link">Delivery</a></li>
-                    <li><a href="#" class="footer__link">Pricing</a></li>
-                    <li><a href="#" class="footer__link">Fast Food</a></li>
-                    <li><a href="#" class="footer__link">Reserve Your Spot</a></li>
-                </ul>
-            </div>
-            <div class="footer__content">
-                <h3 class="footer__title">Information</h3>
-                <ul>
-                    <li><a href="#" class="footer__link">Event</a></li>
-                    <li><a href="#" class="footer__link">Contact Us</a></li>
-                    <li><a href="#" class="footer__link">Privacy Policy</a></li>
-                    <li><a href="#" class="footer__link">Terms of Service</a></li>
-                </ul>
-            </div>
-            <div class="footer__content">
-                <h3 class="footer__title">Address</h3>
-                <ul>
-                    <li>Hyderabad</li>
-                    <li>Infosys</li>
-                    <li>999 - 888 - 777</li>
-                    <li>HIFI-delivery@email.com</li>
-                </ul>
-            </div>
-        </div>
+        {% block footer %}{% endblock footer%}
         <p class="footer__copy">
             © 2025 Infosys Springboard Internship. All rights reserved
         </p>
     </footer>
-
+    
     {% block scripts %}
     <script>
         // Auto-hide flash messages after 3 seconds

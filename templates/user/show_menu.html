@@ -2,7 +2,11 @@
 endblock title %} {% block css %} {{super()}}
 <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/user/show_menu.css') }}" />
-{% endblock css %} {% block content %}
+{% endblock css %}
+
+{%block nav_bar%}{{super()}}{%endblock nav_bar%}
+
+{% block content %}
 <section class="menu section bd-container" id="more-menu">
     <span class="section-subtitle">Explore Our Menu</span>
     <h2 class="section-title" id="menu-heading">All Menu Items</h2>
