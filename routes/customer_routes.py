@@ -1,7 +1,7 @@
 from flask import jsonify, render_template, request, redirect, url_for
 from flask_login import current_user, login_required
 from models import Address, MenuItem, Category, Subcategory, Cart, Order, OrderItem
-from sqlalchemy import text
+from sqlalchemy import text,func
 import json
 from datetime import datetime
 

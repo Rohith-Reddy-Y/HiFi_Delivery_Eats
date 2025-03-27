@@ -6,8 +6,10 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 import os
-
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData,func
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timezone
+import json
 
 load_dotenv()
 
@@ -42,7 +44,7 @@ def create_app():
     login_manager.init_app(app)
     
     # models
-    from models import Customer, Admin, DeliveryAgent
+    from models import Customer, Admin, DeliveryAgent,MenuItem, Category, Subcategory
     @login_manager.user_loader
     def load_user(user_id):
         try:
@@ -89,7 +91,68 @@ def create_app():
     delivery_agent_routes(app, db)
     customer_routes(app, db)
     
-    
+    # Function to apply scheduled updates
+    def apply_scheduled_updates():
+        with app.app_context():
+            try:
+                now = datetime.now(timezone.utc)
+                print(f"Checking updates at {now} UTC")
+
+                pending_items = db.session.query(MenuItem).filter(
+                    MenuItem.scheduled_update_time <= now,
+                    MenuItem.pending_update.isnot(None)
+                ).all()
+                print(f"Found {len(pending_items)} items to update")
+
+                if not pending_items:
+                    all_pending = db.session.query(MenuItem).filter(MenuItem.pending_update.isnot(None)).all()
+                    print(f"All items with pending updates: {len(all_pending)}")
+                    for item in all_pending:
+                        print(f"Excluded item {item.menu_item_id}: scheduled_update_time={item.scheduled_update_time}")
+
+                for item in pending_items:
+                    updates = json.loads(item.pending_update)
+                    print(f"Updating item {item.menu_item_id} with {updates}")
+                    for key, value in updates.items():
+                        if key == "price":
+                            item.price = float(value)
+                        elif key == "stock_available":
+                            item.stock_available = int(value)
+                            item.is_out_of_stock = int(value) == 0
+                        elif key == "discount_percentage":
+                            item.discount_percentage = float(value)
+                        elif key == "is_best_seller":
+                            item.is_best_seller = bool(value)
+                        elif key == "name":
+                            item.name = value
+                        elif key == "description":
+                            item.description = value
+                        elif key == "category_name":
+                            category = db.session.query(Category).filter(func.lower(Category.name) == value.lower()).first()
+                            if category:
+                                item.category_id = category.category_id
+                        elif key == "subcategory_name":
+                            subcategory = db.session.query(Subcategory).filter(func.lower(Subcategory.name) == value.lower()).first()
+                            if subcategory:
+                                item.subcategory_id = subcategory.subcategory_id
+                    item.pending_update = None
+                    item.scheduled_update_time = None
+
+                db.session.commit()
+                print(f"Applied scheduled updates to {len(pending_items)} items")
+
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error applying scheduled updates: {e}")
+
+    # Initialize and start the scheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(apply_scheduled_updates, 'interval', minutes=100)
+    scheduler.start()
+
+    # Ensure scheduler shuts down when app exits
+    import atexit
+    atexit.register(lambda: scheduler.shutdown())
     
     migrate = Migrate(app, db)
     return app
