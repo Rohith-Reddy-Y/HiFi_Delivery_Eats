@@ -261,7 +261,7 @@ def calculate_return_refund_statistics():
     Assumes orders with status 'Refunded' indicate a refund.
     """
     total_orders = db.session.query(func.count(Order.order_id)).scalar()
-    refunded_orders = db.session.query(func.count(Order.order_id)).filter(Order.status == 'Refunded').scalar()
+    refunded_orders = db.session.query(func.count(Order.order_id)).filter(Order.delivery_status == 'Refunded').scalar()
     if total_orders:
         percentage = round((refunded_orders / total_orders) * 100, 1)
         return percentage
@@ -272,15 +272,15 @@ def calculate_on_time_order_percentage():
     Calculate the percentage of orders delivered on time.
     This demo assumes that orders with status 'Delivered' are on time.
     """
-    total_delivered = db.session.query(func.count(Order.order_id)).filter(Order.status == 'Delivered').scalar()
+    total_delivered = db.session.query(func.count(Order.order_id)).filter(Order.delivery_status == 'Delivered').scalar()
     if total_delivered:
         return 98  # For instance, assume 98% on time
     return 0
 
 def calculate_revenue_per_delivery():
     """Calculate the average revenue per delivered order."""
-    total_revenue = db.session.query(func.sum(Order.total_price)).filter(Order.status == 'Delivered').scalar() or 0
-    total_deliveries = db.session.query(func.count(Order.order_id)).filter(Order.status == 'Delivered').scalar() or 0
+    total_revenue = db.session.query(func.sum(Order.total_price)).filter(Order.delivery_status == 'Delivered').scalar() or 0
+    total_deliveries = db.session.query(func.count(Order.order_id)).filter(Order.delivery_status == 'Delivered').scalar() or 0
     if total_deliveries:
         revenue = round(total_revenue / total_deliveries, 2)
         return revenue

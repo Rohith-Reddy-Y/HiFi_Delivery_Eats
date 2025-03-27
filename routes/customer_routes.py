@@ -172,7 +172,7 @@ def customer_routes(app, db):
             new_order = Order(
                 customer_id=current_user.customer_id,
                 delivery_agent_id=None,
-                status="Pending",
+                delivery_status="Pending",
                 total_price=total,
                 delivery_location=f"{delivery_details.get('street', '')}, {delivery_details.get('city', '')}, {delivery_details.get('state', '')} {delivery_details.get('pincode', '')}",
                 created_at=datetime.utcnow()

@@ -62,9 +62,9 @@
           </td>
           <td>₹{{ order.total_price | round(2) }}</td>
           <td
-            class="{% if order.status == 'Pending' %} status-pending {% elif order.status == 'Delivered' %} status-completed {% elif order.status == 'Cancelled' %} status-cancelled {% endif %}"
+            class="{% if order.delivery_status == 'Pending' %} status-pending {% elif order.delivery_status == 'Delivered' %} status-completed {% elif order.delivery_status == 'Cancelled' %} status-cancelled {% endif %}"
           >
-            {{ order.status }}
+            {{ order.delivery_status }}
           </td>
         </tr>
         {% endfor %}

@@ -254,6 +254,26 @@
         border-radius: 20px;
     }
 
+    .bg-danger{
+        background: #f44336;
+        color: white;
+    }
+
+    .bg-success{
+        background: #4caf50;
+        color: white;
+    }
+
+    .bg-warning{
+        background: #ff9800;
+        color: white;
+    }
+
+    .bg-info{
+        background-color: cyan;
+        color: white;
+    }
+
     /* Tracking Section */
     .tracking-section {
         padding: 20px;
@@ -823,7 +843,7 @@
                 document.getElementById("order-message").style.display = "none";
                 document.getElementById("feedback-section").style.display = "block";
 
-                currentOrder.status = "delivered";
+                currentOrder.delivery_status = "delivered";
                 const existingOrderIndex = orders.findIndex(o => o.orderId === currentOrder.orderId);
                 if (existingOrderIndex === -1) {
                     orders.push(currentOrder);

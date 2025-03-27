@@ -75,6 +75,7 @@ function updateRecentOrders() {
     tableBody.innerHTML = '';
 
     for (let i = 0; i < 5; i++) {
+        // ! NEED TO FETCH DATA FROM DATABASE.
         const order = generateRandomOrder();
         const row = `
             <tr>
@@ -82,7 +83,7 @@ function updateRecentOrders() {
                 <td>${order.customer}</td>
                 <td>${order.items}</td>
                 <td>${order.total}</td>
-                <td>${order.status}</td>
+                <td>${order.delivery_status}</td>
             </tr>
         `;
         tableBody.innerHTML += row;

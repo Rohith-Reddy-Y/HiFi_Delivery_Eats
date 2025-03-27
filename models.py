@@ -228,7 +228,7 @@ class Order(BaseModel):
     order_id = db.Column(db.String(10), primary_key=True)
     customer_id = db.Column(db.String(10), db.ForeignKey("customer.customer_id", ondelete="CASCADE"), nullable=False)
     delivery_agent_id = db.Column(db.String(10), db.ForeignKey("delivery_agent.delivery_agent_id", ondelete="SET NULL"), nullable=True)
-    status = db.Column(db.Enum("Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled", name="order_status"), nullable=False, default="Pending")
+    delivery_status = db.Column(db.Enum("Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled","Refunded", name="order_status"), nullable=False, default="Pending")
     total_price = db.Column(db.DECIMAL(10, 2), nullable=False)
     delivery_location = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
