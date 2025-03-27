@@ -396,33 +396,6 @@ function showStockAlert(itemName, stockAvailable) {
       scrollTop.classList.remove("show-scroll");
     }
   }
-  
-  // Dark mode toggle functionality
-  function toggleTheme() {
-    document.body.classList.toggle("dark-theme");
-    const themeButton = document.getElementById("theme-button");
-    if (document.body.classList.contains("dark-theme")) {
-      themeButton.classList.remove("bx-moon");
-      themeButton.classList.add("bx-sun");
-      localStorage.setItem("theme", "dark");
-    } else {
-      themeButton.classList.remove("bx-sun");
-      themeButton.classList.add("bx-moon");
-      localStorage.setItem("theme", "light");
-    }
-  }
-  
-  // Apply saved theme on load
-  function applySavedTheme() {
-    const savedTheme = localStorage.getItem("theme");
-    const themeButton = document.getElementById("theme-button");
-    if (savedTheme === "dark") {
-      document.body.classList.add("dark-theme");
-      themeButton.classList.remove("bx-moon");
-      themeButton.classList.add("bx-sun");
-    }
-  }
-
 
 document.addEventListener("DOMContentLoaded",async function () {
     // DOM Elements

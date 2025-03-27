@@ -114,7 +114,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
-{% block scripts %}
+{% block scripts %}{{super()}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('address-modal');
@@ -123,6 +123,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const addressForm = document.getElementById('address-form');
     const modalTitle = document.getElementById('modal-title');
     const addressIdInput = document.getElementById('address-id');
+
+    const themeButton = document.getElementById("theme-button");
+    if (themeButton) {
+      themeButton.addEventListener("click", toggleTheme);
+    } else {
+      console.error("Theme button not found in DOMContentLoaded");
+    }
+    applySavedTheme();
 
     // Open modal for new address
     addAddressBtn.onclick = function() {

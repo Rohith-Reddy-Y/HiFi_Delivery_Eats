@@ -4,32 +4,10 @@
 /*===== VARIABLES CSS =====*/
 :root {
   --primary-color: #069c54; /* Main green */
-  --primary-color-alt: #34c759; /* Lighter green for hover */
+  --primary-color-alt: #048654; /* Lighter green for hover */
   --secondary-color: #ffffff; /* White for contrast */
-  --text-color: #333333; /* Dark gray for readability */
-  --text-color-light: #666666; /* Lighter gray for subtle text */
-  --body-color: #f0f7f2; /* Light green-tinted white background */
   --card-bg: #ffffff; /* Pure white for cards */
   --shadow-color: rgba(6, 156, 84, 0.15); /* Green-tinted shadow */
-
-  --body-font: "Poppins", sans-serif;
-  --title-font: "Playfair Display", serif;
-  --h1-font-size: 2rem;
-  --h2-font-size: 1.5rem;
-  --h3-font-size: 1.25rem;
-  --normal-font-size: 1rem;
-  --small-font-size: 0.875rem;
-  --smaller-font-size: 0.75rem;
-
-  --font-medium: 500;
-  --font-bold: 700;
-
-  --mb-1: 0.5rem;
-  --mb-2: 1rem;
-  --mb-3: 1.5rem;
-  --mb-4: 2rem;
-  --mb-5: 2.5rem;
-  --mb-6: 3rem;
 }
 
 /*========== CART ==========*/

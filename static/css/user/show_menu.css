@@ -3,64 +3,20 @@
 
 /*===== VARIABLES CSS =====*/
 :root {
-  --header-height: 4rem;
 
   /*========== Colors ==========*/
   --primary-color: #069c54; /* Main green from your theme */
   --primary-color-alt: #34c759; /* Lighter green for hover */
   --secondary-color: #ffffff; /* White for contrast */
-  --text-color: #333333; /* Dark gray for readability */
-  --text-color-light: #666666; /* Lighter gray for subtle text */
-  --body-color: #f0f7f2; /* Light green-tinted white background */
   --card-bg: #ffffff; /* Pure white for cards */
   --shadow-color: rgba(6, 156, 84, 0.15); /* Green-tinted shadow */
-
-  /*========== Font and typography ==========*/
-  --body-font: "Poppins", sans-serif;
-  --title-font: "Playfair Display", serif;
-  --biggest-font-size: 2.5rem;
-  --h1-font-size: 2rem;
-  --h2-font-size: 1.5rem;
-  --h3-font-size: 1.25rem;
-  --normal-font-size: 1rem;
-  --small-font-size: 0.875rem;
-  --smaller-font-size: 0.75rem;
-
-  /*========== Font weight ==========*/
-  --font-medium: 500;
-  --font-bold: 700;
-
-  /*========== Margins ==========*/
-  --mb-1: 0.5rem;
-  --mb-2: 1rem;
-  --mb-3: 1.5rem;
-  --mb-4: 2rem;
-  --mb-5: 2.5rem;
-  --mb-6: 3rem;
-
-  /*========== z index ==========*/
-  --z-tooltip: 10;
-  --z-fixed: 100;
+  /* --small-font-size: 14px;/ Define your size */
+    --font-bold: 600; /* Define your weight */
 }
 
-@media screen and (min-width: 768px) {
-  :root {
-    --biggest-font-size: 4.5rem;
-    --h1-font-size: 2.75rem;
-    --h2-font-size: 2rem;
-    --h3-font-size: 1.5rem;
-    --normal-font-size: 1.125rem;
-    --small-font-size: 0.938rem;
-    --smaller-font-size: 0.813rem;
-  }
-}
 
 /*========== BASE ==========*/
-*,
-::before,
-::after {
-  box-sizing: border-box;
-}
+
 
 html {
   scroll-behavior: smooth;
@@ -68,11 +24,7 @@ html {
 
 body {
   margin: var(--header-height) 0 0 0;
-  font-family: var(--body-font);
-  font-size: var(--normal-font-size);
   background: linear-gradient(135deg, var(--body-color), #e8f2e9);
-  color: var(--text-color);
-  line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -85,14 +37,6 @@ ul {
   margin: 0;
 }
 
-ul {
-  padding: 0;
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-}
 
 img {
   max-width: 100%;
@@ -129,16 +73,16 @@ img {
 }
 
 /*========== LAYOUT ==========*/
-.bd-container {
+#more-menu {
   max-width: 1200px;
-  width: calc(100% - 3rem);
+  width: calc(100% - 2rem);
   margin-left: auto;
   margin-right: auto;
 }
 
 .bd-grid {
   display: grid;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .l-header {
@@ -152,7 +96,7 @@ img {
     rgba(255, 255, 255, 0.95),
     rgba(255, 255, 255, 0.85)
   );
-  box-shadow: 0 2px 10px var(--shadow-color);
+  /* box-shadow: 0 2px 10px var(--shadow-color); */
 }
 
 
@@ -394,57 +338,6 @@ img {
   background: var(--primary-color);
 }
 
-.dark-theme .search-form {
-  background: #2a3a2e; /* Slightly lighter green for search bar */
-  border-color: var(--primary-color-alt);
-}
-
-.dark-theme .search-button i {
-  color: #ffffff; /* White search icon */
-}
-
-/*========== SEARCH BAR ==========*/
-.search-form {
-  display: flex;
-  align-items: center;
-  background: var(--card-bg);
-  border: 2px solid var(--primary-color);
-  border-radius: 25px;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 5px var(--shadow-color);
-}
-
-.search-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: var(--small-font-size);
-  color: var(--text-color);
-  width: 150px;
-  transition: width 0.3s ease;
-}
-
-.search-input:focus {
-  width: 200px;
-}
-
-.search-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.search-button i {
-  font-size: 1.25rem;
-  color: var(--primary-color);
-  transition: color 0.3s ease;
-}
-
-.search-button:hover i {
-  color: var(--primary-color-alt);
-}
-
 /*========== POPUP ==========*/
 .popup-container {
   position: fixed;
@@ -529,13 +422,7 @@ img {
   margin: var(--mb-2) 0;
 }
 
-:root {
-  --primary-color-alt: #069c54; /* Green */
-  --secondary-color: #fff; /* White */
-  --title-font: 'YourFont', sans-serif; /* Define your font */
-  --small-font-size: 14px; /* Define your size */
-  --font-bold: 600; /* Define your weight */
-}
+
 
 /*========== DISCOUNT BADGE ==========*/
 .discount-badge {
@@ -616,12 +503,6 @@ img {
   }
 }
 
-@media screen and (min-width: 960px) {
-  .bd-container {
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
 .menu__separator {
   display: none; /* Hides the green dot */
 }
