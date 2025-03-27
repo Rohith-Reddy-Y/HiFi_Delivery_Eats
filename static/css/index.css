@@ -93,7 +93,8 @@ img {
 
 /* Layout */
 .section {
-    padding: 5rem 0 3rem;
+    /*padding: 5rem 0 3rem; */
+    padding-bottom: 2rem;
 }
 
 .section-title,
@@ -138,7 +139,8 @@ img {
 
 /* Navigation */
 .nav {
-  max-width: 1104px;
+  max-width: 92%;
+  margin: 10px;
   height: var(--header-height);
   display: flex;
   justify-content: space-between;
@@ -381,7 +383,7 @@ img {
     margin: 0;
   }
   .section {
-    padding-top: 8rem;
+    padding-top: 1rem;
   }
   .nav {
     height: calc(var(--header-height) + 1.5rem);
@@ -528,7 +530,7 @@ img {
   text-align: center;
   font-size: var(--small-font-size);
   color: var(--text-color-light);
-  margin-top: 3.5rem;
+  margin-top: 1rem;
 }
 
 /* About */

@@ -1,8 +1,7 @@
 /* ========== Profile Container ========== */
 .profile-container {
-  max-width: 1000px;
-  margin-top: 6rem;
-  /* margin: 10rem auto;  centers the container horizontally */
+  max-width: 90%;
+  margin: 5rem 0 0 5%;      /* This centers the container horizontally */
   padding: 0 2rem;
   max-height: auto;      
   overflow-y: auto;      
