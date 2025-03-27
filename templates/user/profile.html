@@ -124,13 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('modal-title');
     const addressIdInput = document.getElementById('address-id');
 
-    const themeButton = document.getElementById("theme-button");
-    if (themeButton) {
-      themeButton.addEventListener("click", toggleTheme);
-    } else {
-      console.error("Theme button not found in DOMContentLoaded");
-    }
-    applySavedTheme();
+    
 
     // Open modal for new address
     addAddressBtn.onclick = function() {
@@ -282,6 +276,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     */
+
+    const themeButton = document.getElementById("theme-button");
+    if (themeButton) {
+      themeButton.addEventListener("click", toggleTheme);
+    } else {
+      console.error("Theme button not found in DOMContentLoaded");
+    }
+    applySavedTheme();
 });
 </script>
 {% endblock %}
