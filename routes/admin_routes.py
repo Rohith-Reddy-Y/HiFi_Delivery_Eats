@@ -18,12 +18,12 @@ from routes.insight_utils import (
     calculate_on_time_order_percentage,
     calculate_return_refund_statistics,
     calculate_revenue_per_delivery,
+    generate_Customer_Demographics_Distribution,
     generate_agent_rating_chart,
     generate_customer_feedback_chart,
     generate_line_chart,
     generate_monthly_retention_chart,
-    generate_pie_chart,
-    generate_bar_chart
+    generate_Effectiveness_of_Promotions
 )
 
 
@@ -168,8 +168,8 @@ def admin_routes(app, db):
         
         # Fetching charts (demo and database reflected)
         charts = []
-        chart_html = generate_pie_chart()           # Demo data chart
-        bar_chart = generate_bar_chart()              # Demo data chart
+        Customer_Demographics_Distribution = generate_Customer_Demographics_Distribution()           # Demo data chart
+        Effectiveness_of_Promotions = generate_Effectiveness_of_Promotions()              # Demo data chart
         line_chart_html = generate_line_chart()       # Data from the database
         delivery_rating_bar = generate_agent_rating_chart()
         monthly_retention_chart = generate_monthly_retention_chart()
@@ -179,8 +179,8 @@ def admin_routes(app, db):
         charts.append(line_chart_html)
         charts.append(delivery_rating_bar)
         charts.append(monthly_retention_chart)
-        charts.append(chart_html)
-        charts.append(bar_chart)
+        charts.append(Customer_Demographics_Distribution)
+        charts.append(Effectiveness_of_Promotions)
 
         # Compute analysis statistics with optimized queries:
         avg_delivery_time = calculate_average_delivery_time() 

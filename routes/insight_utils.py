@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from app import db
 import plotly.express as px
 
-def generate_pie_chart():
+def generate_Customer_Demographics_Distribution():
     labels = ['Teens (13-19)', 'Young Adults (20-35)', 'Middle-aged (36-50)', 'Seniors (51+)']
     sizes = [15, 40, 30, 15]
     colors = ['#66b3ff', '#99ff99', '#ff9933', '#ff3333']
@@ -83,7 +83,7 @@ def generate_line_chart():
     return Markup(fig.to_html(full_html=False))
 
 
-def generate_bar_chart():
+def generate_Effectiveness_of_Promotions():
     promotions = ['Discount', 'Weekend offers', 'Loyalty Rewards', 'Happy Hour', 'Seasonal Offer']
     effectiveness = [20, 35, 25, 30, 40]
     colors = ['blue', 'green', 'red', 'purple', 'orange']
