@@ -60,7 +60,7 @@
     <tbody>
       {% for order in pending_orders %}
       <tr>
-        <td>OD{{ order.order_id }}</td>
+        <td>{{ order.order_id }}</td>
         <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         <td>
           {{ order.customer_name }}<br />
@@ -147,7 +147,7 @@
     <tbody>
       {% for order in completed_orders %}
       <tr>
-        <td>OD{{ order.order_id }}</td>
+        <td>{{ order.order_id }}</td>
         <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         <td>
           {{ order.customer_name }}<br />

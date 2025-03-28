@@ -411,9 +411,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await response.json();
             if (result.ok) {
                 orders = orders.filter(o => o.orderId !== order.orderId);
-                deliveryAgents = deliveryAgents.map(a =>
-                    a.delivery_agent_id === deliveryAgentId ? { ...a, status: "busy" } : a
-                );
+                // deliveryAgents = deliveryAgents.map(a =>
+                //     a.delivery_agent_id === deliveryAgentId ? { ...a, status: "busy" } : a
+                // );
                 populateOrders();
                 populateDeliveryAgents();
                 fetchAllOrders();  // Refresh all orders table

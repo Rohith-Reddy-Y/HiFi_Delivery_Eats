@@ -54,7 +54,7 @@
       <tbody>
         {% for order in recent_orders %}
         <tr>
-          <td>OD{{ order.id }}</td>
+          <td>{{ order.id }}</td>
           <td>{{ order.user.username if order.user else "N/A" }}</td>
           <td>
             {% for item in order.items %} {{ item.menu_item.name }} ({{
