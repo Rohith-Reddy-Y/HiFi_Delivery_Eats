@@ -664,7 +664,7 @@ def admin_routes(app, db):
             agents = db.session.query(DeliveryAgent).all()
             agents_list = [{
                 'name': agent.username,  # Using username since name isn't in DeliveryAgent model
-                'status': 'available' if agent.available_slots else 'busy',  # Mapping available_slots to status
+                'status': 'available' if agent.is_active else 'busy',  # Mapping is_active to status
                 'delivery_agent_id': agent.delivery_agent_id
             } for agent in agents]
             return jsonify({'data': agents_list, 'ok': True}), 200
@@ -692,12 +692,12 @@ def admin_routes(app, db):
             agent = db.session.query(DeliveryAgent).filter_by(delivery_agent_id=delivery_agent_id).first()
             if not agent:
                 return jsonify({"error": "Delivery agent not found"}), 404
-            if not agent.available_slots:  # Checking Boolean field instead of string
+            if not agent.is_active:  # Checking Boolean field instead of string
                 return jsonify({"error": "Agent not available"}), 400
 
             order.delivery_agent_id = delivery_agent_id
             order.delivery_status = "Preparing"
-            agent.available_slots = False  # Mark agent as busy
+            #agent.is_active = False  # Mark agent as busy
 
             db.session.commit()
             return jsonify({"message": f"Order {order_id} assigned to {agent.username}", "ok": True}), 200

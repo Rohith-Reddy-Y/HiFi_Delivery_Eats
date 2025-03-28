@@ -57,7 +57,7 @@ function appendDynamicItems(menuItems) {
             <span class="menu__detail">${item.description || "No description available"}</span>
             <div class="menu__price-row">
               <span class="menu__preci">₹ ${parseFloat(item.price).toFixed(2)}</span>
-              ${cartControlHtml}
+             
             </div>
           `;
   
