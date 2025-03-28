@@ -21,14 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
         return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     }
 
-    function updateCartCount() {
-        const totalItems = getCartTotalItems();
-        const cartLink = document.querySelector('.nav__link[href="/order"]');
-        if (cartLink) {
-            const span = cartLink.querySelector(".nav__cart-count");
-            if (span) span.textContent = totalItems;
-        }
-    }
+    // function updateCartCount() {
+    //     const totalItems = getCartTotalItems();
+    //     const cartLink = document.querySelector('.nav__link[href="/order"]');
+    //     if (cartLink) {
+    //         const span = cartLink.querySelector(".nav__cart-count");
+    //         if (span) span.textContent = totalItems;
+    //     }
+    // }
 
     function updateOrderPreview() {
         orderPreview.innerHTML = `
@@ -215,6 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     updateOrderPreview();
-    updateCartCount();
+    // updateCartCount();
     initMap();
 });

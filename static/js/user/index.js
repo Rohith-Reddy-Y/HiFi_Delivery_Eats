@@ -103,34 +103,3 @@ const showMenu = (toggleId, navId) => {
     `.home__data, .home__img, .about__data, .about__img, .menu__content, .footer__content`,
     { interval: 200 }
   );
-  
-  /*==================== CART FUNCTIONALITY ====================*/
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  window.globalCart = cart;
-  
-  function saveCart() {
-    try {
-      localStorage.setItem("cart", JSON.stringify(cart));
-      window.globalCart = cart;
-    } catch (error) {
-      console.error("Error saving cart to localStorage:", error);
-      cart = [];
-    }
-  }
-  
-  function updateCartCounter() {
-    const totalQuantity = cart.reduce(
-      (sum, item) => sum + (item.quantity || 1),
-      0
-    );
-    const cartLink = document.querySelector(
-      '.nav__link[href="../order/order.html"]'
-    );
-    if (cartLink) cartLink.textContent = `Cart (${totalQuantity})`;
-  }
-  
-  /*==================== INITIALIZATION ====================*/
-  document.addEventListener("DOMContentLoaded", () => {
-    updateCartCounter();
-  });
-  

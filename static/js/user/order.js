@@ -81,6 +81,53 @@ document.addEventListener("DOMContentLoaded", async function () {
         return "https://via.placeholder.com/150?text=Image+Not+Found";
     }
 
+    // Function to populate order history
+    function populateOrderHistory(orders) {
+        const orderHistoryTable = document.getElementById('order-history-details');
+        orderHistoryTable.innerHTML = ''; // Clear existing content
+        
+        console.log("we are here with previous data",orders);
+        const baseUrl = "https://HiFiDeliveryEats.com/";
+        const staticImagePath = "/images/";
+
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+            image_src = `${staticImagePath}${order.image.replace(baseUrl, '')}`
+            row.innerHTML = `
+            <td>${order.order_id}</td>
+            <td>${order.name || 'Customer'}</td>
+            <td><img src="${image_src}" alt="Item Image" style="width: 50px;" onerror="this.src='default-image.jpg';"></td>
+            <td>${order.item || 'N/A'}</td>
+            <td>₹ ${order.price.toFixed(2)}</td>
+            <td>${order.delivery_details || 'N/A'}</td>
+            <td>${order.payment_method || 'Cash on Delivery'}</td>
+            <td>${order.date || 'N/A'}</td>
+            <td>
+                <a href="/order_confirmation?order_id=${order.order_id}" class="button">View Confirmation</a>
+            </td>
+        `;
+            orderHistoryTable.appendChild(row);
+        });
+        // Show/hide the order history section based on data
+        document.getElementById('order-history').style.display = orders.length > 0 ? 'block' : 'none';
+    }
+
+    fetch('/api/orders/history', {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            populateOrderHistory(data.orders);
+        } else {
+            console.error('Error fetching order history:', data.error);
+        }
+    })
+    .catch(error => console.error('Fetch error:', error));
+
+    
     // Initial fetches
     await fetchMenuItems();
     // await fetchCart();

@@ -6,20 +6,35 @@ import json
 from datetime import datetime
 
 def customer_routes(app, db):
+    def get_the_cart_count():
+        try:
+            total_quantity = (
+                db.session.query(func.sum(Cart.quantity))
+                .filter(Cart.customer_id == current_user.customer_id)
+                .scalar()
+            ) or 0  # Return 0 if no items or result is None
+            return total_quantity
+        except Exception as e:
+            print(f"Error fetching cart count: {e}")
+            return 0
+    
     @app.route('/user/profile')
     @login_required
     def customer():
-        return render_template('user/profile.html', user=current_user)
+        cart_count = get_the_cart_count()
+        return render_template('user/profile.html', user=current_user,cart_count=cart_count)
     
     @app.route('/show_menu')
     @login_required
     def show_menu():
-        return render_template('user/show_menu.html', user=current_user)
+        cart_count = get_the_cart_count()
+        return render_template('user/show_menu.html', user=current_user,cart_count=cart_count)
 
     # ORDER MANAGEMENT ENDPOINTS: Order page route
     @app.route('/order', methods=['GET', 'POST'])
     @login_required
     def order():
+        cart_count = get_the_cart_count()
         if request.method == 'GET':
             try:
                 cart_items = (
@@ -68,7 +83,8 @@ def customer_routes(app, db):
                     subtotal=subtotal - total_discount,
                     tax=tax,
                     delivery_charge=delivery_charge,
-                    user=current_user
+                    user=current_user,
+                    cart_count=cart_count
                 )
             except Exception as e:
                 db.session.rollback()
@@ -81,6 +97,7 @@ def customer_routes(app, db):
     @app.route('/delivery_details')
     @login_required
     def delivery_details():
+        cart_count = get_the_cart_count()
         try:
             # Fetch cart items for the current customer.
             cart_items = (
@@ -140,7 +157,8 @@ def customer_routes(app, db):
                 tax=tax,
                 delivery_charge=delivery_charge,
                 user=current_user,
-                address=preferred_address
+                address=preferred_address,
+                cart_count=cart_count
             )
         except Exception as e:
             db.session.rollback()
@@ -216,6 +234,7 @@ def customer_routes(app, db):
     @app.route('/order_confirmation')
     @login_required
     def order_confirmation():
+        cart_count = get_the_cart_count()
         order_id = request.args.get('order_id')
         if not order_id:
             return "Order ID not provided", 400
@@ -273,7 +292,8 @@ def customer_routes(app, db):
             order_json=order_data,
             cart_items_json=cart_data,
             agent_json=agent_data,
-            user=current_user
+            user=current_user,
+            cart_count=cart_count
         )
     
     
@@ -550,3 +570,29 @@ def customer_routes(app, db):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
     
+    @app.route('/api/orders/history', methods=['GET'])
+    @login_required
+    def get_order_history():
+        try:
+            # Fetch all orders for the current customer
+            orders = Order.query.filter_by(customer_id=current_user.customer_id).order_by(Order.created_at.desc()).all()
+            order_history = []
+
+            for order in orders:
+                # Get the first item for display (you could aggregate all items if needed)
+                first_item = order.order_items[0] if order.order_items else None
+                order_history.append({
+                    'order_id': order.order_id,
+                    'name': current_user.username,  # Customer name
+                    'image': first_item.menu_item.image_url if first_item else '',  # Image from MenuItem
+                    'item': first_item.menu_item.name if first_item else 'N/A',  # Item name from MenuItem
+                    'price': float(order.total_price),  # Total price from Order
+                    'delivery_details': order.delivery_location,  # Delivery location from Order
+                    'payment_method': 'Cash on Delivery',  # Not stored, assuming COD as default
+                    'date': order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else 'N/A'
+                })
+
+            return jsonify({'orders': order_history, 'ok': True}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500

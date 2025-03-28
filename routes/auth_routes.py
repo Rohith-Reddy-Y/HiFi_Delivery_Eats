@@ -2,16 +2,29 @@ import secrets
 from flask import flash, jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
-from models import Address, Admin, Customer, DeliveryAgent
+from models import Address, Admin, Customer, DeliveryAgent, Cart
 
 
 def register_routes(app, db, bcrypt, mail):
+    def get_the_cart_count():
+        try:
+            total_quantity = (
+                db.session.query(func.sum(Cart.quantity))
+                .filter(Cart.customer_id == current_user.customer_id)
+                .scalar()
+            ) or 0  # Return 0 if no items or result is None
+            return total_quantity
+        except Exception as e:
+            print(f"Error fetching cart count: {e}")
+            return 0
+    
     @app.route('/')
     def index():
+        cart_count = get_the_cart_count()
         if current_user.is_authenticated:
-            return render_template('home.html', user=current_user)
+            return render_template('home.html', user=current_user,cart_count=cart_count)
         return render_template('login.html')
     
     @app.route('/signup', methods=['POST', 'GET'])

@@ -135,7 +135,6 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
                 <th>Item</th>
                 <th>Price</th>
                 <th>Delivery Details</th>
-                <th>Coordinates</th>
                 <th>Payment Method</th>
                 <th>Delivery Agent Details</th>
                 <th>Order Status</th>
@@ -154,35 +153,31 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           </button>
         </div>
 
-        <!-- Order History Section -->
+        <!-- Updated Order History Section -->
         <div class="order__history" id="order-history" style="display: none">
-          <h2>Your Past Orders</h2>
-          <table class="order__table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Name</th>
-                <th>Image</th>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Delivery Details</th>
-                <th>Coordinates</th>
-                <th>Payment Method</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="order-history-details">
-              <!-- Past order details will be inserted here -->
-            </tbody>
-          </table>
-          <button
-            class="button clear__orders"
-            id="clear-orders-button"
-            style="margin-top: 20px"
-          >
-            Clear Orders
-          </button>
-        </div>
+            <h2>Your Past Orders</h2>
+            <table class="order__table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Name</th>
+                  <th>Image</th>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Delivery Details</th>
+                  <th>Payment Method</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="order-history-details">
+                <!-- Past order details will be inserted here dynamically -->
+              </tbody>
+            </table>
+            <button class="button clear__orders" id="clear-orders-button" style="margin-top: 20px">
+              Clear Orders
+            </button>
+          </div>
 
         <!-- Order Confirmation Section -->
         <div
@@ -200,7 +195,6 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
                 <th>Item</th>
                 <th>Price</th>
                 <th>Delivery Details</th>
-                <th>Coordinates</th>
                 <th>Payment Method</th>
               </tr>
             </thead>
@@ -210,6 +204,7 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           </table>
         </div>
       </section>
+
 {% endblock content %}
 {% block scripts %} {{super()}}
 
