@@ -1,6 +1,6 @@
 from flask import jsonify, render_template, request, redirect, url_for
 from flask_login import current_user, login_required
-from models import Address, MenuItem, Category, Subcategory, Cart, Order, OrderItem
+from models import Address, MenuItem, Category, Subcategory, Cart, Order, OrderItem, DeliveryAgent, DeliveryFeedback
 from sqlalchemy import text,func
 import json
 from datetime import datetime
@@ -278,25 +278,105 @@ def customer_routes(app, db):
             'tax': total_price * 0.18,  # 18% tax
             'delivery_charge': 50.0,  # Fixed delivery charge
             'delivery_details': delivery_details,
-            'tracking_id': order.order_id  # Using order_id as tracking_id
+            'tracking_id': order.order_id,  # Using order_id as tracking_id
+            'delivery_status': order.delivery_status 
         }
 
-        # Mock agent data (replace with actual logic if DeliveryAgent table is used)
-        agent_data = {
-            'name': "Ravi Kumar",
-            'contact': "+91 98765 43210"
-        }
-
+        # Fetch delivery agent data if assigned
+        if order.delivery_agent_id:
+            delivery_agent = DeliveryAgent.query.filter_by(delivery_agent_id=order.delivery_agent_id).first()
+            if delivery_agent:
+                agent_data = {
+                    'name': delivery_agent.username,
+                    'contact': str(delivery_agent.phone),  # Convert integer phone to string
+                    'delivery_area': delivery_agent.delivery_area
+                }
+            else:
+                # Fallback in case the delivery_agent_id exists but no matching record is found
+                agent_data = {
+                    'name': 'Unknown Agent',
+                    'contact': 'N/A',
+                    'delivery_area': 'N/A'
+                }
+        else:
+            # No delivery agent assigned
+            agent_data = {
+                'name': 'Not Assigned',
+                'contact': 'N/A',
+                'delivery_area': 'Not assigned by admin yet, will be done soon.'
+            }
+        # Check if feedback exists
+        feedback = DeliveryFeedback.query.filter_by(order_id=order_id).first()
+        has_feedback = feedback is not None
+        
         return render_template(
             'user/order_confirmation.html',
             order_json=order_data,
             cart_items_json=cart_data,
             agent_json=agent_data,
             user=current_user,
-            cart_count=cart_count
+            cart_count=cart_count,
+            has_feedback=has_feedback
         )
     
-    
+    @app.route('/api/order_status/<order_id>', methods=['GET'])
+    @login_required
+    def get_order_status(order_id):
+        order = Order.query.filter_by(order_id=order_id, customer_id=current_user.customer_id).first()
+        if not order:
+            return jsonify({'error': 'Order not found'}), 404
+        return jsonify({'delivery_status': order.delivery_status}), 200
+
+    @app.route('/api/delivery_feedback', methods=['POST'])
+    @login_required
+    def submit_delivery_feedback():
+        try:
+            data = request.get_json()
+            order_id = data.get('order_id')
+            rating = data.get('rating')
+            feedback_text = data.get('feedback')
+
+            if not order_id or not rating:
+                return jsonify({'error': 'Order ID and rating are required'}), 400
+
+            if not isinstance(rating, int) or rating < 1 or rating > 5:
+                return jsonify({'error': 'Rating must be an integer between 1 and 5'}), 400
+
+            # Verify the order exists and belongs to the current user
+            order = Order.query.filter_by(order_id=order_id, customer_id=current_user.customer_id).first()
+            if not order:
+                return jsonify({'error': 'Order not found'}), 404
+
+            # Check if a delivery agent is assigned
+            if not order.delivery_agent_id:
+                return jsonify({'error': 'No delivery agent assigned to this order'}), 400
+
+            # Check if feedback already exists
+            feedback = DeliveryFeedback.query.filter_by(order_id=order_id).first()
+            if feedback:
+                # Update existing feedback
+                feedback.rating = rating
+                feedback.feedback = feedback_text
+                feedback.created_at = datetime.utcnow()  # Explicitly set to datetime object
+            else:
+                # Create new feedback
+                feedback = DeliveryFeedback(
+                    order_id=order_id,
+                    delivery_agent_id=order.delivery_agent_id,
+                    rating=rating,
+                    feedback=feedback_text,
+                    created_at=datetime.utcnow()  # Explicitly set to datetime object
+                )
+                db.session.add(feedback)
+
+            db.session.commit()
+            return jsonify({'message': 'Feedback submitted successfully', 'ok': True}), 200
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
+        
+        
     @app.route("/address/new", methods=["POST"])
     @login_required
     def add_address():

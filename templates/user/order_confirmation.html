@@ -5,13 +5,13 @@
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"> -->
 <!-- Boxicons for icons -->
 <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet" />
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Font Awesome for icons (CSS version) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!-- Google Fonts for Poppins -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
-    
     body {
         font-family: 'Poppins', sans-serif;
         margin: 0;
@@ -59,6 +59,7 @@
 
     .tracking-container h2 {
         background: #4CAF50;
+        border-radius: 5px;
         color: white;
         padding: 20px;
         text-align: center;
@@ -114,7 +115,7 @@
 
     .order-details-table {
         flex: 3;
-        min-width: 500px;
+        min-width: 100%;
     }
 
     .agent-details {
@@ -159,6 +160,7 @@
 
     .order-details-table th {
         background: #4CAF50;
+        border-radius: 2px;
         color: white;
         padding: 16px;
         text-align: left;
@@ -254,22 +256,22 @@
         border-radius: 20px;
     }
 
-    .bg-danger{
+    .bg-danger {
         background: #f44336;
         color: white;
     }
 
-    .bg-success{
+    .bg-success {
         background: #4caf50;
         color: white;
     }
 
-    .bg-warning{
+    .bg-warning {
         background: #ff9800;
         color: white;
     }
 
-    .bg-info{
+    .bg-info {
         background-color: cyan;
         color: white;
     }
@@ -542,6 +544,110 @@
             font-size: 0.75rem;
         }
     }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .dark-theme .modal-content {
+        background: #263a2e;
+        color: #a5d6a7;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #777;
+    }
+
+    .dark-theme .modal-close {
+        color: #a5d6a7;
+    }
+
+    .modal-close:hover {
+        color: #4CAF50;
+    }
+
+    .dark-theme .modal-close:hover {
+        color: #81c784;
+    }
+
+    .modal-content h3 {
+        color: #4CAF50;
+        margin-bottom: 15px;
+    }
+
+    .dark-theme .modal-content h3 {
+        color: #81c784;
+    }
+
+    .modal-content p {
+        color: #2e7d32;
+        margin-bottom: 20px;
+    }
+
+    .dark-theme .modal-content p {
+        color: #a5d6a7;
+    }
+
+    .modal-ok {
+        background: #4CAF50;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .dark-theme .modal-ok {
+        background: #2e7d32;
+    }
+
+    .modal-ok:hover {
+        background: #45a049;
+    }
+
+    .dark-theme .modal-ok:hover {
+        background: #1b5e20;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock css %}
 
@@ -571,6 +677,7 @@
             <h3>Delivery Agent</h3>
             <p><strong>Name:</strong> <span id="agent-name"></span></p>
             <p><strong>Contact:</strong> <span id="agent-contact"></span></p>
+            <p><strong>Delivery Area:</strong> <span id="agent-area"></span></p>
         </div>
     </div>
 
@@ -589,25 +696,25 @@
     <div class="tracking-section">
         <h3>Track Your Order</h3>
         <div class="status">
-            <div><span id="icon-confirmed" class="icon active"><i class="fas fa-check"></i></span>
-                <p>Order Confirmed</p>
+            <div><span id="icon-accepted" class="icon active"><i class="fas fa-check"></i></span>
+                <p>Order Accepted</p>
             </div>
-            <div><span id="icon-shipped" class="icon"><i class="fas fa-shipping-fast"></i></span>
-                <p>Order Picked</p>
+            <div><span id="icon-picked" class="icon"><i class="fas fa-shipping-fast"></i></span>
+                <p>Picked Up</p>
             </div>
             <div><span id="icon-out-for-delivery" class="icon"><i class="fas fa-truck"></i></span>
                 <p>Out for Delivery</p>
             </div>
             <div><span id="icon-delivered" class="icon"><i class="fas fa-box-open"></i></span>
-                <p>Order Delivered</p>
+                <p>Delivered</p>
             </div>
             <img id="delivery-scooter"
                 src="{{ url_for('static', filename='images/fast_shipping_delivery_agent_img.png') }}"
                 alt="Delivery Scooter">
             <img id="smoke-icon" src="{{ url_for('static', filename='images/smoke-30.png') }}" alt="Smoke Icon">
         </div>
-        <p id="order-message">Your order is being prepared! 🍕</p>
-        <p id="transition-message">Order Confirmed</p>
+        <p id="order-message">Your order is being processed! 🍕</p>
+        <p id="transition-message">Order Accepted</p>
     </div>
 
     <div id="feedback-section">
@@ -619,32 +726,45 @@
             <i class="fas fa-star" data-value="4"></i>
             <i class="fas fa-star" data-value="5"></i>
         </div>
+        <textarea id="feedback-text" rows="4" placeholder="Share your feedback about the delivery..."
+            style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
         <button class="btn-custom" onclick="submitFeedback()">Submit Feedback</button>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Thank You!</h3>
+            <p>Your feedback has been submitted successfully.</p>
+            <button class="btn-custom modal-ok" onclick="closeModal()">OK</button>
+        </div>
     </div>
 </div>
 {% endblock content2 %}
 {% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
 <script>
     // Pass Flask data to JavaScript
     const orderData = {{ order_json | safe }};
     const cartItems = {{ cart_items_json | safe }} || [];
     const agentData = {{ agent_json | safe }};
-
-    // Configurable total delivery time in minutes (change this value to adjust everything)
-    const TOTAL_DELIVERY_TIME_MINUTES = 0.5; // Set to 10 minutes (or any value you want)
-    const TOTAL_DELIVERY_TIME_SECONDS = TOTAL_DELIVERY_TIME_MINUTES * 60; // Convert to seconds
-    let estimatedSeconds = TOTAL_DELIVERY_TIME_SECONDS; // Dynamic total seconds
+    let hasFeedback = {{ has_feedback | tojson }};  // Pass has_feedback from Flask
+    const TOTAL_DELIVERY_TIME_MINUTES = 0.5;
+    const TOTAL_DELIVERY_TIME_SECONDS = TOTAL_DELIVERY_TIME_MINUTES * 60;
+    let estimatedSeconds = TOTAL_DELIVERY_TIME_SECONDS;
     let timerInterval;
+    let selectedRating = 0;
+    let stars;
 
     document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded fired");
+        console.log("Has feedback initially:", hasFeedback); // Debug
+
         const themeButton = document.getElementById("theme-button");
         const body = document.body;
-        const cartCount = document.getElementsByClassName("nav__cart-count");
         const navToggle = document.getElementById("nav-toggle");
         const navMenu = document.getElementById("nav-menu");
 
-        // Theme toggle
         body.classList.add("dark-theme");
         themeButton.addEventListener("click", () => {
             body.classList.toggle("dark-theme");
@@ -664,10 +784,10 @@
             themeButton.classList.add("bx-moon");
         }
 
-        // Update cart count
-        cartCount.innerText = cartItems.length.toString();
+        const orderStatusElement = document.getElementById("order-status");
+        orderStatusElement.innerText = orderData.delivery_status || "Accepted";
+        orderStatusElement.className = getStatusBadgeClass(orderData.delivery_status || "Accepted");
 
-        // Populate order details
         document.getElementById("order-id").innerText = orderData.order_id || "N/A";
         document.getElementById("tracking-id").innerText = orderData.tracking_id || Math.floor(10000000 + Math.random() * 90000000);
         document.getElementById("ordered-at").innerText = orderData.ordered_at || new Date().toLocaleString();
@@ -675,6 +795,7 @@
         document.getElementById("delivery-address").innerText = `${orderData.delivery_details.street}, ${orderData.delivery_details.city}, ${orderData.delivery_details.state} - ${orderData.delivery_details.pincode}`;
         document.getElementById("agent-name").innerText = agentData.name || "N/A";
         document.getElementById("agent-contact").innerText = agentData.contact || "N/A";
+        document.getElementById("agent-area").innerText = agentData.delivery_area || "N/A";
 
         const orderItemsTable = document.getElementById("order-items-table");
         const billSummary = document.getElementById("bill-summary");
@@ -691,12 +812,12 @@
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                        <td>${item.menu_item_id || "N/A"}</td>
-                        <td>${item.name || "Unknown Item"}</td>
-                        <td>${item.quantity || 1}</td>
-                        <td>₹${discountAmount.toFixed(2)} (${item.discount_percentage || 0}%)</td>
-                        <td>₹${amount.toFixed(2)}</td>
-                    `;
+                    <td>${item.menu_item_id || "N/A"}</td>
+                    <td>${item.name || "Unknown Item"}</td>
+                    <td>${item.quantity || 1}</td>
+                    <td>₹${discountAmount.toFixed(2)} (${item.discount_percentage || 0}%)</td>
+                    <td>₹${amount.toFixed(2)}</td>
+                `;
                 orderItemsTable.appendChild(row);
             });
 
@@ -705,24 +826,44 @@
             const total = orderData.total || (subtotal + parseFloat(tax) + deliveryCharge).toFixed(2);
 
             billSummary.innerHTML = `
-                    <p><span class="summary-label">Subtotal:</span> ₹${subtotal.toFixed(2)}</p>
-                    <p><span class="summary-label">Tax (18%):</span> ₹${tax}</p>
-                    <p><span class="summary-label">Delivery Charge:</span> ₹${deliveryCharge.toFixed(2)}</p>
-                    <p class="total"><span class="summary-label">Total:</span> ₹${total}</p>
-                `;
+                <p><span class="summary-label">Subtotal:</span> ₹${subtotal.toFixed(2)}</p>
+                <p><span class="summary-label">Tax (18%):</span> ₹${tax.toFixed(2)}</p>
+                <p><span class="summary-label">Delivery Charge:</span> ₹${deliveryCharge.toFixed(2)}</p>
+                <p class="total"><span class="summary-label">Total:</span> ₹${total}</p>
+            `;
         } else {
             orderItemsTable.innerHTML = '<tr><td colspan="5">No items found for this order.</td></tr>';
             billSummary.innerHTML = `
-                    <p><span class="summary-label">Subtotal:</span> ₹0.00</p>
-                    <p><span class="summary-label">Tax (18%):</span> ₹0.00</p>
-                    <p><span class="summary-label">Delivery Charge:</span> ₹0.00</p>
-                    <p class="total"><span class="summary-label">Total:</span> ₹0.00</p>
-                `;
+                <p><span class="summary-label">Subtotal:</span> ₹0.00</p>
+                <p><span class="summary-label">Tax (18%):</span> ₹0.00</p>
+                <p><span class="summary-label">Delivery Charge:</span> ₹0.00</p>
+                <p class="total"><span class="summary-label">Total:</span> ₹0.00</p>
+            `;
         }
 
         startEstimatedTime();
-        document.getElementById("order-message").style.display = "block";
-        startDeliveryProcess();
+        startDeliveryTracking();
+
+        const closeModalBtn = document.querySelector(".modal-close");
+        closeModalBtn.addEventListener("click", closeModal);
+        
+        stars = document.querySelectorAll(".star-rating .fas");
+        console.log("Stars found:", stars.length);
+        if (stars.length === 0) {
+            console.error("No star elements found.");
+        }
+
+        stars.forEach((star, index) => {
+            console.log(`Adding listener to star ${index + 1}`);
+            star.addEventListener("click", function () {
+                selectedRating = parseInt(this.getAttribute("data-value"));
+                console.log("Star clicked, rating set to:", selectedRating);
+                stars.forEach(s => s.classList.remove("active"));
+                for (let i = 0; i < selectedRating; i++) {
+                    stars[i].classList.add("active");
+                }
+            });
+        });
 
         navToggle.addEventListener("click", () => {
             navMenu.classList.toggle("show-menu");
@@ -731,7 +872,7 @@
 
     function startEstimatedTime() {
         const arrivalTimeElement = document.getElementById("arrival-time");
-        const now = new Date(); // Real current time
+        const now = new Date();
         const currentTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
         const estimatedDelivery = new Date(now.getTime() + TOTAL_DELIVERY_TIME_SECONDS * 1000);
         const deliveryTimeStr = estimatedDelivery.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
@@ -756,167 +897,144 @@
         }, 1000);
     }
 
-    function startDeliveryProcess() {
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case "Accepted": return "badge bg-success";
+            case "Picked Up": return "badge bg-warning";
+            case "Out for Delivery": return "badge bg-info";
+            case "Delivered": return "badge bg-success";
+            default: return "badge bg-success";
+        }
+    }
+
+    function startDeliveryTracking() {
         const orderStatusElement = document.getElementById("order-status");
         const transitionMessageElement = document.getElementById("transition-message");
         const scooter = document.getElementById("delivery-scooter");
         const smokeIcon = document.getElementById("smoke-icon");
         const icons = {
-            confirmed: document.getElementById("icon-confirmed"),
-            shipped: document.getElementById("icon-shipped"),
+            accepted: document.getElementById("icon-accepted"),
+            picked: document.getElementById("icon-picked"),
             out_for_delivery: document.getElementById("icon-out-for-delivery"),
             delivered: document.getElementById("icon-delivered")
         };
-        const orders = JSON.parse(localStorage.getItem("orders")) || [];
-        let currentOrder = JSON.parse(localStorage.getItem("currentOrder")) || {};
-
-        icons.confirmed.classList.add("active");
-        scooter.style.left = "5%"; /* Adjusted to match new starting position */
-
-        let elapsed = 0;
-        const stage1Duration = TOTAL_DELIVERY_TIME_SECONDS / 6;
-        const stage2Duration = (TOTAL_DELIVERY_TIME_SECONDS * 2) / 6;
-        const stage3Duration = (TOTAL_DELIVERY_TIME_SECONDS * 3) / 6;
-        let hasUpdatedStatusStage1 = false;
-        let hasUpdatedStatusStage2 = false;
-        let hasUpdatedStatusStage3 = false;
 
         const positions = {
-            start: 5,         /* Adjusted from 10 */
-            picked: 35,       /* Unchanged */
-            outForDelivery: 65, /* Unchanged */
-            delivered: 95     /* Adjusted from 90 */
+            accepted: 5,
+            picked: 35,
+            outForDelivery: 65,
+            delivered: 95
         };
 
-        const deliveryInterval = setInterval(() => {
-            elapsed += 0.1;
+        const animationDuration = 2000;
+        let currentStatus = orderData.delivery_status || "Accepted";
+        let feedbackSubmitted = hasFeedback; // Track if feedback was submitted
 
-            let newPosition;
-            if (elapsed < stage1Duration) {
-                const progress = elapsed / stage1Duration;
-                newPosition = positions.start + (positions.picked - positions.start) * progress;
-            } else if (elapsed < (stage1Duration + stage2Duration)) {
-                const stageElapsed = elapsed - stage1Duration;
-                const progress = stageElapsed / stage2Duration;
-                newPosition = positions.picked + (positions.outForDelivery - positions.picked) * progress;
-            } else if (elapsed <= TOTAL_DELIVERY_TIME_SECONDS) {
-                const stageElapsed = elapsed - (stage1Duration + stage2Duration);
-                const progress = stageElapsed / stage3Duration;
-                newPosition = positions.outForDelivery + (positions.delivered - positions.outForDelivery) * progress;
-            } else {
-                newPosition = positions.delivered;
+        updateStatus(currentStatus);
+
+        setInterval(() => {
+            fetch(`/api/order_status/${orderData.order_id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.delivery_status && data.delivery_status !== currentStatus) {
+                        currentStatus = data.delivery_status;
+                        animateScooter(currentStatus);
+                    }
+                })
+                .catch(error => console.error('Error fetching status:', error));
+        }, 5000);
+
+        function updateStatus(status) {
+            orderStatusElement.innerText = status;
+            orderStatusElement.className = getStatusBadgeClass(status);
+            transitionMessageElement.innerText = status;
+            document.getElementById("order-message").style.display = status === "Delivered" ? "none" : "block";
+            // Only show feedback section if Delivered and no feedback yet
+            document.getElementById("feedback-section").style.display = (status === "Delivered" && !feedbackSubmitted) ? "block" : "none";
+
+            icons.accepted.classList.toggle("active", status === "Accepted" || status === "Picked Up" || status === "Out for Delivery" || status === "Delivered");
+            icons.picked.classList.toggle("active", status === "Picked Up" || status === "Out for Delivery" || status === "Delivered");
+            icons.out_for_delivery.classList.toggle("active", status === "Out for Delivery" || status === "Delivered");
+            icons.delivered.classList.toggle("active", status === "Delivered");
+        }
+
+        function animateScooter(status) {
+            let targetPosition;
+            switch (status) {
+                case "Accepted": targetPosition = positions.accepted; break;
+                case "Picked Up": targetPosition = positions.picked; break;
+                case "Out for Delivery": targetPosition = positions.outForDelivery; break;
+                case "Delivered": targetPosition = positions.delivered; break;
+                default: targetPosition = positions.accepted;
             }
 
-            scooter.style.left = `${newPosition}%`;
+            updateStatus(status);
 
-            if (elapsed >= stage1Duration && !hasUpdatedStatusStage1) {
-                hasUpdatedStatusStage1 = true;
-                icons.shipped.classList.add("active");
-                orderStatusElement.innerText = "Order Picked";
-                orderStatusElement.className = "badge bg-warning";
-                transitionMessageElement.innerText = "Order Picked";
-                smokeIcon.style.left = "35%"; /* Matches new picked position */
-                smokeIcon.style.display = "block";
-                setTimeout(() => smokeIcon.style.display = "none", 1000);
-            }
+            scooter.style.transition = `left ${animationDuration}ms ease-in-out`;
+            scooter.style.left = `${targetPosition}%`;
 
-            if (elapsed >= (stage1Duration + stage2Duration) && !hasUpdatedStatusStage2) {
-                hasUpdatedStatusStage2 = true;
-                icons.out_for_delivery.classList.add("active");
-                orderStatusElement.innerText = "Out for Delivery";
-                orderStatusElement.className = "badge bg-info";
-                transitionMessageElement.innerText = "Out for Delivery";
-                smokeIcon.style.left = "65%"; /* Matches new outForDelivery position */
-                smokeIcon.style.display = "block";
-                setTimeout(() => smokeIcon.style.display = "none", 1000);
-            }
-
-            if (elapsed >= TOTAL_DELIVERY_TIME_SECONDS && !hasUpdatedStatusStage3) {
-                hasUpdatedStatusStage3 = true;
-                icons.delivered.classList.add("active");
-                orderStatusElement.innerText = "Order Delivered";
-                orderStatusElement.className = "badge bg-success";
-                transitionMessageElement.innerText = "Order Delivered";
-                smokeIcon.style.left = "95%"; /* Matches new delivered position */
-                smokeIcon.style.display = "block";
-                setTimeout(() => smokeIcon.style.display = "none", 1000);
-                document.getElementById("order-message").style.display = "none";
-                document.getElementById("feedback-section").style.display = "block";
-
-                currentOrder.delivery_status = "delivered";
-                const existingOrderIndex = orders.findIndex(o => o.orderId === currentOrder.orderId);
-                if (existingOrderIndex === -1) {
-                    orders.push(currentOrder);
-                } else {
-                    orders[existingOrderIndex] = currentOrder;
-                }
-                localStorage.setItem("orders", JSON.stringify(orders));
-            }
-
-            if (elapsed >= TOTAL_DELIVERY_TIME_SECONDS) {
-                clearInterval(deliveryInterval);
-                scooter.style.left = `${positions.delivered}%`;
-            }
-        }, 100);
+            smokeIcon.style.left = `${targetPosition}%`;
+            smokeIcon.style.display = "block";
+            setTimeout(() => smokeIcon.style.display = "none", 1000);
+        }
     }
 
-    let selectedRating = 0;
-    const stars = document.querySelectorAll(".star-rating .fas");
-    stars.forEach(star => {
-        star.addEventListener("click", function () {
-            selectedRating = parseInt(this.getAttribute("data-value"));
-            stars.forEach(s => s.classList.remove("active"));
-            for (let i = 0; i < selectedRating; i++) {
-                stars[i].classList.add("active");
-            }
-        });
-    });
+    function showModal() {
+        const modal = document.getElementById("feedback-modal");
+        modal.style.display = "flex";
+    }
 
-    /* 
+    function closeModal() {
+        const modal = document.getElementById("feedback-modal");
+        modal.style.display = "none";
+    }
+    
     function submitFeedback() {
         if (selectedRating === 0) {
             alert("Please select a rating before submitting!");
             return;
         }
-        const feedback = { 
-            order_id: orderData.order_id, 
-            rating: selectedRating, 
-            timestamp: new Date().toLocaleString() 
+
+        const feedbackText = document.getElementById("feedback-text").value.trim();
+        const feedback = {
+            order_id: orderData.order_id,
+            rating: selectedRating,
+            feedback: feedbackText || null
         };
-        fetch('/api/feedback', {
+
+        console.log("Submitting feedback:", feedback);
+
+        fetch('/api/delivery_feedback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify(feedback)
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to submit feedback');
-            alert("Thank you for your feedback!");
-            document.getElementById("feedback-section").style.display = "none";
-        })
-        .catch(error => {
-            console.error("Error submitting feedback:", error);
-            alert("Failed to submit feedback: " + error.message);
-        });
-    }
-    
-    
-    */
-    function submitFeedback() {
-        if (selectedRating === 0) {
-            alert("Please select a rating before submitting!");
-            return;
-        }
-        const feedback = {
-            orderId: document.getElementById("order-id").innerText,
-            rating: selectedRating,
-            timestamp: new Date().toLocaleString()
-        };
-        const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
-        feedbacks.push(feedback);
-        localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
-        alert("Thank you for your feedback!");
-        document.getElementById("feedback-section").style.display = "none";
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.ok) {
+                    showModal();
+                    /*alert("Thank you for your feedback!");*/
+                    document.getElementById("feedback-section").style.display = "none";
+                    document.getElementById("feedback-text").value = "";
+                    selectedRating = 0;
+                    stars.forEach(s => s.classList.remove("active"));
+                    hasFeedback = true; // Update local state to hide feedback section
+                }
+            })
+            .catch(error => {
+                console.error("Error submitting feedback:", error);
+                alert("Failed to submit feedback: " + error.message);
+            });
     }
 </script>
-{% endblock scripts%}
+{% endblock scripts %}
