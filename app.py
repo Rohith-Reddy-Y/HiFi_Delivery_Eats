@@ -37,6 +37,7 @@ def create_app():
     app.secret_key = os.getenv('SECRET_KEY')
     
     db.init_app(app)
+    migrate = Migrate(app, db)
     bcrypt = Bcrypt(app) # for hasing the password
     
     # login manager
@@ -154,5 +155,4 @@ def create_app():
     import atexit
     atexit.register(lambda: scheduler.shutdown())
     
-    migrate = Migrate(app, db)
     return app
