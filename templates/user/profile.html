@@ -4,6 +4,10 @@ css %} {{ super() }}
   rel="stylesheet"
   href="{{ url_for('static', filename='css/user/profile.css') }}"
 />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
 {% endblock css %} {% block content %}
 <div class="profile-container">
   <div class="profile-header">
@@ -43,11 +47,6 @@ css %} {{ super() }}
             <i class="fas fa-star-o"></i> Set as Default
           </button>
           {% endif %}
-          <!-- 
-                    <button class="btn-edit-address" data-address-id="{{ address.id }}">
-                        <i class="fas fa-edit"></i>Edit
-                    </button> 
-                    -->
           <button
             class="btn-delete-address"
             data-address-id="{{ address.address_id }}"
@@ -72,7 +71,6 @@ css %} {{ super() }}
     <h2 id="modal-title">Add New Address</h2>
     <form id="address-form">
       <input type="hidden" id="address-id" />
-
       <div class="form-group">
         <label for="address_line">Address Line</label>
         <input
@@ -84,7 +82,6 @@ css %} {{ super() }}
           aria-label="Address Line"
         />
       </div>
-
       <div class="form-group">
         <label for="city">City</label>
         <input
@@ -96,7 +93,6 @@ css %} {{ super() }}
           aria-label="City"
         />
       </div>
-
       <div class="form-group">
         <label for="state">State</label>
         <input
@@ -108,7 +104,6 @@ css %} {{ super() }}
           aria-label="State"
         />
       </div>
-
       <div class="form-group">
         <label for="zip_code">PIN Code</label>
         <input
@@ -122,7 +117,6 @@ css %} {{ super() }}
           aria-label="PIN Code"
         />
       </div>
-
       <button type="submit" class="btn-primary">
         <i class="fas fa-save"></i> Save Address
       </button>
@@ -158,69 +152,16 @@ css %} {{ super() }}
     </div>
   </div>
 </div>
-{% endblock %} {% block styles %}
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-/>
-{% endblock %} {% block scripts %}{{super()}}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Modal and form elements
     const modal = document.getElementById("address-modal");
     const closeBtn = modal.querySelector(".close");
     const addAddressBtn = document.getElementById("btn-add-address");
     const addressForm = document.getElementById("address-form");
     const modalTitle = document.getElementById("modal-title");
     const addressIdInput = document.getElementById("address-id");
-
-    const themeButton = document.getElementById("theme-button");
-    const darkTheme = "dark-theme";
-    const iconTheme = "bx-sun";
-
-    // Use a single localStorage key for theme and icon
-    const selectedTheme = localStorage.getItem("theme");
-    const selectedIcon = localStorage.getItem("theme-icon");
-
-    // Check current state
-    const getCurrentTheme = () =>
-      document.body.classList.contains(darkTheme) ? "dark" : "light";
-    const getCurrentIcon = () =>
-      themeButton.classList.contains(iconTheme) ? "bx-moon" : "bx-sun";
-
-    // Apply previously saved theme if it exists
-    if (selectedTheme) {
-      document.body.classList[selectedTheme === "dark" ? "add" : "remove"](
-        darkTheme
-      );
-      themeButton.classList[selectedIcon === "bx-moon" ? "add" : "remove"](
-        iconTheme
-      );
-    }
-
-    // Toggle theme on click and save to localStorage
-    function toggleTheme() {
-      document.body.classList.toggle(darkTheme);
-      localStorage.setItem("theme", getCurrentTheme());
-      localStorage.setItem("theme-icon", getCurrentIcon());
-    }
-
-    // Ensure theme is applied on page load
-    function applySavedTheme() {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark") {
-        document.body.classList.add(darkTheme);
-      } else {
-        document.body.classList.remove(darkTheme);
-      }
-    }
-
-    applySavedTheme();
-
-    if (themeButton) {
-      themeButton.addEventListener("click", toggleTheme);
-    } else {
-      console.error("Theme button not found in DOMContentLoaded");
-    }
 
     // Open modal for new address
     addAddressBtn.onclick = function () {
@@ -230,12 +171,10 @@ css %} {{ super() }}
       modal.style.display = "block";
     };
 
-    // Close address modal
+    // Close address modal on close button or outside click
     closeBtn.onclick = function () {
       modal.style.display = "none";
     };
-
-    // Close address modal when clicking outside
     window.onclick = function (event) {
       if (event.target == modal) {
         modal.style.display = "none";
@@ -256,7 +195,6 @@ css %} {{ super() }}
           },
           body: JSON.stringify(Object.fromEntries(formData)),
         });
-
         if (response.ok) {
           window.location.reload();
         } else {
@@ -275,7 +213,6 @@ css %} {{ super() }}
     const deleteConfirmBtn = document.getElementById("delete-confirm");
     let currentDeleteAddressId = null;
 
-    // Open delete modal on delete button click
     document.querySelectorAll(".btn-delete-address").forEach((button) => {
       button.onclick = function () {
         currentDeleteAddressId = this.dataset.addressId;
@@ -283,26 +220,26 @@ css %} {{ super() }}
       };
     });
 
-    // Cancel deletion
     deleteCancelBtn.onclick = function () {
       deleteModal.style.display = "none";
       currentDeleteAddressId = null;
     };
-
-    // Close delete modal when clicking the close button
     deleteCloseBtn.onclick = function () {
       deleteModal.style.display = "none";
       currentDeleteAddressId = null;
     };
-
-    // Confirm deletion
+    window.addEventListener("click", function (event) {
+      if (event.target == deleteModal) {
+        deleteModal.style.display = "none";
+        currentDeleteAddressId = null;
+      }
+    });
     deleteConfirmBtn.onclick = async function () {
       if (currentDeleteAddressId) {
         try {
           const response = await fetch(`/address/${currentDeleteAddressId}`, {
             method: "DELETE",
           });
-
           if (response.ok) {
             window.location.reload();
           } else {
@@ -318,14 +255,6 @@ css %} {{ super() }}
       }
     };
 
-    // Close delete modal when clicking outside its content
-    window.addEventListener("click", function (event) {
-      if (event.target == deleteModal) {
-        deleteModal.style.display = "none";
-        currentDeleteAddressId = null;
-      }
-    });
-
     // Handle set preferred address
     document.querySelectorAll(".btn-make-preferred").forEach((button) => {
       button.onclick = async function () {
@@ -334,7 +263,6 @@ css %} {{ super() }}
           const response = await fetch(`/address/${addressId}/set-preferred`, {
             method: "POST",
           });
-
           if (response.ok) {
             window.location.reload();
           } else {
@@ -347,38 +275,59 @@ css %} {{ super() }}
       };
     });
 
-    /*
-    // Handle edit address (commented out for now)
-    var customerId = "{{ current_user.id }}";
-    document.querySelectorAll('.btn-edit-address').forEach(button => {
-        button.onclick = async function() {
-            const addressId = this.dataset.addressId;
-            try {
-                const response = await fetch(`/address/${addressId}`, { method: "GET" });
-                const address = await response.json();
-                
-                modalTitle.textContent = 'Edit Address';
-                addressIdInput.value = addressId;
-                document.getElementById('address_line').value = address.address_line || '';
-                document.getElementById('city').value = address.city || '';
-                document.getElementById('state').value = address.state || '';
-                document.getElementById('zip_code').value = address.zip_code || '';
-                
-                modal.style.display = 'block';
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error loading address details');
-            }
-        }
-    });
-    */
-
     const themeButton = document.getElementById("theme-button");
+    const darkThemeClass = "dark-theme";
+    // Icon classes: in light mode, use bx-moon; in dark mode, use bx-sun
+    const lightIconClass = "bx-moon";
+    const darkIconClass = "bx-sun";
+
+    // Apply the saved theme from localStorage (default is "light")
+    function applySavedTheme() {
+      const storedTheme = localStorage.getItem("theme") || "light";
+      if (storedTheme === "dark") {
+        document.body.classList.add(darkThemeClass);
+        themeButton.classList.remove(lightIconClass);
+        themeButton.classList.add(darkIconClass);
+      } else {
+        document.body.classList.remove(darkThemeClass);
+        themeButton.classList.remove(darkIconClass);
+        themeButton.classList.add(lightIconClass);
+      }
+      // Ensure localStorage reflects the applied state
+      localStorage.setItem("theme", storedTheme);
+      localStorage.setItem(
+        "theme-icon",
+        document.body.classList.contains(darkThemeClass) ? darkIconClass : lightIconClass
+      );
+    }
+
+    // Toggle theme and update localStorage and icon classes
+    function toggleTheme() {
+      let currentTheme = localStorage.getItem("theme") || "light";
+      if (currentTheme === "light") {
+        document.body.classList.add(darkThemeClass);
+        themeButton.classList.remove(lightIconClass);
+        themeButton.classList.add(darkIconClass);
+        currentTheme = "dark";
+      } else {
+        document.body.classList.remove(darkThemeClass);
+        themeButton.classList.remove(darkIconClass);
+        themeButton.classList.add(lightIconClass);
+        currentTheme = "light";
+      }
+      localStorage.setItem("theme", currentTheme);
+      localStorage.setItem(
+        "theme-icon",
+        document.body.classList.contains(darkThemeClass) ? darkIconClass : lightIconClass
+      );
+    }
+
     if (themeButton) {
       themeButton.addEventListener("click", toggleTheme);
     } else {
       console.error("Theme button not found in DOMContentLoaded");
     }
+
     applySavedTheme();
   });
 </script>
