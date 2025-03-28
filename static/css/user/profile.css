@@ -222,3 +222,80 @@
   border-color: #4caf50;
   outline: none;
 }
+
+/* Existing Light Mode Styles Remain Unchanged */
+/* ... */
+
+/* ========== Dark Mode Overrides for Manual Toggle ========== */
+body.dark-theme .profile-container {
+  background: #1d2521;
+  color: #ffffff;
+}
+
+body.dark-theme .profile-header h1 {
+  color: #81c784;
+}
+
+body.dark-theme .profile-section {
+  background: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .user-info p {
+  color: #e0e0e0;
+}
+
+body.dark-theme .address-card {
+  border-color: #424242;
+  background: #242424;
+}
+
+body.dark-theme .address-card:hover,
+body.dark-theme .address-card.preferred {
+  border-color: #66bb6a;
+  background-color: #2e7d32;
+}
+
+body.dark-theme .preferred-badge {
+  background: #66bb6a;
+}
+
+body.dark-theme .address-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .btn-primary {
+  background: #66bb6a;
+}
+
+body.dark-theme .btn-primary:hover {
+  background: #388e3c;
+}
+
+body.dark-theme .modal-content {
+  background: #1e1e1e;
+  color: #ffffff;
+}
+
+body.dark-theme .close {
+  color: #ffffff;
+}
+
+body.dark-theme .close:hover {
+  color: #ff5252;
+}
+
+body.dark-theme .form-group label {
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-group input {
+  background: #2e2e2e;
+  border-color: #424242;
+  color: #ffffff;
+}
+
+body.dark-theme .form-group input:focus {
+  border-color: #66bb6a;
+}
+
