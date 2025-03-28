@@ -8,14 +8,11 @@ from werkzeug.utils import secure_filename
 
 from models import Address, Customer, DeliveryAgent, DeliveryFeedback, Earnings, Order, OrderItem
 
-
 def delivery_agent_routes(app, db):
     @app.route('/delivery-agent')
     def delivery_agent():
         # Get the delivery agent using the current user's delivery_agent_id.
-        print(current_user)
         agent = DeliveryAgent.query.get(current_user.delivery_agent_id)
-        print(agent)
         
         # Create a subquery that selects one address per customer.
         address_subquery = (
@@ -41,7 +38,7 @@ def delivery_agent_routes(app, db):
             )
             .join(Customer, Order.customer_id == Customer.customer_id)
             .outerjoin(address_subquery, address_subquery.c.customer_id == Customer.customer_id)
-            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Pending")
+            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Preparing")
             .all()
         )
 
@@ -51,35 +48,39 @@ def delivery_agent_routes(app, db):
                 Customer.customer_id.label("customer_id"),
                 Customer.username.label("customer_name"),
                 Customer.phone.label("customer_phone"),
-                Address.address_line.label("customer_address"),
+                address_subquery.c.customer_address,
                 Order.delivery_status.label("order_status"),
                 Order.total_price.label("order_total"),
                 Order.delivery_location.label("delivery_location"),
                 Order.created_at.label("order_date"),
             )
             .join(Customer, Order.customer_id == Customer.customer_id)
-            .outerjoin(Address, Address.customer_id == Customer.customer_id)
-            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Accepted")
-            .group_by(Order.order_id, Customer.customer_id, Address.address_line)
+            .outerjoin(address_subquery, address_subquery.c.customer_id == Customer.customer_id)
+            .filter(
+                Order.delivery_agent_id == current_user.delivery_agent_id,
+                Order.delivery_status == "Accepted"
+            )
             .all()
         )
-        
+
         completed_orders = (
             db.session.query(
                 Order.order_id.label("order_id"),
                 Customer.customer_id.label("customer_id"),
                 Customer.username.label("customer_name"),
                 Customer.phone.label("customer_phone"),
-                Address.address_line.label("customer_address"),
+                address_subquery.c.customer_address.label("customer_address"),
                 Order.delivery_status.label("order_status"),
                 Order.total_price.label("order_total"),
                 Order.delivery_location.label("delivery_location"),
                 Order.created_at.label("order_date"),
             )
             .join(Customer, Order.customer_id == Customer.customer_id)
-            .outerjoin(Address, Address.customer_id == Customer.customer_id)
-            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Delivered")
-            .group_by(Order.order_id, Customer.customer_id, Address.address_line)
+            .outerjoin(address_subquery, address_subquery.c.customer_id == Customer.customer_id)
+            .filter(
+                Order.delivery_agent_id == current_user.delivery_agent_id,
+                Order.delivery_status == "Delivered"
+            )
             .all()
         )
         
@@ -92,7 +93,7 @@ def delivery_agent_routes(app, db):
             .filter(
                 Order.delivery_agent_id == current_user.delivery_agent_id,
                 func.date(Order.created_at) == today,
-                or_(Order.delivery_status == "Delivered", Order.delivery_status == "Pending", Order.delivery_status == "Accepted")
+                or_(Order.delivery_status == "Delivered", Order.delivery_status == "Preparing", Order.delivery_status == "Accepted")
             )
             .count()
         )
@@ -100,7 +101,7 @@ def delivery_agent_routes(app, db):
         # Count total pending orders.
         pending_count = (
             db.session.query(Order)
-            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Pending")
+            .filter(Order.delivery_agent_id == current_user.delivery_agent_id, Order.delivery_status == "Preparing")
             .count()
         )
         
@@ -158,7 +159,7 @@ def delivery_agent_routes(app, db):
             db.session.query(Order)
             .options(
                 joinedload(Order.customer).joinedload(Customer.addresses),
-                joinedload(Order.items).joinedload(OrderItem.menu_item)
+                joinedload(Order.order_items).joinedload(OrderItem.menu_item)
             )
             .filter(
                 Order.delivery_agent_id == current_user.delivery_agent_id,
@@ -190,7 +191,7 @@ def delivery_agent_routes(app, db):
             db.session.query(Order)
             .options(
                 joinedload(Order.customer).joinedload(Customer.addresses),
-                joinedload(Order.items).joinedload(OrderItem.menu_item)
+                joinedload(Order.order_items).joinedload(OrderItem.menu_item)
             )
             .filter(
                 Order.delivery_agent_id == current_user.delivery_agent_id,
@@ -209,11 +210,11 @@ def delivery_agent_routes(app, db):
     def accept_order(order_id):
         order = Order.query.get_or_404(order_id)
         
-        if Order.delivery_status != "Pending":
+        # Check instance's status, not the class's attribute
+        if order.delivery_status != "Preparing":
             flash("Order already accepted.")
             return redirect(url_for("delivery_agent"))
         
-        Order.delivery_status = "Accepted"
         order.delivery_status = "Accepted"
         order.delivery_agent_id = current_user.delivery_agent_id
         db.session.commit()
@@ -226,11 +227,11 @@ def delivery_agent_routes(app, db):
     def decline_order(order_id):
         order = Order.query.get_or_404(order_id)
         
-        if Order.delivery_status != "Pending":
-            flash("Order already declined.")
+        if order.delivery_status != "Preparing":
+            flash("Order already declined or processed.")
             return redirect(url_for("delivery_agent"))
         
-        Order.delivery_status = "Declined"
+        order.delivery_status = "Pending"
         order.delivery_agent_id = None
         db.session.commit()
         
@@ -251,7 +252,6 @@ def delivery_agent_routes(app, db):
 
         order.delivery_status = new_status
         if new_status == "Delivered":
-            Order.delivery_status = "Delivered"
             order.delivered_at = func.now()
             
             base_pay_per_delivery = 50.0

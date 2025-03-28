@@ -233,13 +233,16 @@ def admin_routes(app, db):
         if not current_user.is_authenticated:
             return redirect(url_for('employee_login'))
         # Fetching charts (demo and database reflected)
+        selected_theme = request.cookies.get('selected-theme', 'light')
+        dark_mode = selected_theme.lower() == 'dark'
+        
         charts = []
-        Customer_Demographics_Distribution = generate_Customer_Demographics_Distribution()           # Demo data chart
-        Effectiveness_of_Promotions = generate_Effectiveness_of_Promotions()              # Demo data chart
-        line_chart_html = generate_line_chart()       # Data from the database
-        delivery_rating_bar = generate_agent_rating_chart()
-        monthly_retention_chart = generate_monthly_retention_chart()
-        customer_feedback_chart = generate_customer_feedback_chart()
+        Customer_Demographics_Distribution = generate_Customer_Demographics_Distribution(dark_mode)           # Demo data chart
+        Effectiveness_of_Promotions = generate_Effectiveness_of_Promotions(dark_mode)              # Demo data chart
+        line_chart_html = generate_line_chart(dark_mode)       # Data from the database
+        delivery_rating_bar = generate_agent_rating_chart(dark_mode)
+        monthly_retention_chart = generate_monthly_retention_chart(dark_mode)
+        customer_feedback_chart = generate_customer_feedback_chart(dark_mode)
 
         charts.append(customer_feedback_chart)
         charts.append(line_chart_html)

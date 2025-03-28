@@ -82,6 +82,7 @@ def customer_routes(app, db):
     @login_required
     def delivery_details():
         try:
+            # Fetch cart items for the current customer.
             cart_items = (
                 Cart.query
                 .join(MenuItem, Cart.menu_item_id == MenuItem.menu_item_id)
@@ -111,8 +112,8 @@ def customer_routes(app, db):
 
             if not cart_data:
                 return redirect(url_for('order'))  # Redirect back if cart is empty
-            
-            # Calculate totals
+
+            # Calculate totals.
             subtotal = 0
             total_discount = 0
             for item in cart_data:
@@ -120,10 +121,16 @@ def customer_routes(app, db):
                 item_discount = (item_total * item['discount_percentage']) / 100
                 subtotal += item_total
                 total_discount += item_discount
-                
+
             tax = (subtotal - total_discount) * 0.18  # 18% tax
             delivery_charge = 50.0
             total = subtotal - total_discount + tax + delivery_charge
+
+            # Fetch the customer's preferred address.
+            preferred_address = Address.query.filter_by(
+                customer_id=current_user.customer_id,
+                is_preferred=True
+            ).first()
 
             return render_template(
                 'user/delivery_details.html',
@@ -132,11 +139,13 @@ def customer_routes(app, db):
                 subtotal=subtotal - total_discount,
                 tax=tax,
                 delivery_charge=delivery_charge,
-                user=current_user
+                user=current_user,
+                address=preferred_address
             )
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+
         
     @app.route('/api/orders', methods=['POST'])
     @login_required

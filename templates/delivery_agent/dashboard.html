@@ -68,15 +68,7 @@
         </td>
         <td>{{ order.delivery_location }}</td>
         <td>
-          {% if order.order_status == "Pending" %}
-          <span class="status-value pending">{{ order.order_status }}</span>
-          {% elif order.order_status == "Completed" %}
-          <span class="status-value completed">{{ order.order_status }}</span>
-          {% elif order.order_status == "In Progress" %}
-          <span class="status-value in-progress">{{ order.order_status }}</span>
-          {% else %}
-          <span class="status-value">{{ order.order_status }}</span>
-          {% endif %}
+          <span class="status-value pending">Pending</span>
         </td>
         <td>
           <a
@@ -111,7 +103,7 @@
     <tbody>
       {% for order in assigned_orders %}
       <tr>
-        <td>OD{{ order.order_id }}</td>
+        <td>{{ order.order_id }}</td>
         <td>
           {{ (order.order_date + timedelta(minutes=30)).strftime('%Y-%m-%d
           %H:%M:%S') }}

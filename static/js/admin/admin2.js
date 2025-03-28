@@ -91,6 +91,7 @@ const showMenu = (toggleId, navId) => {
     localStorage.setItem("selected-theme", getCurrentTheme());
     localStorage.setItem("selected-icon", getCurrentIcon());
   });
+
   
   /*==================== SCROLL REVEAL ANIMATION ====================*/
   const sr = ScrollReveal({

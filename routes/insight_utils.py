@@ -9,7 +9,7 @@ from app import db
 import plotly.express as px
 
 
-def generate_Customer_Demographics_Distribution():
+def generate_Customer_Demographics_Distribution(dark_mode=False):
     # Query all addresses from the database
     addresses = Address.query.all()
 
@@ -58,14 +58,14 @@ def generate_Customer_Demographics_Distribution():
         showlegend=True,
         legend=dict(x=1, y=0.5),
         height=400,
+        template="plotly_dark" if dark_mode else "plotly_white",
     )
-
     # Generate HTML for embedding the chart
     chart_html = fig.to_html(full_html=False)
     return Markup(chart_html)
 
 
-def generate_line_chart():
+def generate_line_chart(dark_mode=False):
     agents = DeliveryAgent.query.all()
     agent_names = []
     early_counts = []
@@ -133,7 +133,7 @@ def generate_line_chart():
         xaxis=dict(title="Percentage"),
         yaxis=dict(title="Delivery Agent", categoryorder="total ascending"),
         barmode="stack",
-        template="plotly_white",
+        template="plotly_dark" if dark_mode else "plotly_white",
         bargap=0.05,
         height=400,
     )
@@ -141,7 +141,7 @@ def generate_line_chart():
     return Markup(fig.to_html(full_html=False))
 
 
-def generate_Effectiveness_of_Promotions():
+def generate_Effectiveness_of_Promotions(dark_mode=False):
     promotions = [
         "Discount",
         "Weekend offers",
@@ -168,14 +168,14 @@ def generate_Effectiveness_of_Promotions():
         title="Effectiveness of Promotions",
         xaxis=dict(title="Promotion Type"),
         yaxis=dict(title="Effectiveness (% Sales Increase)", range=[0, 50]),
-        template="plotly_white",
+        template="plotly_dark" if dark_mode else "plotly_white",
         height=400,
     )
 
     return Markup(fig.to_html(full_html=False))
 
 
-def generate_agent_rating_chart():
+def generate_agent_rating_chart(dark_mode=False):
     # Get all delivery agents and initialize a dictionary for ratings count
     agents = DeliveryAgent.query.all()
     agent_names = [agent.username for agent in agents]
@@ -220,14 +220,14 @@ def generate_agent_rating_chart():
         yaxis=dict(title="Number of Ratings", tickmode="linear", dtick=1),
         barmode="group",
         bargap=0.1,
-        template="plotly_white",
+        template="plotly_dark" if dark_mode else "plotly_white",
         height=400,
     )
 
     return Markup(fig.to_html(full_html=False))
 
 
-def generate_customer_feedback_chart():
+def generate_customer_feedback_chart(dark_mode=False):
     # Count ratings for each star value (1 to 5) from orders with feedback
     feedback_counts = {}
     for rating in range(1, 6):
@@ -259,14 +259,14 @@ def generate_customer_feedback_chart():
         title=f"Customer Feedback (Average Rating: {avg_rating:.2f} ⭐)",
         xaxis=dict(title="Ratings"),
         yaxis=dict(title="Number of Orders"),
-        template="plotly_white",
+        template="plotly_dark" if dark_mode else "plotly_white",
         height=400,
     )
 
     return Markup(fig.to_html(full_html=False))
 
 
-def generate_monthly_retention_chart():
+def generate_monthly_retention_chart(dark_mode=False):
     months = [
         "Jan",
         "Feb",
@@ -333,7 +333,7 @@ def generate_monthly_retention_chart():
         xaxis=dict(title="Months"),
         yaxis=dict(title="Retention Rate (%)", range=[0, 100]),
         height=400,
-        template="plotly_white",
+        template="plotly_dark" if dark_mode else "plotly_white",
     )
 
     return Markup(fig.to_html(full_html=False))
