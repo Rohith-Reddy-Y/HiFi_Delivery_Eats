@@ -264,6 +264,37 @@ def admin_routes(app, db):
         pending_agents = DeliveryAgent.query.filter_by(is_approved=False).all()
         accepted_agents = DeliveryAgent.query.filter_by(is_approved=True).all()
         
+        recent_orders = Order.query.filter(Order.delivery_status == "Delivered")\
+            .order_by(desc(Order.created_at)).limit(10).all()
+
+        recent_orders_list = []
+        for order in recent_orders:
+            # Build order items list
+            order_items_list = []
+            for item in order.order_items:
+                order_items_list.append({
+                    'menu_item_name': item.menu_item.name,
+                    'quantity': item.quantity
+                })
+            
+            # Calculate average delivery feedback rating, if available
+            if order.delivery_feedbacks:
+                avg_rating = sum(feedback.rating for feedback in order.delivery_feedbacks) / len(order.delivery_feedbacks)
+            else:
+                avg_rating = None
+            
+            recent_orders_list.append({
+                'order_id': order.order_id,
+                'customer_name': order.customer.username if order.customer else 'N/A',
+                'status': order.delivery_status,
+                'total_price': float(order.total_price),
+                'created_at': order.created_at.isoformat(),
+                'delivery_agent_id': order.delivery_agent_id or 'Not Assigned',
+                'order_items': order_items_list,
+                'avg_feedback': avg_rating  # Average rating from delivery feedbacks, if any
+            })
+
+        
         return render_template(
             'admin/dashboard.html',
             charts=charts,
@@ -273,7 +304,8 @@ def admin_routes(app, db):
             on_time_order_percentage=on_time_order_percentage,
             revenue_per_delivery=revenue_per_delivery,
             pending_agents=pending_agents,
-            accepted_agents=accepted_agents
+            accepted_agents=accepted_agents,
+            recent_orders=recent_orders_list
         )
         
     

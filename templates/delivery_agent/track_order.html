@@ -75,7 +75,7 @@
     <section class="order-items card">
       <h2>Ordered Items</h2>
       <ul id="itemList">
-        {% for item in order.items %}
+        {% for item in order.order_items %}
         <li>
           <span>{{ item.menu_item.name }} (x{{ item.quantity }})</span>
           <span>₹{{ '%.2f' | format(item.price * item.quantity) }}</span>
