@@ -219,8 +219,8 @@ HIFI Delivery Eats Team
                 if admin and bcrypt.check_password_hash(admin.password, password):
                     login_user(admin)
                     session['user_id'] = admin.get_id()
-                    print(current_user)
-                    return redirect(url_for('admin'))
+                    # print(current_user)
+                    return redirect(url_for('admin2'))
                 else:
                     flash('Invalid username or password', 'error')
                     return render_template('employee_login.html', message='Invalid username or password')
