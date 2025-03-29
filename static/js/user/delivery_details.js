@@ -37,59 +37,69 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Initialize Leaflet Map
-    let map, marker;
+    // Map Initialization and Functions
+    let map;
+    let marker;
+
     function initMap() {
-        // Ensure the map container is visible before initialization
-        const mapContainer = document.getElementById("map");
-        if (!mapContainer) {
-            console.error("Map container not found!");
+        const mapElement = document.getElementById("map");
+        if (!mapElement) {
+            console.error("Map container not found");
             return;
         }
 
-        // map = L.map("map").setView([12.9716, 77.5946], 12); // Default: Bengaluru
+        // Set default dimensions if not set
+        mapElement.style.height = mapElement.style.height || "400px";
+        mapElement.style.width = mapElement.style.width || "100%";
 
-        // Initialize map with explicit dimensions check
-        map = L.map(mapContainer, {
-            center: [28.5355, 77.3910], // Noida
-            zoom: 12,
-            scrollWheelZoom: false
-        });
+        try {
+            // Initialize map with default Bangalore coordinates
+            map = L.map("map").setView([28.5355, 77.3910], 12);
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
+            // Add tile layers
+            L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+                    attribution: "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+                }
+            ).addTo(map);
 
-        map.on("click", function (event) {
-            const lat = event.latlng.lat;
-            const lng = event.latlng.lng;
-            geocodeLatLng(lat, lng);
-            updateMarker(lat, lng);
-            document.getElementById("coordinates").value = `(${lat.toFixed(6)}, ${lng.toFixed(6)})`;
-        });
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                opacity: 0.5,
+            }).addTo(map);
 
-        // Robust map resizing function
-        function resizeMap() {
-            if (map) {
+            // Click handler for map
+            map.on("click", function (event) {
+                const lat = event.latlng.lat;
+                const lng = event.latlng.lng;
+                geocodeLatLng(lat, lng);
+                updateMarker(lat, lng);
+            });
+
+            // Ensure proper sizing
+            setTimeout(() => {
                 map.invalidateSize();
-                // Force a redraw of tiles
-                map.setView([28.5355, 77.3910], 12);
-            }
+            }, 300);
+        } catch (error) {
+            console.error("Map initialization error:", error);
         }
-
-        // Wait for animations and DOM to settle, then resize
-        setTimeout(resizeMap, 1000); // Increased to 1000ms to account for fadeIn (0.8s)
-        window.addEventListener("resize", resizeMap);
-
-        // Additional check after map loads
-        map.whenReady(() => {
-            setTimeout(resizeMap, 100); // Extra call after tiles load
-        });
     }
 
     function updateMarker(lat, lng) {
-        if (marker) map.removeLayer(marker);
-        marker = L.marker([lat, lng]).addTo(map);
-        map.setView([lat, lng], 15);
+        const redIcon = L.icon({
+            iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+            shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41],
+        });
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker([lat, lng], { icon: redIcon }).addTo(map);
     }
 
     function geocodeLatLng(lat, lng) {
@@ -104,34 +114,20 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((data) => {
                 if (data && data.address) {
                     const address = data.address;
-                    const street = address.road || address.street || "";
-                    const city =
-                        address.city ||
-                        address.city_district ||
-                        address.county ||
-                        address.town ||
-                        address.village ||
-                        address.suburb ||
-                        "";
-                    const state = address.state || "";
-                    const pincode = address.postcode || "";
-
-                    document.getElementById("street").value = street;
-                    document.getElementById("city").value = city;
-                    document.getElementById("state").value = state;
-                    document.getElementById("pincode").value = pincode;
+                    document.getElementById("street").value = address.road || address.street || "";
+                    document.getElementById("city").value =
+                        address.city || address.town || address.village || "";
+                    document.getElementById("state").value = address.state || "";
+                    document.getElementById("pincode").value = address.postcode || "";
                     document.getElementById("coordinates").value = `(${lat}, ${lng})`;
-                } else {
-                    showPopup("Error", "No address found for this location.");
                 }
             })
             .catch((error) => {
-                console.error("Reverse Geocoding error:", error);
-                showPopup("Error", "Failed to fetch address. Please try again.");
+                console.error("Geocoding error:", error);
             });
     }
 
-
+    
     // Popup functions
     function showPopup(title, message, isConfirm = false) {
         popupTitle.textContent = title;
@@ -194,17 +190,17 @@ document.addEventListener("DOMContentLoaded", function () {
             credentials: 'include',
             body: JSON.stringify(orderData)
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to place order');
-            return response.json();
-        })
-        .then(data => {
-            window.location.href = `/order_confirmation?order_id=${data.order_id}`;
-        })
-        .catch(error => {
-            console.error("Error placing order:", error);
-            showPopup("Error", "Failed to place order: " + error.message);
-        });
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to place order');
+                return response.json();
+            })
+            .then(data => {
+                window.location.href = `/order_confirmation?order_id=${data.order_id}`;
+            })
+            .catch(error => {
+                console.error("Error placing order:", error);
+                showPopup("Error", "Failed to place order: " + error.message);
+            });
     }
 
     // Event listeners
@@ -217,4 +213,5 @@ document.addEventListener("DOMContentLoaded", function () {
     updateOrderPreview();
     // updateCartCount();
     initMap();
+    
 });
