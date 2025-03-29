@@ -228,11 +228,11 @@ def generate_agent_rating_chart(dark_mode=False):
 
 
 def generate_customer_feedback_chart(dark_mode=False):
-    # Count ratings for each star value (1 to 5) from orders with feedback
+    # Count ratings for each star value (1 to 5) from DeliveryFeedback entries
     feedback_counts = {}
-    for rating in range(1, 6):
-        count = Order.query.filter_by(order_feedback=rating).count()
-        feedback_counts[rating] = count
+    for star in range(1, 6):
+        count = DeliveryFeedback.query.filter_by(rating=star).count()
+        feedback_counts[star] = count  
 
     ratings = list(feedback_counts.keys())
     counts = list(feedback_counts.values())
@@ -249,21 +249,23 @@ def generate_customer_feedback_chart(dark_mode=False):
         ]
     )
 
+    total_feedback = sum(counts)
     avg_rating = (
-        (sum(r * c for r, c in feedback_counts.items()) / sum(counts))
-        if sum(counts) > 0
+        (sum(star * count for star, count in feedback_counts.items()) / total_feedback)
+        if total_feedback > 0
         else 0
     )
 
     fig.update_layout(
         title=f"Customer Feedback (Average Rating: {avg_rating:.2f} ⭐)",
         xaxis=dict(title="Ratings"),
-        yaxis=dict(title="Number of Orders"),
+        yaxis=dict(title="Number of Feedbacks"),
         template="plotly_dark" if dark_mode else "plotly_white",
         height=400,
     )
 
     return Markup(fig.to_html(full_html=False))
+
 
 
 def generate_monthly_retention_chart(dark_mode=False):
