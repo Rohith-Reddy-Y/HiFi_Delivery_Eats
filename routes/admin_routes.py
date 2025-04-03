@@ -532,7 +532,7 @@ def admin_routes(app, db):
             subcategory_name = data.get("subcategory")
             discount = float(data.get("discount", 0))
             best_seller = data.get("best_seller", "no").lower() in ["yes", "true", "1"]
-            stock_available = int(data.get("stock-available", 0))
+            stock_available = int(data.get("stock_available", 100))
             is_out_of_stock = stock_available == 0
             
             # Validate required fields
