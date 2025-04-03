@@ -15,7 +15,7 @@ HIFI Delivery is a comprehensive delivery management system designed to streamli
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/HIFIDelivery.git
+    git clone https://github.com/Pawanverma9660/HIFIDelivery.git
     cd HIFIDelivery
     ```
 
