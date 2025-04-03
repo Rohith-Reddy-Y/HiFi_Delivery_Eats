@@ -268,6 +268,7 @@
         padding: 25px;
         background: #fff;
         border-top: 1px solid #ddd;
+        width: 100vh;
         transition: background 0.3s, border-color 0.3s;
         /* Smooth transition for dark mode */
     }
@@ -607,7 +608,7 @@
 
 
             <div class="payment-section">
-                <h3 class="section-title">Payment Method</h3>
+                <div><h3 class="section-title">Payment Method</h3></div>
                 <div class="payment-options">
                     <div class="payment-option">
                         <input type="radio" name="payment" id="cash" value="cod" checked />
@@ -618,9 +619,9 @@
           <label for="online">Online Payment</label>
         </div> -->
                 </div>
-            </div>
-            <div class="confirm-section">
-                <button id="confirm-order-btn" class="confirm-btn">Confirm Order</button>
+                <div class="confirm-section">
+                    <button id="confirm-order-btn" class="confirm-btn">Confirm Order</button>
+                </div>
             </div>
         </div>
 
