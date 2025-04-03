@@ -404,14 +404,6 @@ document.addEventListener("DOMContentLoaded",async function () {
     await fetchRecommendations();
     updateCartCount();
     
-    const themeButton = document.getElementById("theme-button");
-    if (themeButton) {
-      themeButton.addEventListener("click", toggleTheme);
-    } else {
-      console.error("Theme button not found in DOMContentLoaded");
-    }
-    applySavedTheme();
-
     const searchInput = document.querySelector(".search-input");
     const vegNonVegFilter = document.getElementById("veg-nonveg-filter");
     const subCategoryFilter = document.getElementById("sub-category");
@@ -505,4 +497,12 @@ document.addEventListener("DOMContentLoaded",async function () {
     searchInput?.addEventListener("input", applyFilters);
     vegNonVegFilter?.addEventListener("change", applyFilters);
     subCategoryFilter?.addEventListener("change", applyFilters);
+
+    const themeButton = document.getElementById("theme-button");
+    if (themeButton) {
+      themeButton.addEventListener("click", toggleTheme);
+    } else {
+      console.error("Theme button not found in DOMContentLoaded");
+    }
+    applySavedTheme();
   });
