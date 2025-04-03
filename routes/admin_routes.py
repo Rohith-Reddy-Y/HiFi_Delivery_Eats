@@ -244,11 +244,12 @@ def admin_routes(app, db):
         monthly_retention_chart = generate_monthly_retention_chart(dark_mode)
         customer_feedback_chart = generate_customer_feedback_chart(dark_mode)
 
+        charts.append(Customer_Demographics_Distribution)
         charts.append(customer_feedback_chart)
         charts.append(line_chart_html)
         charts.append(delivery_rating_bar)
         charts.append(monthly_retention_chart)
-        charts.append(Customer_Demographics_Distribution)
+        
         charts.append(Effectiveness_of_Promotions)
 
         # Compute analysis statistics with optimized queries:
@@ -257,6 +258,10 @@ def admin_routes(app, db):
         return_refund_percentage = calculate_return_refund_statistics()
         on_time_order_percentage = calculate_on_time_order_percentage()
         revenue_per_delivery = calculate_revenue_per_delivery()
+        delivered_orders = db.session.query(func.count(Order.order_id)).filter(Order.delivery_status == "Delivered").scalar()
+        total_revenue = db.session.query(func.sum(Order.total_price)).scalar() or 0.0
+        total_orders = db.session.query(func.count(Order.order_id)).scalar()
+            
         
         
         
@@ -305,7 +310,10 @@ def admin_routes(app, db):
             revenue_per_delivery=revenue_per_delivery,
             pending_agents=pending_agents,
             accepted_agents=accepted_agents,
-            recent_orders=recent_orders_list
+            recent_orders=recent_orders_list,
+            delivered_orders=delivered_orders,
+            total_revenue=total_revenue,
+            total_orders=total_orders
         )
         
     
