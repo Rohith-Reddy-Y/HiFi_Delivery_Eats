@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # HIFI Delivery
 
 HIFI Delivery is a comprehensive delivery management system designed to streamline the process of managing delivery agents, orders, and customer interactions. This project is built using Flask, SQLAlchemy, and other modern web technologies.
@@ -68,3 +69,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 
 For any inquiries or support, please contact us at support@hifidelivery.com.
+=======
+# HiFi_Delivery_Eats
+HiFi Delivery Eats is a fine-dining delivery platform that connects restaurants, customers, and delivery agents for a seamless ordering experience. It streamlines menu browsing, order placement, payment processing, and real-time tracking, ensuring efficient and high-quality food delivery.
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88

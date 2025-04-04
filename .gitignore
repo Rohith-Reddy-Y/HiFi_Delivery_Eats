@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
 # Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,flask,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,flask,python
@@ -9,6 +10,8 @@
 # .enva
 
 ### Flask.Python Stack ###
+=======
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -73,7 +76,12 @@ db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
+<<<<<<< HEAD
 # instance/
+=======
+instance/
+.webassets-cache
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88
 
 # Scrapy stuff:
 .scrapy
@@ -116,8 +124,15 @@ ipython_config.py
 #pdm.lock
 #   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
 #   in version control.
+<<<<<<< HEAD
 #   https://pdm.fming.dev/#use-with-ide
 .pdm.toml
+=======
+#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
+.pdm.toml
+.pdm-python
+.pdm-build/
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
@@ -130,6 +145,10 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+<<<<<<< HEAD
+=======
+.env
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88
 .venv
 env/
 venv/
@@ -168,6 +187,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+<<<<<<< HEAD
 ### Python ###
 # Byte-compiled / optimized / DLL files
 
@@ -310,3 +330,8 @@ $RECYCLE.BIN/
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 research.ipynb
+=======
+my_help.txt
+research/
+create_structure.py
+>>>>>>> 9854de8e974d770f1eae69ef1a48053bf2d24d88
