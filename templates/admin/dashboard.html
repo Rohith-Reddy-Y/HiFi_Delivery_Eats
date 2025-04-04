@@ -312,17 +312,24 @@ block content %}{% endblock content %} {%block content2 %}
         </div>
       </div>
       <div class="stat-card">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-shopping-cart"></i>
         <div class="stat-info">
-          <h2>Delivery Partner Performance</h2>
-          <span class="stat-number">{{ delivery_partner_performance }}%</span>
+          <h2>Total Orders</h2>
+          <span class="stat-number">{{ total_orders }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-handshake"></i>
+        <div class="stat-info">
+          <h2>Total Order Delivered</h2>
+          <span class="stat-number">{{ delivered_orders }}</span>
         </div>
       </div>
       <div class="stat-card">
         <i class="fas fa-chart-line"></i>
         <div class="stat-info">
-          <h2>Revenue Per Delivery</h2>
-          <span class="stat-number">₹ {{ revenue_per_delivery }}</span>
+          <h2>Total Revenue</h2>
+          <span class="stat-number">₹ {{ total_revenue }}</span>
         </div>
       </div>
     </div>

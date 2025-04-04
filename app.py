@@ -148,7 +148,7 @@ def create_app():
 
     # Initialize and start the scheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(apply_scheduled_updates, 'interval', minutes=100)
+    scheduler.add_job(apply_scheduled_updates, 'interval', minutes=1)
     scheduler.start()
 
     # Ensure scheduler shuts down when app exits

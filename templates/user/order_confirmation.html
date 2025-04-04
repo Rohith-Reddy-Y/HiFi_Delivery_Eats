@@ -749,7 +749,7 @@
     const cartItems = {{ cart_items_json | safe }} || [];
     const agentData = {{ agent_json | safe }};
     let hasFeedback = {{ has_feedback | tojson }};  // Pass has_feedback from Flask
-    const TOTAL_DELIVERY_TIME_MINUTES = 0.5;
+    const TOTAL_DELIVERY_TIME_MINUTES = 15;
     const TOTAL_DELIVERY_TIME_SECONDS = TOTAL_DELIVERY_TIME_MINUTES * 60;
     let estimatedSeconds = TOTAL_DELIVERY_TIME_SECONDS;
     let timerInterval;
@@ -880,6 +880,7 @@
 
         arrivalTimeElement.innerText = `${Math.floor(TOTAL_DELIVERY_TIME_SECONDS / 60)}min:${(TOTAL_DELIVERY_TIME_SECONDS % 60).toString().padStart(2, '0')}sec | ${deliveryDateStr} [${currentTimeStr} - ${deliveryTimeStr} IST]`;
 
+        /*
         timerInterval = setInterval(() => {
             estimatedSeconds--;
             if (estimatedSeconds < 0) {
@@ -895,6 +896,7 @@
 
             arrivalTimeElement.innerText = `${minutesLeft}min:${secondsLeft.toString().padStart(2, '0')}sec | ${deliveryDateStr} [${currentTimeStr} - ${deliveryTimeStr} IST]`;
         }, 1000);
+        */
     }
 
     function getStatusBadgeClass(status) {
